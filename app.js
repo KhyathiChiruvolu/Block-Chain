@@ -1,8 +1,11 @@
 /**
- * Consensus Algorithms in Blockchain — A Comparative Explorer
- * Core Application Logic & Interactive State Management
+ * Consensus Algorithms in Blockchain — Immersive Website
+ * Complete Application Logic with Canvas Mimicking Animations
  */
-// 1. Data Definitions for Consensus Algorithms
+
+// ==========================================================================
+// 1. DATA DEFINITIONS (PRESERVED)
+// ==========================================================================
 const algorithmsData = {
     pow: {
         id: "pow",
@@ -18,49 +21,16 @@ const algorithmsData = {
             stake: "ASIC hardware + heavy electricity cost"
         },
         steps: [
-            {
-                title: "Transaction Broadcast",
-                desc: "Users sign and submit transactions. These are broadcast to the peer-to-peer network and wait in a temporary storage pool (mempool)."
-            },
-            {
-                title: "Puzzle Competition",
-                desc: "Mining nodes aggregate transactions into a candidate block. They repeatedly hash the block header with a changing variable ('nonce') trying to get an output below the target threshold."
-            },
-            {
-                title: "Block Broadcast",
-                desc: "The first miner to find a valid nonce instantly broadcasts their solution and candidate block to the rest of the network."
-            },
-            {
-                title: "Consensus Verification",
-                desc: "Other nodes receive the block, verify that all transactions are valid (no double-spend), and run a single hash to verify the miner's work proof."
-            },
-            {
-                title: "Reward & Confirmation",
-                desc: "If verified, nodes add the block to their local chain and start mining the next block. The miner receives native block rewards and fees. Finality increases with each added block."
-            }
+            { title: "Transaction Broadcast", desc: "Users sign and submit transactions. These are broadcast to the peer-to-peer network and wait in a temporary storage pool (mempool)." },
+            { title: "Puzzle Competition", desc: "Mining nodes aggregate transactions into a candidate block. They repeatedly hash the block header with a changing variable ('nonce') trying to get an output below the target threshold." },
+            { title: "Block Broadcast", desc: "The first miner to find a valid nonce instantly broadcasts their solution and candidate block to the rest of the network." },
+            { title: "Consensus Verification", desc: "Other nodes receive the block, verify that all transactions are valid (no double-spend), and run a single hash to verify the miner's work proof." },
+            { title: "Reward & Confirmation", desc: "If verified, nodes add the block to their local chain and start mining the next block. The miner receives native block rewards and fees. Finality increases with each added block." }
         ],
         blockchains: [
-            {
-                name: "Bitcoin",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Bitcoin values absolute decentralisation and censorship resistance above speed. PoW's heavy capital and energy expenditures make the network highly secure and resistant to nation-state level tampering.",
-                languages: ["Bitcoin Script (Non-Turing complete stack language)"]
-            },
-            {
-                name: "Litecoin",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Uses the Scrypt PoW algorithm. Litecoin was designed as a 'silver' complement to Bitcoin, offering 2.5-minute block times for quicker retail transactions.",
-                languages: ["Bitcoin Script"]
-            },
-            {
-                name: "Rootstock",
-                layer: "Layer 2 (Bitcoin Scaling)",
-                layerType: "L2",
-                rationale: "A sidechain providing EVM-compatible smart contracts. It uses 'Merged Mining' PoW, allowing Bitcoin miners to validate Rootstock blocks simultaneously without additional energy consumption.",
-                languages: ["Solidity", "Vyper", "Yul"]
-            }
+            { name: "Bitcoin", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Bitcoin values absolute decentralisation and censorship resistance above speed. PoW's heavy capital and energy expenditures make the network highly secure and resistant to nation-state level tampering.", languages: ["Bitcoin Script (Non-Turing complete stack language)"] },
+            { name: "Litecoin", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses the Scrypt PoW algorithm. Litecoin was designed as a 'silver' complement to Bitcoin, offering 2.5-minute block times for quicker retail transactions.", languages: ["Bitcoin Script"] },
+            { name: "Rootstock", layer: "Layer 2 (Bitcoin Scaling)", layerType: "L2", rationale: "A sidechain providing EVM-compatible smart contracts. It uses 'Merged Mining' PoW, allowing Bitcoin miners to validate Rootstock blocks simultaneously without additional energy consumption.", languages: ["Solidity", "Vyper", "Yul"] }
         ]
     },
     pos: {
@@ -77,49 +47,16 @@ const algorithmsData = {
             stake: "32 ETH (Ethereum) / 0.1 ADA (Cardano)"
         },
         steps: [
-            {
-                title: "Collateral Registration",
-                desc: "Users deposit and lock native currency into a smart contract (e.g. 32 ETH) to register as validator nodes in the network."
-            },
-            {
-                title: "Proposer Selection",
-                desc: "At the start of each time slot, an on-chain randomizer selects a validator to propose the next block. Probability scales with total stake value."
-            },
-            {
-                title: "Attestation Phase",
-                desc: "A randomly selected committee of other validators verifies the proposed block and 'attests' (votes) that it is valid and belongs to the canonical chain."
-            },
-            {
-                title: "Consensus & Settlement",
-                desc: "When a supermajority (2/3 of active stake) attestations are gathered, the block is finalized and settled permanently into the ledger."
-            },
-            {
-                title: "Yield & Slashing",
-                desc: "Honest validators earn staking yields (issuance + fees). Violators who sign conflicting blocks have their stake slashed and are ejected."
-            }
+            { title: "Collateral Registration", desc: "Users deposit and lock native currency into a smart contract (e.g. 32 ETH) to register as validator nodes in the network." },
+            { title: "Proposer Selection", desc: "At the start of each time slot, an on-chain randomizer selects a validator to propose the next block. Probability scales with total stake value." },
+            { title: "Attestation Phase", desc: "A randomly selected committee of other validators verifies the proposed block and 'attests' (votes) that it is valid and belongs to the canonical chain." },
+            { title: "Consensus & Settlement", desc: "When a supermajority (2/3 of active stake) attestations are gathered, the block is finalized and settled permanently into the ledger." },
+            { title: "Yield & Slashing", desc: "Honest validators earn staking yields (issuance + fees). Violators who sign conflicting blocks have their stake slashed and are ejected." }
         ],
         blockchains: [
-            {
-                name: "Ethereum",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Transitioned from PoW to PoS (The Merge) in 2022 to decrease energy consumption by 99.95%, support decentralized liquid staking, and secure settlement for Layer 2 rollups.",
-                languages: ["Solidity", "Vyper", "Yul"]
-            },
-            {
-                name: "Cardano",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Uses the Ouroboros PoS protocol. Cardano uses a liquid staking model where users can delegate voting weight without locking up their native ADA tokens, promoting open delegation.",
-                languages: ["Plutus (Haskell-based)", "Aiken", "Marlowe"]
-            },
-            {
-                name: "Arbitrum",
-                layer: "Layer 2 (Ethereum Rollup)",
-                layerType: "L2",
-                rationale: "An optimistic rollup that processes computations off-chain, then settles data batches directly to Ethereum L1, inheriting Ethereum's robust PoS security model.",
-                languages: ["Solidity", "Vyper"]
-            }
+            { name: "Ethereum", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Transitioned from PoW to PoS (The Merge) in 2022 to decrease energy consumption by 99.95%, support decentralized liquid staking, and secure settlement for Layer 2 rollups.", languages: ["Solidity", "Vyper", "Yul"] },
+            { name: "Cardano", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses the Ouroboros PoS protocol. Cardano uses a liquid staking model where users can delegate voting weight without locking up their native ADA tokens, promoting open delegation.", languages: ["Plutus (Haskell-based)", "Aiken", "Marlowe"] },
+            { name: "Arbitrum", layer: "Layer 2 (Ethereum Rollup)", layerType: "L2", rationale: "An optimistic rollup that processes computations off-chain, then settles data batches directly to Ethereum L1, inheriting Ethereum's robust PoS security model.", languages: ["Solidity", "Vyper"] }
         ]
     },
     poh: {
@@ -136,35 +73,14 @@ const algorithmsData = {
             stake: "High hardware requirements + voting gas fee"
         },
         steps: [
-            {
-                title: "Sequential VDF Hashing",
-                desc: "A leader node runs a continuous SHA-256 loop. Because it is single-threaded, it provides a reliable, cryptographically verifiable 'clock'."
-            },
-            {
-                title: "Transaction Timestamping",
-                desc: "As transactions arrive at the leader node, they are combined with the current VDF hash, fixing their exact sequential position in time."
-            },
-            {
-                title: "Pipelined Distribution",
-                desc: "The leader broadcasts the transaction stream in fragments to other validators before the block is even fully created."
-            },
-            {
-                title: "Parallel Verification",
-                desc: "Validators use multi-core GPUs to verify the VDF proofs in parallel, validating the timing sequence faster than it took to generate."
-            },
-            {
-                title: "Tower BFT Agreement",
-                desc: "Validators execute a modified PBFT vote (Tower BFT) backed by PoS weights to lock in and finalize the sequenced ledger."
-            }
+            { title: "Sequential VDF Hashing", desc: "A leader node runs a continuous SHA-256 loop. Because it is single-threaded, it provides a reliable, cryptographically verifiable 'clock'." },
+            { title: "Transaction Timestamping", desc: "As transactions arrive at the leader node, they are combined with the current VDF hash, fixing their exact sequential position in time." },
+            { title: "Pipelined Distribution", desc: "The leader broadcasts the transaction stream in fragments to other validators before the block is even fully created." },
+            { title: "Parallel Verification", desc: "Validators use multi-core GPUs to verify the VDF proofs in parallel, validating the timing sequence faster than it took to generate." },
+            { title: "Tower BFT Agreement", desc: "Validators execute a modified PBFT vote (Tower BFT) backed by PoS weights to lock in and finalize the sequenced ledger." }
         ],
         blockchains: [
-            {
-                name: "Solana",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Solana couples PoH with PoS to eliminate block time coordination overhead, facilitating high-frequency trading and sub-second transaction settle speeds directly on Layer 1.",
-                languages: ["Rust", "C", "C++ (using Anchor framework)"]
-            }
+            { name: "Solana", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Solana couples PoH with PoS to eliminate block time coordination overhead, facilitating high-frequency trading and sub-second transaction settle speeds directly on Layer 1.", languages: ["Rust", "C", "C++ (using Anchor framework)"] }
         ]
     },
     dpos: {
@@ -181,42 +97,15 @@ const algorithmsData = {
             stake: "No minimum to vote; high backing required to be elected"
         },
         steps: [
-            {
-                title: "Continuous Voting",
-                desc: "Token holders vote for delegate candidates by locking up their native tokens. One token equals one vote weight."
-            },
-            {
-                title: "Representative Selection",
-                desc: "The votes are tallied. The top-ranking nodes (e.g. 27 on Tron) are designated as the active block producers."
-            },
-            {
-                title: "Round-Robin Scheduling",
-                desc: "A slot scheduler assigns block creation duties to the active delegates in a rotating sequence."
-            },
-            {
-                title: "Rapid Attestation",
-                desc: "The assigned delegate bundles transactions and signs the block. The remaining active delegates verify and approve the block rapidly."
-            },
-            {
-                title: "Democratic Demotion",
-                desc: "If a delegate goes offline or signs fraudulent data, voters withdraw votes, automatically replacing them with an honest candidate in the next epoch."
-            }
+            { title: "Continuous Voting", desc: "Token holders vote for delegate candidates by locking up their native tokens. One token equals one vote weight." },
+            { title: "Representative Selection", desc: "The votes are tallied. The top-ranking nodes (e.g. 27 on Tron) are designated as the active block producers." },
+            { title: "Round-Robin Scheduling", desc: "A slot scheduler assigns block creation duties to the active delegates in a rotating sequence." },
+            { title: "Rapid Attestation", desc: "The assigned delegate bundles transactions and signs the block. The remaining active delegates verify and approve the block rapidly." },
+            { title: "Democratic Demotion", desc: "If a delegate goes offline or signs fraudulent data, voters withdraw votes, automatically replacing them with an honest candidate in the next epoch." }
         ],
         blockchains: [
-            {
-                name: "Tron",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Uses 27 Super Representatives. The high-speed turn rotation allows Tron to process high volumes of USDT stablecoin transfers with negligible network fees.",
-                languages: ["Solidity (Tron Virtual Machine - TVM)"]
-            },
-            {
-                name: "EOS",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Relies on 21 Block Producers. EOS targets enterprise application scaling, using DPoS to offer account creation and fee-less smart contract interactions.",
-                languages: ["C++"]
-            }
+            { name: "Tron", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses 27 Super Representatives. The high-speed turn rotation allows Tron to process high volumes of USDT stablecoin transfers with negligible network fees.", languages: ["Solidity (Tron Virtual Machine - TVM)"] },
+            { name: "EOS", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Relies on 21 Block Producers. EOS targets enterprise application scaling, using DPoS to offer account creation and fee-less smart contract interactions.", languages: ["C++"] }
         ]
     },
     poa: {
@@ -233,49 +122,16 @@ const algorithmsData = {
             stake: "Governance vetting + professional hardware hosting"
         },
         steps: [
-            {
-                title: "Vetting & KYC Check",
-                desc: "Individuals or organizations undergo rigorous identity, background, and legal checks to establish accountability."
-            },
-            {
-                title: "Authority Whitelisting",
-                desc: "The governing council adds the approved node's cryptographic key to the active validator whitelist."
-            },
-            {
-                title: "Block Generation",
-                desc: "Validators take turns proposing blocks in a deterministic rotation, reducing latency and communication overhead."
-            },
-            {
-                title: "Signature Authentication",
-                desc: "Consensus is achieved when other whitelisted nodes verify the proposer's digital signature and append the block."
-            },
-            {
-                title: "Council Revocation",
-                desc: "If a validator acts maliciously, the governing council revokes their credentials and keys, instantly removing them from consensus."
-            }
+            { title: "Vetting & KYC Check", desc: "Individuals or organizations undergo rigorous identity, background, and legal checks to establish accountability." },
+            { title: "Authority Whitelisting", desc: "The governing council adds the approved node's cryptographic key to the active validator whitelist." },
+            { title: "Block Generation", desc: "Validators take turns proposing blocks in a deterministic rotation, reducing latency and communication overhead." },
+            { title: "Signature Authentication", desc: "Consensus is achieved when other whitelisted nodes verify the proposer's digital signature and append the block." },
+            { title: "Council Revocation", desc: "If a validator acts maliciously, the governing council revokes their credentials and keys, instantly removing them from consensus." }
         ],
         blockchains: [
-            {
-                name: "BNB Chain",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Uses a hybrid Proof of Staked Authority (PoSA). BNB Chain relies on a small validator set (currently ~40) to offer fast, cheap EVM-compatible execution.",
-                languages: ["Solidity", "Vyper"]
-            },
-            {
-                name: "VeChain",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Uses PoA 2.0. VeChain tracks global supply chains and requires predictable enterprise transaction fees, secured by vetted Authority Masternodes.",
-                languages: ["Solidity"]
-            },
-            {
-                name: "Base",
-                layer: "Layer 2 (Ethereum Rollup)",
-                layerType: "L2",
-                rationale: "An optimistic rollup operated by Coinbase. It initially relies on a centralized PoA sequencer to execute and batch transactions before decentralizing.",
-                languages: ["Solidity"]
-            }
+            { name: "BNB Chain", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses a hybrid Proof of Staked Authority (PoSA). BNB Chain relies on a small validator set (currently ~40) to offer fast, cheap EVM-compatible execution.", languages: ["Solidity", "Vyper"] },
+            { name: "VeChain", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses PoA 2.0. VeChain tracks global supply chains and requires predictable enterprise transaction fees, secured by vetted Authority Masternodes.", languages: ["Solidity"] },
+            { name: "Base", layer: "Layer 2 (Ethereum Rollup)", layerType: "L2", rationale: "An optimistic rollup operated by Coinbase. It initially relies on a centralized PoA sequencer to execute and batch transactions before decentralizing.", languages: ["Solidity"] }
         ]
     },
     pbft: {
@@ -292,46 +148,45 @@ const algorithmsData = {
             stake: "Low hardware + peer trust inclusion"
         },
         steps: [
-            {
-                title: "Trust Configuration",
-                desc: "Each node defines its own subset of trusted peers (a 'Quorum Slice'). Nodes build decentralized networks of trust."
-            },
-            {
-                title: "Nomination Phase",
-                desc: "Nodes propose candidate transactions for a ledger slot and broadcast their choices to peers in their quorum slices."
-            },
-            {
-                title: "Ballot Selection",
-                desc: "Nodes vote on candidates, checking if a quorum of peers agrees. If a consensus slice matches, the ballot is prepared."
-            },
-            {
-                title: "Commit Phase",
-                desc: "Nodes commit to the agreed-upon ballot and verify that their trusted peers have committed to the same ledger modifications."
-            },
-            {
-                title: "Final Externalization",
-                desc: "The transaction set is finalized. Once a node's quorum slice reaches agreement, it updates its local ledger instantly."
-            }
+            { title: "Trust Configuration", desc: "Each node defines its own subset of trusted peers (a 'Quorum Slice'). Nodes build decentralized networks of trust." },
+            { title: "Nomination Phase", desc: "Nodes propose candidate transactions for a ledger slot and broadcast their choices to peers in their quorum slices." },
+            { title: "Ballot Selection", desc: "Nodes vote on candidates, checking if a quorum of peers agrees. If a consensus slice matches, the ballot is prepared." },
+            { title: "Commit Phase", desc: "Nodes commit to the agreed-upon ballot and verify that their trusted peers have committed to the same ledger modifications." },
+            { title: "Final Externalization", desc: "The transaction set is finalized. Once a node's quorum slice reaches agreement, it updates its local ledger instantly." }
         ],
         blockchains: [
-            {
-                name: "Stellar",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Uses the Stellar Consensus Protocol (SCP) — an FBA model. Stellar targets cross-border asset tokenization and remittance, requiring sub-second finality.",
-                languages: ["Rust (Soroban Smart Contracts)", "JavaScript", "Python", "Go (SDKs)"]
-            },
-            {
-                name: "Ripple",
-                layer: "Layer 1 (Base Chain)",
-                layerType: "L1",
-                rationale: "Uses the Ripple Protocol Consensus Algorithm (RPCA). It relies on a Unique Node List (UNL) of trusted validators to settle global banking payments.",
-                languages: ["C++ (XRPL Hooks)"]
-            }
+            { name: "Stellar", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses the Stellar Consensus Protocol (SCP) — an FBA model. Stellar targets cross-border asset tokenization and remittance, requiring sub-second finality.", languages: ["Rust (Soroban Smart Contracts)", "JavaScript", "Python", "Go (SDKs)"] },
+            { name: "Ripple", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses the Ripple Protocol Consensus Algorithm (RPCA). It relies on a Unique Node List (UNL) of trusted validators to settle global banking payments.", languages: ["C++ (XRPL Hooks)"] }
+        ]
+    },
+    pob: {
+        id: "pob",
+        name: "Proof of Burn",
+        acronym: "PoB",
+        tagline: "Security through provable token destruction",
+        description: "Proof of Burn is a consensus mechanism where validators demonstrate commitment by permanently destroying (burning) cryptocurrency tokens by sending them to a verifiably unspendable address. The more tokens a validator burns, the higher their probability of being selected to mine the next block. This creates a long-term economic commitment without the energy waste of PoW, as the burned tokens represent 'virtual mining rigs' that cannot be recovered.",
+        scores: { scalability: 5.0, security: 6.5, decentralisation: 6.0 },
+        specs: {
+            blockTime: "10 mins (Slimcoin)",
+            tps: "10 - 50 TPS",
+            nodes: "~50 - 200 validators",
+            stake: "Permanent token burn (irreversible cost)"
+        },
+        steps: [
+            { title: "Token Acquisition", desc: "Participants acquire native tokens from the open market or through prior mining/staking rewards." },
+            { title: "Burn Transaction", desc: "Validators send tokens to a provably unspendable address (e.g., 0x000...dead). The transaction is recorded on-chain as proof of burn." },
+            { title: "Virtual Mining Power", desc: "The protocol assigns virtual mining power proportional to the amount of tokens burned. More burns = higher probability of block selection." },
+            { title: "Block Selection", desc: "A weighted random selection picks the next block producer based on cumulative burn history and a decay function over time." },
+            { title: "Reward & Decay", desc: "The selected validator creates the block and earns rewards. Burn power gradually decays, requiring periodic re-burning to maintain position." }
+        ],
+        blockchains: [
+            { name: "Slimcoin", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "The first cryptocurrency to implement Proof of Burn. Uses a hybrid PoW/PoS/PoB model where burning coins creates long-term virtual mining power.", languages: ["C++ (Bitcoin Core fork)"] },
+            { name: "Counterparty", layer: "Layer 2 (Bitcoin Metaprotocol)", layerType: "L2", rationale: "Used PoB in its genesis — 2,130 BTC were permanently burned to create XCP tokens, ensuring a fair distribution with no pre-mine.", languages: ["Python", "Bitcoin Script (OP_RETURN)"] }
         ]
     }
 };
-// 2. Compatibility Heatmap Dataset
+
+// Compatibility Heatmap Dataset
 const blockchainsList = ["Bitcoin", "Litecoin", "Ethereum", "Cardano", "Solana", "BNB Chain", "Stellar", "Arbitrum"];
 const compatibilityMap = {
     "Bitcoin": {
@@ -370,7 +225,7 @@ const compatibilityMap = {
         "Ethereum": { status: "Compatible", detail: "Both use Proof of Stake (PoS). Validator signatures can be read to build decentralized bridges." },
         "Cardano": { status: "Compatible", detail: "Same protocol (PoS). Self-compatible." },
         "Solana": { status: "Incompatible", detail: "PoS vs PoH+PoS. Requires cross-chain oracle nodes to relay state data." },
-        "BNB Chain": { status: "Compatible", detail: "PoS vs PoSA. Staking architectures align; requires relayers to map Cardano's UTXO and BNB's Account models." },
+        "BNB Chain": { status: "Compatible", detail: "PoSA vs PoS. Staking architectures align; requires relayers to map Cardano's UTXO and BNB's Account models." },
         "Stellar": { status: "Incompatible", detail: "PoS vs FBA. Requires external bridge portals." },
         "Arbitrum": { status: "Incompatible", detail: "Cardano (PoS L1) cannot natively read Arbitrum's Ethereum L2 optimistic rollup batches." }
     },
@@ -415,16 +270,40 @@ const compatibilityMap = {
         "Arbitrum": { status: "Compatible", detail: "Same protocol (L2 Rollup). Self-compatible." }
     }
 };
-// 3. Application State
+
+// ==========================================================================
+// 2. APPLICATION STATE
+// ==========================================================================
 let activeAlgoId = "pow";
 let simTimeoutId = null;
-// 4. DOM Elements
-const algoCards = document.querySelectorAll(".algo-card");
-const panelOverview = document.getElementById("panel-overview");
-const panelTrilemma = document.getElementById("panel-trilemma");
-const panelMapping = document.getElementById("panel-mapping");
-const panelMatrix = document.getElementById("panel-matrix");
-const panelSimulator = document.getElementById("panel-simulator");
+let heroAnimFrame = null;
+let consensusAnimFrame = null;
+
+// Accent color map
+const accentColors = {
+    pow: { hex: "#ff9f43", rgb: [255, 159, 67] },
+    pos: { hex: "#1dd1a1", rgb: [29, 209, 161] },
+    poh: { hex: "#a55eea", rgb: [165, 94, 234] },
+    dpos: { hex: "#48dbfb", rgb: [72, 219, 251] },
+    poa: { hex: "#ff6b6b", rgb: [255, 107, 107] },
+    pbft: { hex: "#00d2d3", rgb: [0, 210, 211] },
+    pob: { hex: "#f368e0", rgb: [243, 104, 224] }
+};
+
+const animLabels = {
+    pow: "⛏️ Mining Simulation",
+    pos: "🪙 Validator Staking",
+    poh: "⏱️ VDF Time Sequence",
+    dpos: "🗳️ Delegate Voting",
+    poa: "🔐 Authority Rotation",
+    pbft: "🤝 Quorum Consensus",
+    pob: "🔥 Token Burn Proof"
+};
+
+// ==========================================================================
+// 3. DOM ELEMENTS
+// ==========================================================================
+const navTabs = document.querySelectorAll(".nav-tab");
 const algoDescriptionEl = document.getElementById("algo-description");
 const algoTaglineEl = document.getElementById("algo-tagline");
 const timelineFlowEl = document.getElementById("timeline-flow");
@@ -442,7 +321,6 @@ const mappingContainerEl = document.getElementById("mapping-container");
 const matrixHeaderEl = document.querySelector("#compatibility-matrix thead");
 const matrixBodyEl = document.getElementById("compatibility-matrix-body");
 const matrixInfoEl = document.getElementById("matrix-info");
-// Simulator DOM
 const sliderAttackerPower = document.getElementById("slider-attacker-power");
 const sliderNodes = document.getElementById("slider-nodes");
 const valAttackerPower = document.getElementById("val-attacker-power");
@@ -451,175 +329,823 @@ const btnSybil = document.getElementById("btn-sybil-attack");
 const btnTakeover = document.getElementById("btn-takeover-attack");
 const simOutcomeText = document.getElementById("sim-outcome-text");
 const simLogText = document.getElementById("sim-log-text");
-// 5. Core Initialization
+const animLabelEl = document.getElementById("anim-label");
+
+// ==========================================================================
+// 4. INITIALIZATION
+// ==========================================================================
 function init() {
     bindEvents();
+    setupScrollReveal();
+    setupStickyNav();
+    initHeroCanvas();
+    initConsensusCanvas();
     renderCompatibilityMatrix();
     updateDashboard(activeAlgoId);
 }
-// 6. Event Bindings
+
+// ==========================================================================
+// 5. EVENT BINDINGS
+// ==========================================================================
 function bindEvents() {
-    algoCards.forEach(card => {
-        card.addEventListener("click", () => {
-            // Toggle active states
-            algoCards.forEach(c => {
-                c.classList.remove("active");
-                c.setAttribute("aria-pressed", "false");
+    navTabs.forEach(tab => {
+        tab.addEventListener("click", () => {
+            navTabs.forEach(t => {
+                t.classList.remove("active");
+                t.setAttribute("aria-pressed", "false");
             });
-            card.classList.add("active");
-            card.setAttribute("aria-pressed", "true");
-            activeAlgoId = card.getAttribute("data-algo");
+            tab.classList.add("active");
+            tab.setAttribute("aria-pressed", "true");
+            activeAlgoId = tab.getAttribute("data-algo");
             updateDashboard(activeAlgoId);
         });
     });
-    // Simulator controls
+
     sliderAttackerPower.addEventListener("input", (e) => {
         valAttackerPower.textContent = `${e.target.value}%`;
     });
     sliderNodes.addEventListener("input", (e) => {
         valNodes.textContent = `${Number(e.target.value).toLocaleString()} nodes`;
     });
-    btnSybil.addEventListener("click", () => {
-        runAttackSimulation("sybil");
-    });
-    btnTakeover.addEventListener("click", () => {
-        runAttackSimulation("takeover");
-    });
+    btnSybil.addEventListener("click", () => runAttackSimulation("sybil"));
+    btnTakeover.addEventListener("click", () => runAttackSimulation("takeover"));
 }
-// 7. Update Dashboard Content based on selected Algorithm
+
+// ==========================================================================
+// 6. SCROLL REVEAL (IntersectionObserver)
+// ==========================================================================
+function setupScrollReveal() {
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add("revealed");
+            }
+        });
+    }, { threshold: 0.1, rootMargin: "0px 0px -50px 0px" });
+
+    document.querySelectorAll(".scroll-reveal").forEach(el => observer.observe(el));
+}
+
+// ==========================================================================
+// 7. STICKY NAV SCROLL STATE
+// ==========================================================================
+function setupStickyNav() {
+    const nav = document.getElementById("algo-nav");
+    window.addEventListener("scroll", () => {
+        if (window.scrollY > window.innerHeight * 0.8) {
+            nav.classList.add("scrolled");
+        } else {
+            nav.classList.remove("scrolled");
+        }
+    }, { passive: true });
+}
+
+// ==========================================================================
+// 8. HERO CANVAS — Floating Blockchain Network
+// ==========================================================================
+function initHeroCanvas() {
+    const canvas = document.getElementById("hero-canvas");
+    const ctx = canvas.getContext("2d");
+    let particles = [];
+    const PARTICLE_COUNT = 60;
+    const CONNECTION_DIST = 150;
+
+    function resize() {
+        canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+        canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+        ctx.scale(window.devicePixelRatio, window.devicePixelRatio);
+    }
+
+    resize();
+    window.addEventListener("resize", resize);
+
+    // Create particles
+    for (let i = 0; i < PARTICLE_COUNT; i++) {
+        particles.push({
+            x: Math.random() * canvas.offsetWidth,
+            y: Math.random() * canvas.offsetHeight,
+            vx: (Math.random() - 0.5) * 0.5,
+            vy: (Math.random() - 0.5) * 0.5,
+            r: Math.random() * 2.5 + 1.5,
+            bright: Math.random()
+        });
+    }
+
+    function drawHero() {
+        const w = canvas.offsetWidth;
+        const h = canvas.offsetHeight;
+        ctx.clearRect(0, 0, w, h);
+
+        // Move particles
+        particles.forEach(p => {
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > w) p.vx *= -1;
+            if (p.y < 0 || p.y > h) p.vy *= -1;
+            p.bright += (Math.random() - 0.5) * 0.02;
+            p.bright = Math.max(0.3, Math.min(1, p.bright));
+        });
+
+        // Draw connections
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < CONNECTION_DIST) {
+                    const alpha = (1 - dist / CONNECTION_DIST) * 0.15;
+                    ctx.beginPath();
+                    ctx.strokeStyle = `rgba(0, 242, 254, ${alpha})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        // Draw particles
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(0, 242, 254, ${p.bright * 0.6})`;
+            ctx.fill();
+            // Glow
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r * 3, 0, Math.PI * 2);
+            const grad = ctx.createRadialGradient(p.x, p.y, p.r * 0.5, p.x, p.y, p.r * 3);
+            grad.addColorStop(0, `rgba(0, 242, 254, ${p.bright * 0.15})`);
+            grad.addColorStop(1, "transparent");
+            ctx.fillStyle = grad;
+            ctx.fill();
+        });
+
+        heroAnimFrame = requestAnimationFrame(drawHero);
+    }
+
+    drawHero();
+}
+
+// ==========================================================================
+// 9. CONSENSUS MIMICKING CANVAS ANIMATIONS
+// ==========================================================================
+let consensusState = {};
+
+function initConsensusCanvas() {
+    const canvas = document.getElementById("consensus-canvas");
+    const ctx = canvas.getContext("2d");
+
+    function resize() {
+        canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+        canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+        ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+    }
+    resize();
+    window.addEventListener("resize", resize);
+
+    consensusState = { canvas, ctx, time: 0 };
+    runConsensusAnimation();
+}
+
+function runConsensusAnimation() {
+    if (consensusAnimFrame) cancelAnimationFrame(consensusAnimFrame);
+    consensusState.time = 0;
+
+    function loop() {
+        const { canvas, ctx } = consensusState;
+        const w = canvas.offsetWidth;
+        const h = canvas.offsetHeight;
+        ctx.clearRect(0, 0, w, h);
+        consensusState.time++;
+
+        const color = accentColors[activeAlgoId];
+        switch (activeAlgoId) {
+            case "pow": drawPoWAnimation(ctx, w, h, color, consensusState.time); break;
+            case "pos": drawPoSAnimation(ctx, w, h, color, consensusState.time); break;
+            case "poh": drawPoHAnimation(ctx, w, h, color, consensusState.time); break;
+            case "dpos": drawDPoSAnimation(ctx, w, h, color, consensusState.time); break;
+            case "poa": drawPoAAnimation(ctx, w, h, color, consensusState.time); break;
+            case "pbft": drawPBFTAnimation(ctx, w, h, color, consensusState.time); break;
+            case "pob": drawPoBAnimation(ctx, w, h, color, consensusState.time); break;
+        }
+        consensusAnimFrame = requestAnimationFrame(loop);
+    }
+    loop();
+}
+
+// ---- PoW: Mining Hash Animation ----
+function drawPoWAnimation(ctx, w, h, color, t) {
+    const cx = w / 2, cy = h / 2;
+    // Block chain at bottom
+    const blockW = 50, blockH = 35, gap = 12;
+    const chainY = h - 60;
+    const blocksCount = Math.floor(w / (blockW + gap));
+    const chainOffset = (t * 0.3) % (blockW + gap);
+
+    for (let i = -1; i < blocksCount + 1; i++) {
+        const bx = i * (blockW + gap) - chainOffset;
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.15)`;
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.4)`;
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.roundRect(bx, chainY, blockW, blockH, 5);
+        ctx.fill();
+        ctx.stroke();
+        // Link lines
+        if (i > -1) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.25)`;
+            ctx.moveTo(bx, chainY + blockH / 2);
+            ctx.lineTo(bx - gap, chainY + blockH / 2);
+            ctx.stroke();
+        }
+    }
+
+    // Mining nonces area
+    const fontSize = 11;
+    ctx.font = `${fontSize}px 'Fira Code', monospace`;
+    ctx.textAlign = "left";
+    const cols = 4, rows = 6;
+    const cellW = w / cols, cellH = 28;
+    const startY = 25;
+
+    for (let r = 0; r < rows; r++) {
+        for (let c = 0; c < cols; c++) {
+            const hash = randomHex(8);
+            const isSolution = (t % 120 > 100) && r === rows - 1 && c === cols - 1;
+            if (isSolution) {
+                ctx.fillStyle = color.hex;
+                ctx.shadowColor = color.hex;
+                ctx.shadowBlur = 12;
+                ctx.fillText("✓ 0x00000" + randomHex(3), c * cellW + 10, startY + r * cellH);
+                ctx.shadowBlur = 0;
+            } else {
+                ctx.fillStyle = `rgba(255,255,255, ${0.15 + Math.random() * 0.15})`;
+                ctx.fillText("0x" + hash, c * cellW + 10, startY + r * cellH);
+            }
+        }
+    }
+
+    // "Mining..." label
+    const dots = ".".repeat((Math.floor(t / 20) % 3) + 1);
+    ctx.font = "bold 13px Outfit, sans-serif";
+    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
+    ctx.textAlign = "center";
+    ctx.fillText(t % 120 > 100 ? "✨ BLOCK MINED!" : `Mining${dots}`, cx, cy + 15);
+}
+
+// ---- PoS: Validator Selection ----
+function drawPoSAnimation(ctx, w, h, color, t) {
+    const cx = w / 2, cy = h / 2 - 10;
+    const validators = 8;
+    const radius = Math.min(w, h) * 0.3;
+    const selectedIdx = Math.floor(t / 90) % validators;
+    const selectionProgress = (t % 90) / 90;
+
+    // Draw stake amounts
+    for (let i = 0; i < validators; i++) {
+        const angle = (i / validators) * Math.PI * 2 - Math.PI / 2;
+        const x = cx + Math.cos(angle) * radius;
+        const y = cy + Math.sin(angle) * radius;
+        const isSelected = i === selectedIdx && selectionProgress > 0.6;
+        const nodeR = isSelected ? 18 : 12;
+
+        // Connection to center
+        ctx.beginPath();
+        ctx.strokeStyle = isSelected ? `rgba(${color.rgb.join(",")}, 0.6)` : `rgba(255,255,255, 0.06)`;
+        ctx.lineWidth = isSelected ? 2 : 1;
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+
+        // Node circle
+        ctx.beginPath();
+        ctx.arc(x, y, nodeR, 0, Math.PI * 2);
+        ctx.fillStyle = isSelected ? `rgba(${color.rgb.join(",")}, 0.3)` : `rgba(255,255,255, 0.05)`;
+        ctx.strokeStyle = isSelected ? color.hex : `rgba(255,255,255, 0.15)`;
+        ctx.lineWidth = isSelected ? 2.5 : 1;
+        ctx.fill();
+        ctx.stroke();
+
+        if (isSelected) {
+            ctx.beginPath();
+            ctx.arc(x, y, nodeR + 6, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.3 + Math.sin(t * 0.1) * 0.15})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        // Stake label
+        ctx.font = "bold 9px Fira Code, monospace";
+        ctx.textAlign = "center";
+        ctx.fillStyle = isSelected ? color.hex : `rgba(255,255,255,0.4)`;
+        ctx.fillText(`${(i + 1) * 32}Ξ`, x, y + nodeR + 14);
+    }
+
+    // Center: Spinning selector
+    const spinAngle = selectionProgress * Math.PI * 4 + (selectedIdx / validators) * Math.PI * 2 - Math.PI / 2;
+    ctx.save();
+    ctx.translate(cx, cy);
+    ctx.rotate(spinAngle);
+    ctx.beginPath();
+    ctx.moveTo(0, -8);
+    ctx.lineTo(radius * 0.4, 0);
+    ctx.lineTo(0, 8);
+    ctx.closePath();
+    ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${0.5 + selectionProgress * 0.5})`;
+    ctx.fill();
+    ctx.restore();
+
+    // Center dot
+    ctx.beginPath();
+    ctx.arc(cx, cy, 6, 0, Math.PI * 2);
+    ctx.fillStyle = color.hex;
+    ctx.fill();
+
+    ctx.font = "bold 12px Outfit, sans-serif";
+    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
+    ctx.textAlign = "center";
+    ctx.fillText(selectionProgress > 0.6 ? `Validator ${selectedIdx + 1} Selected ✓` : "Selecting Proposer...", cx, h - 30);
+}
+
+// ---- PoH: Sequential Hash Chain ----
+function drawPoHAnimation(ctx, w, h, color, t) {
+    const nodeCount = 10;
+    const nodeR = 14;
+    const spacing = (w - 60) / (nodeCount - 1);
+    const startX = 30;
+    const cy = h / 2 - 10;
+    const progress = (t % 150) / 150;
+    const activeNode = Math.floor(progress * nodeCount);
+
+    // Draw chain line
+    ctx.beginPath();
+    ctx.moveTo(startX, cy);
+    ctx.lineTo(startX + (nodeCount - 1) * spacing, cy);
+    ctx.strokeStyle = `rgba(255,255,255, 0.06)`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Active chain line
+    const activeX = startX + activeNode * spacing;
+    ctx.beginPath();
+    ctx.moveTo(startX, cy);
+    ctx.lineTo(activeX, cy);
+    ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Draw nodes
+    for (let i = 0; i < nodeCount; i++) {
+        const x = startX + i * spacing;
+        const isActive = i <= activeNode;
+        const isCurrent = i === activeNode;
+
+        ctx.beginPath();
+        ctx.arc(x, cy, isCurrent ? nodeR + 3 : nodeR, 0, Math.PI * 2);
+        ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, ${isCurrent ? 0.35 : 0.15})` : `rgba(255,255,255, 0.03)`;
+        ctx.strokeStyle = isActive ? color.hex : `rgba(255,255,255, 0.1)`;
+        ctx.lineWidth = isCurrent ? 2.5 : 1;
+        ctx.fill();
+        ctx.stroke();
+
+        if (isCurrent) {
+            ctx.beginPath();
+            ctx.arc(x, cy, nodeR + 10, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.2 + Math.sin(t * 0.15) * 0.15})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        // Hash text
+        ctx.font = "8px Fira Code, monospace";
+        ctx.textAlign = "center";
+        ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, 0.7)` : `rgba(255,255,255, 0.2)`;
+        ctx.fillText(isActive ? `H${i}` : "---", x, cy - nodeR - 8);
+
+        // Timestamp
+        if (isActive) {
+            ctx.font = "7px Fira Code, monospace";
+            ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
+            ctx.fillText(`t+${i * 400}ms`, x, cy + nodeR + 14);
+        }
+    }
+
+    ctx.font = "bold 12px Outfit, sans-serif";
+    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
+    ctx.textAlign = "center";
+    ctx.fillText("Sequential VDF Hash Chain →", w / 2, h - 25);
+}
+
+// ---- DPoS: Delegate Voting ----
+function drawDPoSAnimation(ctx, w, h, color, t) {
+    const cx = w / 2, cy = h / 2 - 5;
+    const delegates = 6;
+    const voters = 12;
+    const innerR = Math.min(w, h) * 0.15;
+    const outerR = Math.min(w, h) * 0.36;
+    const activeDelegate = Math.floor(t / 80) % delegates;
+
+    // Draw voters (outer ring)
+    for (let i = 0; i < voters; i++) {
+        const angle = (i / voters) * Math.PI * 2 - Math.PI / 2;
+        const x = cx + Math.cos(angle) * outerR;
+        const y = cy + Math.sin(angle) * outerR;
+        const targetDelegate = i % delegates;
+
+        // Vote line to delegate
+        const dAngle = (targetDelegate / delegates) * Math.PI * 2 - Math.PI / 2;
+        const dx = cx + Math.cos(dAngle) * innerR;
+        const dy = cy + Math.sin(dAngle) * innerR;
+
+        ctx.beginPath();
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${targetDelegate === activeDelegate ? 0.3 : 0.08})`;
+        ctx.lineWidth = 1;
+        ctx.setLineDash([3, 3]);
+        ctx.moveTo(x, y);
+        ctx.lineTo(dx, dy);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Voter node
+        ctx.beginPath();
+        ctx.arc(x, y, 6, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255, 0.08)`;
+        ctx.strokeStyle = `rgba(255,255,255, 0.15)`;
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+    }
+
+    // Draw delegates (inner ring)
+    for (let i = 0; i < delegates; i++) {
+        const angle = (i / delegates) * Math.PI * 2 - Math.PI / 2;
+        const x = cx + Math.cos(angle) * innerR;
+        const y = cy + Math.sin(angle) * innerR;
+        const isActive = i === activeDelegate;
+
+        ctx.beginPath();
+        ctx.arc(x, y, isActive ? 16 : 12, 0, Math.PI * 2);
+        ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, 0.3)` : `rgba(255,255,255, 0.05)`;
+        ctx.strokeStyle = isActive ? color.hex : `rgba(255,255,255, 0.15)`;
+        ctx.lineWidth = isActive ? 2.5 : 1;
+        ctx.fill();
+        ctx.stroke();
+
+        if (isActive) {
+            ctx.beginPath();
+            ctx.arc(x, y, 22, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.2 + Math.sin(t * 0.1) * 0.15})`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+        }
+
+        ctx.font = "bold 9px Fira Code";
+        ctx.textAlign = "center";
+        ctx.fillStyle = isActive ? color.hex : `rgba(255,255,255, 0.35)`;
+        ctx.fillText(`D${i + 1}`, x, y + 4);
+    }
+
+    ctx.font = "bold 12px Outfit, sans-serif";
+    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
+    ctx.textAlign = "center";
+    ctx.fillText(`Delegate ${activeDelegate + 1} producing block...`, cx, h - 25);
+}
+
+// ---- PoA: Authority Rotation ----
+function drawPoAAnimation(ctx, w, h, color, t) {
+    const cx = w / 2, cy = h / 2 - 10;
+    const authorities = 5;
+    const radius = Math.min(w, h) * 0.28;
+    const activeAuth = Math.floor(t / 100) % authorities;
+    const rotProgress = (t % 100) / 100;
+
+    // Draw rotation arc
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius + 20, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(255,255,255, 0.04)`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    // Rotation indicator
+    const arcStart = (activeAuth / authorities) * Math.PI * 2 - Math.PI / 2;
+    const arcEnd = arcStart + (1 / authorities) * Math.PI * 2 * rotProgress;
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius + 20, arcStart, arcEnd);
+    ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    for (let i = 0; i < authorities; i++) {
+        const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
+        const x = cx + Math.cos(angle) * radius;
+        const y = cy + Math.sin(angle) * radius;
+        const isActive = i === activeAuth;
+
+        // Shield shape for authority
+        ctx.save();
+        ctx.translate(x, y);
+        const shieldR = isActive ? 20 : 14;
+        ctx.beginPath();
+        ctx.moveTo(0, -shieldR);
+        ctx.quadraticCurveTo(shieldR, -shieldR * 0.5, shieldR * 0.8, shieldR * 0.3);
+        ctx.lineTo(0, shieldR);
+        ctx.lineTo(-shieldR * 0.8, shieldR * 0.3);
+        ctx.quadraticCurveTo(-shieldR, -shieldR * 0.5, 0, -shieldR);
+        ctx.closePath();
+        ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, 0.25)` : `rgba(255,255,255, 0.04)`;
+        ctx.strokeStyle = isActive ? color.hex : `rgba(255,255,255, 0.12)`;
+        ctx.lineWidth = isActive ? 2 : 1;
+        ctx.fill();
+        ctx.stroke();
+
+        // Checkmark for active
+        if (isActive) {
+            ctx.font = "bold 12px sans-serif";
+            ctx.fillStyle = color.hex;
+            ctx.textAlign = "center";
+            ctx.fillText("✓", 0, 5);
+        }
+        ctx.restore();
+
+        ctx.font = "bold 8px Fira Code";
+        ctx.textAlign = "center";
+        ctx.fillStyle = isActive ? color.hex : `rgba(255,255,255, 0.3)`;
+        ctx.fillText(`AUTH ${i + 1}`, x, y + (isActive ? 28 : 22));
+    }
+
+    // Center
+    ctx.beginPath();
+    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.6)`;
+    ctx.fill();
+
+    ctx.font = "bold 12px Outfit, sans-serif";
+    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
+    ctx.textAlign = "center";
+    ctx.fillText(`Authority ${activeAuth + 1} signing block`, cx, h - 25);
+}
+
+// ---- PBFT: Quorum Message Passing ----
+function drawPBFTAnimation(ctx, w, h, color, t) {
+    const cx = w / 2, cy = h / 2 - 10;
+    const nodes = 7;
+    const radius = Math.min(w, h) * 0.3;
+    const phase = Math.floor(t / 80) % 3; // 0=prepare, 1=commit, 2=finalize
+    const phaseProgress = (t % 80) / 80;
+    const phaseLabels = ["Prepare", "Commit", "Finalize ✓"];
+
+    for (let i = 0; i < nodes; i++) {
+        const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
+        const x = cx + Math.cos(angle) * radius;
+        const y = cy + Math.sin(angle) * radius;
+
+        // Connections to other nodes (message passing)
+        for (let j = i + 1; j < nodes; j++) {
+            const angle2 = (j / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x2 = cx + Math.cos(angle2) * radius;
+            const y2 = cy + Math.sin(angle2) * radius;
+
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.06)`;
+            ctx.lineWidth = 0.5;
+            ctx.moveTo(x, y);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+        }
+
+        // Animated message dots
+        if (phaseProgress > 0.2 && phaseProgress < 0.8) {
+            const nextNode = (i + 1) % nodes;
+            const angle2 = (nextNode / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x2 = cx + Math.cos(angle2) * radius;
+            const y2 = cy + Math.sin(angle2) * radius;
+            const msgProgress = (phaseProgress - 0.2) / 0.6;
+            const mx = x + (x2 - x) * msgProgress;
+            const my = y + (y2 - y) * msgProgress;
+
+            ctx.beginPath();
+            ctx.arc(mx, my, 3, 0, Math.PI * 2);
+            ctx.fillStyle = color.hex;
+            ctx.fill();
+        }
+
+        // Node
+        const isAgreed = phase > 0 || phaseProgress > 0.7;
+        ctx.beginPath();
+        ctx.arc(x, y, 14, 0, Math.PI * 2);
+        ctx.fillStyle = isAgreed ? `rgba(${color.rgb.join(",")}, 0.2)` : `rgba(255,255,255, 0.04)`;
+        ctx.strokeStyle = isAgreed ? color.hex : `rgba(255,255,255, 0.12)`;
+        ctx.lineWidth = isAgreed ? 2 : 1;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "bold 9px Fira Code";
+        ctx.textAlign = "center";
+        ctx.fillStyle = isAgreed ? color.hex : `rgba(255,255,255, 0.3)`;
+        ctx.fillText(`N${i + 1}`, x, y + 4);
+    }
+
+    ctx.font = "bold 12px Outfit, sans-serif";
+    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
+    ctx.textAlign = "center";
+    ctx.fillText(`Phase: ${phaseLabels[phase]}`, cx, h - 25);
+}
+
+// ---- PoB: Token Burn Animation ----
+function drawPoBAnimation(ctx, w, h, color, t) {
+    const cx = w / 2, cy = h / 2 - 10;
+
+    // Burn address at center
+    const burnPulse = 0.5 + Math.sin(t * 0.08) * 0.3;
+    ctx.beginPath();
+    ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+    ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${0.15 + burnPulse * 0.15})`;
+    ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.5 + burnPulse * 0.3})`;
+    ctx.lineWidth = 2.5;
+    ctx.fill();
+    ctx.stroke();
+
+    // Burn glow
+    ctx.beginPath();
+    ctx.arc(cx, cy, 35 + burnPulse * 8, 0, Math.PI * 2);
+    ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.08 + burnPulse * 0.08})`;
+    ctx.lineWidth = 1;
+    ctx.stroke();
+
+    ctx.font = "bold 16px sans-serif";
+    ctx.textAlign = "center";
+    ctx.fillStyle = color.hex;
+    ctx.fillText("🔥", cx, cy + 6);
+
+    // Token particles being sent toward the burn address
+    const tokenCount = 8;
+    const outerR = Math.min(w, h) * 0.38;
+    for (let i = 0; i < tokenCount; i++) {
+        const angle = (i / tokenCount) * Math.PI * 2 - Math.PI / 2;
+        const phase = ((t * 1.2 + i * 50) % 200) / 200;
+
+        const sx = cx + Math.cos(angle) * outerR;
+        const sy = cy + Math.sin(angle) * outerR;
+        const tx = sx + (cx - sx) * phase;
+        const ty = sy + (cy - sy) * phase;
+
+        // Trail
+        if (phase < 0.9) {
+            ctx.beginPath();
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${(1 - phase) * 0.25})`;
+            ctx.lineWidth = 1;
+            ctx.setLineDash([2, 4]);
+            ctx.moveTo(sx, sy);
+            ctx.lineTo(tx, ty);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Token dot
+            ctx.beginPath();
+            ctx.arc(tx, ty, 4 - phase * 3, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${1 - phase})`;
+            ctx.fill();
+        }
+
+        // Source node
+        ctx.beginPath();
+        ctx.arc(sx, sy, 8, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255, 0.05)`;
+        ctx.strokeStyle = `rgba(255,255,255, 0.15)`;
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "7px Fira Code, monospace";
+        ctx.textAlign = "center";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
+        ctx.fillText(`V${i + 1}`, sx, sy + 3);
+    }
+
+    ctx.font = "bold 12px Outfit, sans-serif";
+    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
+    ctx.textAlign = "center";
+    ctx.fillText("Tokens → Burn Address (0x000...dead)", cx, h - 25);
+}
+
+// Helper
+function randomHex(len) {
+    let s = "";
+    const chars = "0123456789abcdef";
+    for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * 16)];
+    return s;
+}
+
+// ==========================================================================
+// 10. UPDATE DASHBOARD
+// ==========================================================================
 function updateDashboard(algoId) {
     const algo = algorithmsData[algoId];
     if (!algo) return;
-    // Update theme colors of panels
-    const allPanels = [panelOverview, panelTrilemma, panelMapping, panelMatrix, panelSimulator];
-    const themeClasses = ["panel-pow", "panel-pos", "panel-poh", "panel-dpos", "panel-poa", "panel-pbft"];
 
-    allPanels.forEach(panel => {
-        panel.classList.remove(...themeClasses);
-        panel.classList.add(`panel-${algoId}`);
-    });
-    // Set local style color variable on panels for custom SVG styles & inputs
-    let accentColor = "var(--accent-pow)";
-    if (algoId === "pos") accentColor = "var(--accent-pos)";
-    else if (algoId === "poh") accentColor = "var(--accent-poh)";
-    else if (algoId === "dpos") accentColor = "var(--accent-dpos)";
-    else if (algoId === "poa") accentColor = "var(--accent-poa)";
-    else if (algoId === "pbft") accentColor = "var(--accent-pbft)";
+    // Update CSS accent
+    const accentVar = `var(--accent-${algoId})`;
+    document.documentElement.style.setProperty("--accent-theme", accentVar);
 
-    document.documentElement.style.setProperty("--accent-theme", accentColor);
-    // 7a. Update Overview Text
+    // Update animation label
+    animLabelEl.textContent = animLabels[algoId];
+
+    // Restart consensus animation
+    runConsensusAnimation();
+
+    // Overview
     algoDescriptionEl.textContent = algo.description;
     algoTaglineEl.textContent = algo.tagline;
-    // 7b. Render Timeline Flow
+
+    // Timeline
     timelineFlowEl.innerHTML = "";
     algo.steps.forEach((step, idx) => {
         const stepEl = document.createElement("div");
         stepEl.className = "timeline-step";
-        stepEl.style.animationDelay = `${idx * 0.1}s`;
-
+        stepEl.style.animationDelay = `${idx * 0.12}s`;
         stepEl.innerHTML = `
-      <div class="step-node"></div>
-      <div class="step-content">
-        <h4>Step ${idx + 1}: ${step.title}</h4>
-        <p>${step.desc}</p>
-      </div>
-    `;
+            <div class="step-node"></div>
+            <div class="step-content">
+                <h4>Step ${idx + 1}: ${step.title}</h4>
+                <p>${step.desc}</p>
+            </div>
+        `;
         timelineFlowEl.appendChild(stepEl);
     });
-    // 7c. Render Trilemma Data (Radar + Scorebars)
+
+    // Trilemma
     updateRadarChart(algo.scores, algoId);
     updateScoreBars(algo.scores);
-    // Update specs
     specBlockTimeEl.textContent = algo.specs.blockTime;
     specTpsEl.textContent = algo.specs.tps;
     specNodesEl.textContent = algo.specs.nodes;
     specStakeEl.textContent = algo.specs.stake;
-    // 7d. Render Real-World Mapping
+
+    // Mapping
     mappingContainerEl.innerHTML = "";
     algo.blockchains.forEach(chain => {
         const card = document.createElement("div");
         card.className = "blockchain-map-card";
-
-        // languages list
-        const langBadges = chain.languages.map(lang => `<span class="language-badge">${lang}</span>`).join(" ");
-
+        const langBadges = chain.languages.map(l => `<span class="language-badge">${l}</span>`).join(" ");
         card.innerHTML = `
-      <div class="blockchain-card-header">
-        <div class="blockchain-info">
-          <span class="blockchain-name">${chain.name}</span>
-          <span class="layer-badge ${chain.layerType === 'L1' ? 'badge-l1' : 'badge-l2'}">${chain.layer}</span>
-        </div>
-      </div>
-      <p class="blockchain-rationale">${chain.rationale}</p>
-      <div class="blockchain-meta-info">
-        <span class="meta-label">Smart Contracts:</span>
-        ${langBadges}
-      </div>
-    `;
+            <div class="blockchain-card-header">
+                <div class="blockchain-info">
+                    <span class="blockchain-name">${chain.name}</span>
+                    <span class="layer-badge ${chain.layerType === 'L1' ? 'badge-l1' : 'badge-l2'}">${chain.layer}</span>
+                </div>
+            </div>
+            <p class="blockchain-rationale">${chain.rationale}</p>
+            <div class="blockchain-meta-info">
+                <span class="meta-label">Smart Contracts:</span>
+                ${langBadges}
+            </div>
+        `;
         mappingContainerEl.appendChild(card);
     });
-    // 7e. Update Heatmap/Compatibility Highlights
+
+    // Matrix highlight
     highlightMatrixForAlgo(algo);
-    // Reset simulator view
+
+    // Extended feature panels (from features.js)
+    if (typeof renderBlockAnatomy === 'function') renderBlockAnatomy(algoId);
+    if (typeof renderConsensusPatterns === 'function') renderConsensusPatterns(algoId);
+    if (typeof renderCurrencyDeepDive === 'function') renderCurrencyDeepDive(algoId);
+    if (typeof renderLayerStack === 'function') renderLayerStack(algoId);
+    if (typeof initWorkflowAnimation === 'function') initWorkflowAnimation(algoId);
+
     resetSimulator();
 }
-// 8. Custom SVG Radar Chart Drawing
+
+// ==========================================================================
+// 11. RADAR CHART
+// ==========================================================================
 function updateRadarChart(scores, algoId) {
     const radarShape = document.getElementById("radar-shape");
     const dotScale = document.getElementById("dot-scalability");
     const dotSec = document.getElementById("dot-security");
     const dotDec = document.getElementById("dot-decentralisation");
-    // Centers are (120, 120)
-    const cx = 120;
-    const cy = 120;
-    // Calculate radius for each score (max score is 10, maps to 100px radius)
-    const rScalability = scores.scalability * 10;
-    const rSecurity = scores.security * 10;
-    const rDecentralisation = scores.decentralisation * 10;
-    // Calculate coordinates
-    // 1. Scalability (0 degrees = Straight Up: x = 120, y = 120 - R)
-    const x1 = cx;
-    const y1 = cy - rScalability;
-    // 2. Security (120 degrees = Bottom-Right: x = 120 + R * cos(30), y = 120 + R * sin(30))
-    // cos(30) = 0.866, sin(30) = 0.5
-    const x2 = cx + rSecurity * 0.8660;
-    const y2 = cy + rSecurity * 0.5;
-    // 3. Decentralisation (240 degrees = Bottom-Left: x = 120 - R * cos(30), y = 120 + R * sin(30))
-    const x3 = cx - rDecentralisation * 0.8660;
-    const y3 = cy + rDecentralisation * 0.5;
-    // Update radar shape points
-    radarShape.setAttribute("points", `${x1},${y1} ${x2},${y2} ${x3},${y3}`);
-    // Set colors based on algorithm
-    let colorStroke = "#ff9f43";
-    let colorArea = "rgba(255, 159, 67, 0.15)";
 
-    if (algoId === "pos") {
-        colorStroke = "#1dd1a1";
-        colorArea = "rgba(29, 209, 161, 0.15)";
-    } else if (algoId === "poh") {
-        colorStroke = "#a55eea";
-        colorArea = "rgba(165, 94, 234, 0.15)";
-    } else if (algoId === "dpos") {
-        colorStroke = "#48dbfb";
-        colorArea = "rgba(72, 219, 251, 0.15)";
-    } else if (algoId === "poa") {
-        colorStroke = "#ff6b6b";
-        colorArea = "rgba(255, 107, 107, 0.15)";
-    } else if (algoId === "pbft") {
-        colorStroke = "#00d2d3";
-        colorArea = "rgba(0, 210, 211, 0.15)";
-    }
-    document.documentElement.style.setProperty("--accent-stroke", colorStroke);
-    document.documentElement.style.setProperty("--accent-area", colorArea);
-    // Position the dots
-    dotScale.setAttribute("cx", x1);
-    dotScale.setAttribute("cy", y1);
-    dotSec.setAttribute("cx", x2);
-    dotSec.setAttribute("cy", y2);
-    dotDec.setAttribute("cx", x3);
-    dotDec.setAttribute("cy", y3);
+    const cx = 120, cy = 120;
+    const rS = scores.scalability * 10;
+    const rSec = scores.security * 10;
+    const rD = scores.decentralisation * 10;
+
+    const x1 = cx, y1 = cy - rS;
+    const x2 = cx + rSec * 0.866, y2 = cy + rSec * 0.5;
+    const x3 = cx - rD * 0.866, y3 = cy + rD * 0.5;
+
+    radarShape.setAttribute("points", `${x1},${y1} ${x2},${y2} ${x3},${y3}`);
+
+    const c = accentColors[algoId];
+    document.documentElement.style.setProperty("--accent-stroke", c.hex);
+    document.documentElement.style.setProperty("--accent-area", `rgba(${c.rgb.join(",")}, 0.12)`);
+
+    dotScale.setAttribute("cx", x1); dotScale.setAttribute("cy", y1);
+    dotSec.setAttribute("cx", x2); dotSec.setAttribute("cy", y2);
+    dotDec.setAttribute("cx", x3); dotDec.setAttribute("cy", y3);
 }
-// 9. Update Score Bar Layouts
+
 function updateScoreBars(scores) {
     scoreScalabilityValEl.textContent = `${scores.scalability}/10`;
     scoreSecurityValEl.textContent = `${scores.security}/10`;
@@ -628,44 +1154,41 @@ function updateScoreBars(scores) {
     fillSecurityEl.style.width = `${scores.security * 10}%`;
     fillDecentralisationEl.style.width = `${scores.decentralisation * 10}%`;
 }
-// 10. Generate Compatibility Heatmap Table
+
+// ==========================================================================
+// 12. COMPATIBILITY MATRIX
+// ==========================================================================
 function renderCompatibilityMatrix() {
-    // Render headers
-    let headHtml = `<tr><th class="corner-cell" aria-label="Blockchains compatibility grid corner"></th>`;
+    let headHtml = `<tr><th class="corner-cell" aria-label="Compatibility grid corner"></th>`;
     blockchainsList.forEach(chain => {
         headHtml += `<th scope="col" id="col-header-${chain.replace(/\s+/g, '')}">${chain}</th>`;
     });
     headHtml += `</tr>`;
     matrixHeaderEl.innerHTML = headHtml;
-    // Render rows
+
     let bodyHtml = "";
     blockchainsList.forEach(rowChain => {
         bodyHtml += `<tr id="row-line-${rowChain.replace(/\s+/g, '')}">`;
         bodyHtml += `<th scope="row" class="matrix-header-y" id="row-header-${rowChain.replace(/\s+/g, '')}">${rowChain}</th>`;
-
         blockchainsList.forEach(colChain => {
             const match = compatibilityMap[rowChain][colChain];
             const isCompat = match.status === "Compatible";
             const cellClass = isCompat ? "cell-compat" : "cell-incompat";
             const content = isCompat ? "COMPAT" : "INCOMPAT";
-
             bodyHtml += `
-        <td class="${cellClass}" 
-            data-row="${rowChain}" 
-            data-col="${colChain}" 
-            tabindex="0"
-            role="gridcell"
-            aria-describedby="matrix-info"
-            aria-label="${rowChain} and ${colChain} compatibility: ${match.status}">
-          ${content}
-        </td>
-      `;
+                <td class="${cellClass}"
+                    data-row="${rowChain}"
+                    data-col="${colChain}"
+                    tabindex="0"
+                    role="gridcell"
+                    aria-label="${rowChain} and ${colChain}: ${match.status}">
+                    ${content}
+                </td>`;
         });
-
         bodyHtml += `</tr>`;
     });
     matrixBodyEl.innerHTML = bodyHtml;
-    // Attach matrix event listeners for interactive cells
+
     const cells = matrixBodyEl.querySelectorAll("td");
     cells.forEach(cell => {
         const showDetails = () => {
@@ -673,60 +1196,43 @@ function renderCompatibilityMatrix() {
             const col = cell.getAttribute("data-col");
             const data = compatibilityMap[row][col];
             const statusText = data.status === "Compatible" ? "🟢 Compatible" : "🔴 Incompatible";
-
-            // Update info box
-            matrixInfoEl.innerHTML = `
-        <span class="title">${row} &amp; ${col} — ${statusText}</span>
-        ${data.detail}
-      `;
+            matrixInfoEl.innerHTML = `<span class="title">${row} & ${col} — ${statusText}</span>${data.detail}`;
         };
         cell.addEventListener("mouseenter", showDetails);
         cell.addEventListener("focus", showDetails);
-
-        cell.addEventListener("mouseleave", () => {
-            // Return to default active algorithm compatibility state or general tip
-            restoreDefaultMatrixInfo();
-        });
-        cell.addEventListener("blur", () => {
-            restoreDefaultMatrixInfo();
-        });
+        cell.addEventListener("mouseleave", () => restoreDefaultMatrixInfo());
+        cell.addEventListener("blur", () => restoreDefaultMatrixInfo());
     });
 }
-// Restore default compatibility matrix explanation
+
 function restoreDefaultMatrixInfo() {
     const algo = algorithmsData[activeAlgoId];
     const blockchains = algo.blockchains.map(b => b.name).join(", ");
-
     matrixInfoEl.innerHTML = `
-    <span class="title">Active Context: ${algo.name} Compatibility</span>
-    Highlighting blockchains utilizing ${algo.acronym} (${blockchains}). Hover over intersection cells to inspect cross-chain bridging details.
-  `;
+        <span class="title">Active: ${algo.name} Compatibility</span>
+        Highlighting ${algo.acronym} blockchains (${blockchains}). Hover cells to inspect bridging details.
+    `;
 }
-// Highlight compatibility rows and columns matching selected algorithm blockchains
+
 function highlightMatrixForAlgo(algo) {
     const activeChainNames = algo.blockchains.map(b => b.name);
-
-    // Clear previous highlights
     const rows = matrixBodyEl.querySelectorAll("tr");
     const headersY = matrixBodyEl.querySelectorAll(".matrix-header-y");
     const headersX = matrixHeaderEl.querySelectorAll("th");
     const cells = matrixBodyEl.querySelectorAll("td");
+
     rows.forEach(r => r.classList.remove("active-row"));
     headersY.forEach(h => h.style.color = "");
     headersX.forEach(h => h.style.color = "");
     cells.forEach(c => {
         c.classList.remove("active-highlight");
-        c.style.opacity = "0.5"; // Dim inactive intersections
+        c.style.opacity = "0.5";
     });
-    // Apply new highlights
-    blockchainsList.forEach((chain, colIdx) => {
-        const isChainActive = activeChainNames.includes(chain);
 
-        if (isChainActive) {
-            // Highlight X-Header
+    blockchainsList.forEach(chain => {
+        if (activeChainNames.includes(chain)) {
             const xHead = document.getElementById(`col-header-${chain.replace(/\s+/g, '')}`);
             if (xHead) xHead.style.color = "var(--accent-theme)";
-            // Highlight Y-Header
             const yHead = document.getElementById(`row-header-${chain.replace(/\s+/g, '')}`);
             if (yHead) {
                 yHead.style.color = "var(--accent-theme)";
@@ -734,197 +1240,205 @@ function highlightMatrixForAlgo(algo) {
             }
         }
     });
-    // Highlight intersection cells between active chains
+
     cells.forEach(cell => {
         const rowVal = cell.getAttribute("data-row");
         const colVal = cell.getAttribute("data-col");
-
         const rowActive = activeChainNames.includes(rowVal);
         const colActive = activeChainNames.includes(colVal);
         if (rowActive || colActive) {
-            cell.style.opacity = "1.0"; // Full opacity for relevant intersections
-            if (rowActive && colActive) {
-                cell.classList.add("active-highlight");
-            }
+            cell.style.opacity = "1.0";
+            if (rowActive && colActive) cell.classList.add("active-highlight");
         }
     });
     restoreDefaultMatrixInfo();
 }
-// 11. Interactive Attack Simulator Logic
+
+// ==========================================================================
+// 13. ATTACK SIMULATOR
+// ==========================================================================
 function resetSimulator() {
     if (simTimeoutId) clearTimeout(simTimeoutId);
     simOutcomeText.textContent = "System Idle. Ready for input.";
     simOutcomeText.className = "sim-outcome outcome-pending";
-    simLogText.textContent = `Targeting Active Protocol: ${algorithmsData[activeAlgoId].name}\nSelect attack specifications on the left to begin...`;
+    simLogText.textContent = `Targeting: ${algorithmsData[activeAlgoId].name}\nSelect attack specifications to begin...`;
     btnSybil.disabled = false;
     btnTakeover.disabled = false;
 }
+
 function runAttackSimulation(attackType) {
     if (simTimeoutId) clearTimeout(simTimeoutId);
-    // Disable buttons during simulation runs
     btnSybil.disabled = true;
     btnTakeover.disabled = true;
+
     const attackerPower = parseInt(sliderAttackerPower.value, 10);
     const honestNodes = parseInt(sliderNodes.value, 10);
     const algoId = activeAlgoId;
     const algo = algorithmsData[algoId];
+
     simOutcomeText.textContent = "Simulating Attack...";
     simOutcomeText.className = "sim-outcome outcome-pending";
     simLogText.textContent = `[SYSTEM INIT] Connecting to validator mesh...\n`;
-    // Simulation sequence logs
-    let steps = [];
-    if (attackType === "sybil") {
-        // SYBIL ATTACK SIMULATION
-        steps.push(`[1/4] Spawning ${honestNodes.toLocaleString()} malicious virtual Sybil identities...`);
 
+    let steps = [];
+
+    if (attackType === "sybil") {
+        steps.push(`[1/4] Spawning ${honestNodes.toLocaleString()} malicious Sybil identities...`);
         if (algoId === "pow") {
             steps.push(`[2/4] Sybils flooding peer mempools with transactions...`);
-            steps.push(`[3/4] Honest mining nodes verify block mathematical hash puzzle (SHA-256 target check).`);
-            steps.push(`[4/4] Sybil node count ignored. Nakamoto consensus allocates voting weight solely based on physical compute hashrate.`);
-            steps.push(`[RESULT] Attack Defeated. PoW security relies on hardware work, not virtual node counts. Attacker holds only ${attackerPower}% of actual hash rate.`);
+            steps.push(`[3/4] Honest miners verify SHA-256 hash puzzle target check.`);
+            steps.push(`[4/4] Sybil count ignored. Nakamoto consensus allocates weight by hashrate.`);
+            steps.push(`[RESULT] Attack Defeated. PoW relies on hardware work, not virtual node counts. Attacker holds only ${attackerPower}% of hash rate.`);
             steps.push("FAIL");
-        }
-        else if (algoId === "pos") {
-            steps.push(`[2/4] Launching virtual validators. Attempting registration without active staking ledger balance...`);
-            steps.push(`[3/4] Ethereum Staking Deposit Contract checks credentials. Staked balance of Sybils = 0 ETH.`);
-            steps.push(`[4/4] Validator selection filter rejects the attackers due to lack of minimum 32 ETH locked capital.`);
-            steps.push(`[RESULT] Attack Defeated. Proof of Stake requires physical collateral backing. Multiplied node ids without capital lockup are ignored.`);
+        } else if (algoId === "pos") {
+            steps.push(`[2/4] Launching virtual validators without staking balance...`);
+            steps.push(`[3/4] Staking Deposit Contract checks credentials. Sybil balance = 0 ETH.`);
+            steps.push(`[4/4] Validator filter rejects attackers — minimum 32 ETH required.`);
+            steps.push(`[RESULT] Attack Defeated. PoS requires physical capital backing.`);
             steps.push("FAIL");
-        }
-        else if (algoId === "poh") {
+        } else if (algoId === "poh") {
             steps.push(`[2/4] Flooding Solana gossip network with virtual validator IDs...`);
-            steps.push(`[3/4] Leader node checks timing slot alignment. Sybils lack verifiable delay function (VDF) clock inputs.`);
-            steps.push(`[4/4] Validator pipeline drops un-staked, out-of-sync nodes from Tower BFT voting schedules.`);
-            steps.push(`[RESULT] Attack Defeated. High-speed timing pipeline and PoS voting requirements filter out zero-collateral Sybil identities.`);
+            steps.push(`[3/4] Leader checks timing slot alignment. Sybils lack VDF clock inputs.`);
+            steps.push(`[4/4] Pipeline drops un-staked, out-of-sync nodes from Tower BFT voting.`);
+            steps.push(`[RESULT] Attack Defeated. High-speed timing + PoS voting requirements filter Sybils.`);
+            steps.push("FAIL");
+        } else if (algoId === "dpos") {
+            steps.push(`[2/4] Deploying Sybil nodes requesting scheduling slots...`);
+            steps.push(`[3/4] Ledger checks delegation database. Slots filled by voter-backed nodes.`);
+            steps.push(`[4/4] Attackers hold 0 delegation tokens. System bypasses un-voted nodes.`);
+            steps.push(`[RESULT] Attack Defeated. DPoS locks proposals to top N delegates.`);
+            steps.push("FAIL");
+        } else if (algoId === "poa") {
+            steps.push(`[2/4] Connecting Sybil nodes to authority networks...`);
+            steps.push(`[3/4] Whitelist signature validation. Keys checked against certificate directory.`);
+            steps.push(`[4/4] Vetting fails. Sybil keys missing from governing consortium.`);
+            steps.push(`[RESULT] Attack Defeated. PoA permits only pre-vetted whitelisted addresses.`);
+            steps.push("FAIL");
+        } else if (algoId === "pbft") {
+            steps.push(`[2/4] Deploying fake nodes querying for quorum inclusion...`);
+            steps.push(`[3/4] Existing nodes examine Quorum Slices. Sybils excluded from trust configs.`);
+            steps.push(`[4/4] Quorum slices closed to unknown actors. Zero consensus influence.`);
+            steps.push(`[RESULT] Attack Defeated. FBA relies on peer-defined trust trees.`);
+            steps.push("FAIL");
+        } else if (algoId === "pob") {
+            steps.push(`[2/4] Launching zero-cost Sybil nodes seeking block production...`);
+            steps.push(`[3/4] Protocol checks on-chain burn history. Sybil addresses have 0 burns.`);
+            steps.push(`[4/4] Virtual mining power = 0. Block selection probability = 0%.`);
+            steps.push(`[RESULT] Attack Defeated. PoB requires irreversible token destruction.`);
             steps.push("FAIL");
         }
-        else if (algoId === "dpos") {
-            steps.push(`[2/4] Deploying Sybil nodes. Requesting slots in scheduling queues...`);
-            steps.push(`[3/4] Ledger checks stakeholder delegation database. Top-voted delegate slots are filled by active, voter-backed nodes.`);
-            steps.push(`[4/4] Attackers hold 0 voter delegation tokens. System bypasses block proposals from un-voted nodes.`);
-            steps.push(`[RESULT] Attack Defeated. DPoS locks block proposal rights to the top N delegates (e.g. 27). Virtual nodes fail to bypass democratic voting.`);
-            steps.push("FAIL");
-        }
-        else if (algoId === "poa") {
-            steps.push(`[2/4] Attempting to connect Sybil nodes directly to BNB/VeChain authority networks...`);
-            steps.push(`[3/4] Whitelist signature validation check. Whitelisted node registry verifies cryptographic identity.`);
-            steps.push(`[4/4] Vetting records fail. Sybil keys are missing from the governing consortium certificate directory.`);
-            steps.push(`[RESULT] Attack Defeated. Proof of Authority permits validation duties only to pre-vetted whitelisted addresses.`);
-            steps.push("FAIL");
-        }
-        else if (algoId === "pbft") {
-            steps.push(`[2/4] Deploying fake nodes. Querying Stellar federated consensus nodes for inclusion...`);
-            steps.push(`[3/4] Stellar Consensus Protocol check. Existing nodes examine local Quorum Slices.`);
-            steps.push(`[4/4] Sybils are excluded from trust config matrices. Quorum slices remain closed to unknown actors.`);
-            steps.push(`[RESULT] Attack Defeated. Federated Byzantine Agreement relies on peer-defined overlapping trust trees. Un-trusted nodes have zero consensus influence.`);
-            steps.push("FAIL");
-        }
-    }
-    else {
-        // 51% / TAKEOVER ATTACK SIMULATION
-        steps.push(`[1/4] Aggregating resources... Attacker commands ${attackerPower}% of total consensus weight.`);
-
+    } else {
+        steps.push(`[1/4] Aggregating resources... Attacker commands ${attackerPower}% of consensus weight.`);
         if (algoId === "pow") {
-            steps.push(`[2/4] Attempting to construct private block series...`);
+            steps.push(`[2/4] Constructing private block series...`);
             if (attackerPower >= 51) {
-                steps.push(`[3/4] Attacker hash power dominates. Private chain length outpaces the public honest chain.`);
-                steps.push(`[4/4] Releasing shadow chain. Nakamoto consensus 'longest-chain rule' forces honest nodes to accept the attacker's double-spend fork.`);
-                steps.push(`[RESULT] Network Compromised! 51% hash takeover successful. Transaction history reorganized.`);
+                steps.push(`[3/4] Attacker hash power dominates. Private chain outpaces honest chain.`);
+                steps.push(`[4/4] Shadow chain released. Longest-chain rule forces double-spend fork.`);
+                steps.push(`[RESULT] Network Compromised! 51% hash takeover successful.`);
                 steps.push("SUCCESS");
             } else {
-                steps.push(`[3/4] Honest network mining speed exceeds attacker capability. Shadow chain cannot keep pace.`);
-                steps.push(`[4/4] Attacker blocks rejected. Honest nodes continue built on standard canonical blocks.`);
-                steps.push(`[RESULT] Attack Blocked. Insufficient hashrate to rewrite history. Nakamoto consensus remains secure.`);
+                steps.push(`[3/4] Honest network mining speed exceeds attacker capability.`);
+                steps.push(`[4/4] Attacker blocks rejected. Canonical chain maintained.`);
+                steps.push(`[RESULT] Attack Blocked. Insufficient hashrate.`);
                 steps.push("FAIL");
             }
-        }
-        else if (algoId === "pos") {
-            steps.push(`[2/4] Staking validator keys. Activating signatures on conflicting block proposals...`);
+        } else if (algoId === "pos") {
+            steps.push(`[2/4] Staking validator keys. Activating conflicting block proposals...`);
             if (attackerPower >= 51) {
-                steps.push(`[3/4] Attacker holds absolute stake majority. Finalizing double-signed checkpoints.`);
-                steps.push(`[4/4] Attackers validate conflicting states. Double-spend transactions finalized.`);
-                steps.push(`[RESULT] Network Compromised! 51% stake takeover successful. Finality safeguards breached.`);
+                steps.push(`[3/4] Absolute stake majority. Finalizing double-signed checkpoints.`);
+                steps.push(`[4/4] Conflicting states validated. Double-spend finalized.`);
+                steps.push(`[RESULT] Network Compromised! 51% stake takeover successful.`);
                 steps.push("SUCCESS");
             } else if (attackerPower >= 33) {
-                steps.push(`[3/4] Attacker stake exceeds liveness safety bounds. Attacker validators stall signature attestations.`);
-                steps.push(`[4/4] Staking engine fails to gather 66.7% supermajority attestation required to finalize blocks.`);
-                steps.push(`[RESULT] Liveness Halted. Consensus stalled. Double-spend failed, but transaction settlement is blocked.`);
+                steps.push(`[3/4] Stake exceeds liveness safety bounds. Attestations stalled.`);
+                steps.push(`[4/4] Engine fails to gather 66.7% supermajority. Blocks frozen.`);
+                steps.push(`[RESULT] Liveness Halted. Settlement blocked, but no double-spend.`);
                 steps.push("PARTIAL");
             } else {
-                steps.push(`[3/4] Attestation pool maintains >67% honest participation. Malicious votes are mathematically ignored.`);
-                steps.push(`[4/4] Double-signing detected. Ethereum slashing smart contract destroys the attacker's locked ETH stakes.`);
-                steps.push(`[RESULT] Attack Blocked. Attacker assets slashed. Consensus integrity preserved.`);
+                steps.push(`[3/4] >67% honest participation maintained. Malicious votes ignored.`);
+                steps.push(`[4/4] Double-signing detected. Attacker ETH stakes slashed.`);
+                steps.push(`[RESULT] Attack Blocked. Assets slashed. Integrity preserved.`);
                 steps.push("FAIL");
             }
-        }
-        else if (algoId === "poh") {
-            steps.push(`[2/4] Running sequential VDF pipelines and signing blocks on Solana validators...`);
+        } else if (algoId === "poh") {
+            steps.push(`[2/4] Running VDF pipelines on Solana validators...`);
             if (attackerPower >= 51) {
-                steps.push(`[3/4] Attacker stake controls leader schedules. Solana pipelines accept manipulated timestamps.`);
-                steps.push(`[4/4] Leader nodes rewrite sequential entries. Censorship of honest user transactions achieved.`);
-                steps.push(`[RESULT] Network Compromised! 51% control of sequence and stake achieved.`);
+                steps.push(`[3/4] Attacker controls leader schedules. Timestamps manipulated.`);
+                steps.push(`[4/4] Leader nodes rewrite sequential entries. Censorship achieved.`);
+                steps.push(`[RESULT] Network Compromised! 51% sequence + stake control.`);
                 steps.push("SUCCESS");
             } else if (attackerPower >= 33) {
-                steps.push(`[3/4] Tower BFT consensus voting pool threshold check. Attacker blocks voting progress.`);
-                steps.push(`[4/4] Sub-second finality fails due to missing voting majorities. Transaction confirmations freeze.`);
-                steps.push(`[RESULT] Liveness Halted. Fast settlement stopped. Chain freezes, though double-spend was blocked.`);
+                steps.push(`[3/4] Tower BFT voting pool threshold check. Progress blocked.`);
+                steps.push(`[4/4] Sub-second finality fails. Transaction confirmations freeze.`);
+                steps.push(`[RESULT] Liveness Halted. Chain freezes, double-spend blocked.`);
                 steps.push("PARTIAL");
             } else {
-                steps.push(`[3/4] Tower BFT maintains high-speed validation. Honest leader schedules remain aligned.`);
-                steps.push(`[4/4] Out-of-sync block proposals are dropped. Leader pipeline bypasses delayed validator responses.`);
-                steps.push(`[RESULT] Attack Blocked. Fast pipelines and Tower BFT voting weights drop minority attacker nodes.`);
+                steps.push(`[3/4] Tower BFT maintains high-speed validation.`);
+                steps.push(`[4/4] Out-of-sync proposals dropped. Pipeline bypasses attacker.`);
+                steps.push(`[RESULT] Attack Blocked. Minority attacker nodes dropped.`);
                 steps.push("FAIL");
             }
-        }
-        else if (algoId === "dpos") {
-            steps.push(`[2/4] Acquiring tokens to vote. Attempting to hijack delegate seats...`);
+        } else if (algoId === "dpos") {
+            steps.push(`[2/4] Acquiring tokens to hijack delegate seats...`);
             if (attackerPower >= 51) {
-                steps.push(`[3/4] Voter turnout manipulation. Attacker elects a majority (e.g. 14 of 27) of Super Representatives.`);
-                steps.push(`[4/4] Malicious representatives collude to write conflicting blocks and sign double-spend state changes.`);
-                steps.push(`[RESULT] Network Compromised! Attacker captured majority representative slots (51%+), subverting consensus.`);
+                steps.push(`[3/4] Voter manipulation. Majority Super Representatives captured.`);
+                steps.push(`[4/4] Malicious reps collude for double-spend state changes.`);
+                steps.push(`[RESULT] Network Compromised! Majority seats subverted.`);
                 steps.push("SUCCESS");
             } else {
-                steps.push(`[3/4] Attacker elects only a minority of delegates. Honest representatives maintain majority validation.`);
-                steps.push(`[4/4] Malicious block suggestions from attacker representatives are rejected by honest delegate consensus.`);
-                steps.push(`[RESULT] Attack Blocked. Voter delegation failed to secure majority seat representation.`);
+                steps.push(`[3/4] Only minority delegates elected. Honest majority maintained.`);
+                steps.push(`[4/4] Malicious block suggestions rejected by honest consensus.`);
+                steps.push(`[RESULT] Attack Blocked. Voter delegation insufficient.`);
                 steps.push("FAIL");
             }
-        }
-        else if (algoId === "poa") {
-            steps.push(`[2/4] Compromising keys or colluding with whitelisted authority nodes...`);
+        } else if (algoId === "poa") {
+            steps.push(`[2/4] Compromising whitelisted authority keys...`);
             if (attackerPower >= 51) {
-                steps.push(`[3/4] Attacker controls more than half of whitelisted authority keys (51%+).`);
-                steps.push(`[4/4] Malicious authority validators execute double-signature forks. Consortium validation rules accept signatures.`);
-                steps.push(`[RESULT] Network Compromised! Collusion takeover successful. Central gatekeeper trust was breached.`);
+                steps.push(`[3/4] Attacker controls >50% authority keys.`);
+                steps.push(`[4/4] Double-signature forks executed. Consortium trust breached.`);
+                steps.push(`[RESULT] Network Compromised! Collusion takeover successful.`);
                 steps.push("SUCCESS");
             } else {
-                steps.push(`[3/4] Honest whitelisted nodes detect conflicting signatures from the compromised validator subset.`);
-                steps.push(`[4/4] Off-chain governance council executes emergency key rotation, revoking compromised node certificates.`);
-                steps.push(`[RESULT] Attack Blocked. Consortium governance rotated keys, maintaining network operation.`);
+                steps.push(`[3/4] Honest nodes detect conflicting signatures.`);
+                steps.push(`[4/4] Governance council rotates keys, revoking compromised nodes.`);
+                steps.push(`[RESULT] Attack Blocked. Key rotation maintained operations.`);
                 steps.push("FAIL");
             }
-        }
-        else if (algoId === "pbft") {
-            steps.push(`[2/4] Compromising core institutional validators in Stellar quorum slices...`);
+        } else if (algoId === "pbft") {
+            steps.push(`[2/4] Compromising core institutional validators...`);
             if (attackerPower >= 51) {
-                steps.push(`[3/4] Attacker nodes dominate critical quorum intersections. Overlapping slices agree on the malicious state.`);
-                steps.push(`[4/4] Federated Byzantine Consensus validates the duplicate ledger slots. Double-spend externalized.`);
-                steps.push(`[RESULT] Network Compromised! Core trusted institution takeover successful.`);
+                steps.push(`[3/4] Attacker dominates critical quorum intersections.`);
+                steps.push(`[4/4] FBA validates duplicate ledger slots. Double-spend externalized.`);
+                steps.push(`[RESULT] Network Compromised! Core institution takeover.`);
                 steps.push("SUCCESS");
             } else if (attackerPower >= 33) {
-                steps.push(`[3/4] Attacker nodes refuse to ballot-vote on active transaction slots.`);
-                steps.push(`[4/4] Quorum slices cannot align on transaction selection. Ledger halts safety operations to prevent forks.`);
-                steps.push(`[RESULT] Liveness Halted. Ledger progression frozen to prevent double-spending. Stellar safety rules enforced.`);
+                steps.push(`[3/4] Attacker nodes refuse to ballot-vote on transaction slots.`);
+                steps.push(`[4/4] Quorum slices cannot align. Ledger halts to prevent forks.`);
+                steps.push(`[RESULT] Liveness Halted. Safety rules enforced.`);
                 steps.push("PARTIAL");
             } else {
-                steps.push(`[3/4] Quorum slices bypass the faulty/silent node subset. Overlapping agreements maintained.`);
-                steps.push(`[4/4] Stellar Consensus Protocol externalizes transactions seamlessly using remaining active trust slices.`);
-                steps.push(`[RESULT] Attack Blocked. Federated agreement tolerates minority validator failure easily.`);
+                steps.push(`[3/4] Quorum slices bypass faulty nodes. Agreements maintained.`);
+                steps.push(`[4/4] Transactions externalized seamlessly using active trust slices.`);
+                steps.push(`[RESULT] Attack Blocked. Minority failure tolerated.`);
+                steps.push("FAIL");
+            }
+        } else if (algoId === "pob") {
+            steps.push(`[2/4] Burning tokens to accumulate virtual mining power...`);
+            if (attackerPower >= 51) {
+                steps.push(`[3/4] Attacker has burned >51% of total burn pool. Dominates block selection.`);
+                steps.push(`[4/4] Attacker produces consecutive blocks. Double-spend executed.`);
+                steps.push(`[RESULT] Network Compromised! Majority burn power takeover.`);
+                steps.push("SUCCESS");
+            } else {
+                steps.push(`[3/4] Honest burn pool exceeds attacker's. Block selection stays distributed.`);
+                steps.push(`[4/4] Attacker's burned tokens are permanently lost with no return.`);
+                steps.push(`[RESULT] Attack Blocked. Irreversible cost deters sustained attacks.`);
                 steps.push("FAIL");
             }
         }
     }
-    // Animate the log text line-by-line
+
+    // Animate log
     let logText = "";
     let logIdx = 0;
     function runLogInterval() {
@@ -933,9 +1447,8 @@ function runAttackSimulation(attackType) {
             simLogText.textContent = logText;
             simLogText.scrollTop = simLogText.scrollHeight;
             logIdx++;
-            simTimeoutId = setTimeout(runLogInterval, 900);
+            simTimeoutId = setTimeout(runLogInterval, 800);
         } else {
-            // Last element is the outcome keyword
             const outcome = steps[steps.length - 1];
             if (outcome === "SUCCESS") {
                 simOutcomeText.textContent = "ATTACK SUCCEEDED ⚠️";
@@ -947,13 +1460,14 @@ function runAttackSimulation(attackType) {
                 simOutcomeText.textContent = "ATTACK DEFEATED ✅";
                 simOutcomeText.className = "sim-outcome outcome-fail";
             }
-
-            // Re-enable buttons
             btnSybil.disabled = false;
             btnTakeover.disabled = false;
         }
     }
     simTimeoutId = setTimeout(runLogInterval, 300);
 }
-// 12. Run on page load
+
+// ==========================================================================
+// 14. INIT ON LOAD
+// ==========================================================================
 window.addEventListener("DOMContentLoaded", init);
