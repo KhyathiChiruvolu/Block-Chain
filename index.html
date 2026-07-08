@@ -18,32 +18,76 @@
         <canvas id="hero-canvas"></canvas>
         <div class="hero-overlay"></div>
         <div class="hero-content">
-            <div class="hero-badge">⛓️ Interactive Blockchain Explorer</div>
-            <h1>Consensus Algorithms<br><span class="hero-gradient">Visualized & Compared</span></h1>
-            <p class="hero-subtitle">Explore how blockchains reach agreement — with live mimicking animations,
-                trilemma trade-off analysis, cross-chain compatibility maps, and interactive attack simulations.</p>
-            <div class="hero-stats">
-                <div class="hero-stat">
-                    <span class="hero-stat-num">7</span>
-                    <span class="hero-stat-label">Algorithms</span>
+            <!-- Left Info Panel -->
+            <div class="hero-info-panel">
+                <div class="hero-badge">⛓️ Interactive Blockchain Explorer</div>
+                <h1>Consensus Algorithms</h1>
+                
+                <!-- Meaning Card -->
+                <div class="intro-card meaning-card">
+                    <div class="card-header">
+                        <span class="card-icon">🧠</span>
+                        <h3>What is a Consensus Algorithm?</h3>
+                    </div>
+                    <p>A fundamental protocol in distributed computing that allows a network of independent computers (nodes) to agree on a single, shared state or transaction history, ensuring trust and security without a central authority.</p>
                 </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="hero-stat-num">12</span>
-                    <span class="hero-stat-label">Blockchains</span>
+
+                <!-- How It Works Card -->
+                <div class="intro-card how-card">
+                    <div class="card-header">
+                        <span class="card-icon">⚙️</span>
+                        <h3>How It Works</h3>
+                    </div>
+                    <div class="how-steps">
+                        <div class="how-step active" data-step="0">
+                            <span class="step-num">1</span>
+                            <div class="step-text">
+                                <h4>Transaction Broadcast</h4>
+                                <p>Users sign and submit transactions, which propagate to all nodes in the network.</p>
+                            </div>
+                        </div>
+                        <div class="how-step" data-step="1">
+                            <span class="step-num">2</span>
+                            <div class="step-text">
+                                <h4>Block Proposal</h4>
+                                <p>A designated or competing validator compiles pending transactions into a new candidate block.</p>
+                            </div>
+                        </div>
+                        <div class="how-step" data-step="2">
+                            <span class="step-num">3</span>
+                            <div class="step-text">
+                                <h4>Network Validation</h4>
+                                <p>Nodes verify the proposed block using cryptographic rules (e.g., PoW math, PoS signatures).</p>
+                            </div>
+                        </div>
+                        <div class="how-step" data-step="3">
+                            <span class="step-num">4</span>
+                            <div class="step-text">
+                                <h4>Consensus &amp; Commit</h4>
+                                <p>Once validation succeeds, nodes append the block to their local copy of the blockchain ledger.</p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="hero-stat-divider"></div>
-                <div class="hero-stat">
-                    <span class="hero-stat-num">64</span>
-                    <span class="hero-stat-label">Compatibility Pairs</span>
+
+                <a href="#algo-nav" class="hero-cta">
+                    <span>Start Exploring Algorithms</span>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M19 12l-7 7-7-7" />
+                    </svg>
+                </a>
+            </div>
+
+            <!-- Right Visual Panel (Interactive Animation) -->
+            <div class="hero-visual-panel">
+                <div class="animation-container">
+                    <canvas id="how-works-canvas"></canvas>
+                    <div class="anim-status-banner">
+                        <span id="anim-status-dot" class="status-dot-pulse"></span>
+                        <span id="anim-status-text">Broadcasting Transactions...</span>
+                    </div>
                 </div>
             </div>
-            <a href="#algo-nav" class="hero-cta">
-                <span>Start Exploring</span>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 5v14M19 12l-7 7-7-7" />
-                </svg>
-            </a>
         </div>
     </section>
 

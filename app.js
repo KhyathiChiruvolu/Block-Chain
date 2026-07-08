@@ -339,6 +339,7 @@ function init() {
     setupScrollReveal();
     setupStickyNav();
     initHeroCanvas();
+    initHowWorksCanvas();
     initConsensusCanvas();
     renderCompatibilityMatrix();
     updateDashboard(activeAlgoId);
@@ -484,6 +485,540 @@ function initHeroCanvas() {
     }
 
     drawHero();
+}
+
+// ==========================================================================
+// 8b. GENERAL CONSENSUS "HOW IT WORKS" INTERACTIVE ANIMATION
+// ==========================================================================
+let howWorksState = {
+    canvas: null,
+    ctx: null,
+    time: 0,
+    currentPhase: 0,
+    phaseTime: 0,
+    phaseDuration: 240, // 4 seconds at 60fps
+    particles: [],
+    nodes: [],
+    clientNode: { x: 0, y: 0, radius: 18, pulse: 0 }
+};
+
+function initHowWorksCanvas() {
+    const canvas = document.getElementById("how-works-canvas");
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+
+    function resize() {
+        canvas.width = canvas.offsetWidth * window.devicePixelRatio;
+        canvas.height = canvas.offsetHeight * window.devicePixelRatio;
+        ctx.setTransform(window.devicePixelRatio, 0, 0, window.devicePixelRatio, 0, 0);
+        setupHowWorksNodes(canvas.offsetWidth, canvas.offsetHeight);
+    }
+    
+    resize();
+    window.addEventListener("resize", resize);
+    
+    howWorksState.canvas = canvas;
+    howWorksState.ctx = ctx;
+    howWorksState.time = 0;
+    howWorksState.currentPhase = 0;
+    howWorksState.phaseTime = 0;
+    howWorksState.particles = [];
+    
+    bindHowWorksEvents();
+    runHowWorksAnimation();
+}
+
+function setupHowWorksNodes(w, h) {
+    const cx = w / 2;
+    const cy = h / 2 - 30;
+    const r = Math.min(w, h) * 0.28;
+    
+    howWorksState.nodes = [];
+    for (let i = 0; i < 5; i++) {
+        const angle = (i * 2 * Math.PI / 5) - Math.PI / 2;
+        howWorksState.nodes.push({
+            id: i,
+            x: cx + r * Math.cos(angle),
+            y: cy + r * Math.sin(angle),
+            radius: 20,
+            pulse: 0,
+            isProposer: i === 0,
+            hasBlock: false,
+            verified: false
+        });
+    }
+    
+    howWorksState.clientNode = {
+        x: w / 2,
+        y: h - 60,
+        radius: 18,
+        pulse: 0
+    };
+}
+
+function bindHowWorksEvents() {
+    const steps = document.querySelectorAll(".how-step");
+    steps.forEach(step => {
+        step.addEventListener("click", () => {
+            const stepIdx = parseInt(step.getAttribute("data-step"));
+            if (!isNaN(stepIdx)) {
+                howWorksState.currentPhase = stepIdx;
+                howWorksState.phaseTime = 0;
+                howWorksState.particles = [];
+                howWorksState.nodes.forEach(n => {
+                    n.hasBlock = false;
+                    n.verified = false;
+                });
+                updateUIHowWorksStep(stepIdx);
+            }
+        });
+    });
+}
+
+function updateUIHowWorksStep(stepIndex) {
+    const steps = document.querySelectorAll(".how-step");
+    steps.forEach((step, idx) => {
+        if (idx === stepIndex) {
+            step.classList.add("active");
+        } else {
+            step.classList.remove("active");
+        }
+    });
+
+    const statusText = document.getElementById("anim-status-text");
+    const statusDot = document.getElementById("anim-status-dot");
+    if (statusText) {
+        switch (stepIndex) {
+            case 0:
+                statusText.textContent = "Broadcasting Transactions to Network...";
+                if (statusDot) statusDot.style.background = "var(--color-scalability)";
+                break;
+            case 1:
+                statusText.textContent = "Validator Proposing New Block...";
+                if (statusDot) statusDot.style.background = "#ffb000";
+                break;
+            case 2:
+                statusText.textContent = "Nodes Verifying & Voting on Block...";
+                if (statusDot) statusDot.style.background = "var(--color-decentralisation)";
+                break;
+            case 3:
+                statusText.textContent = "Consensus Achieved! Block Committed.";
+                if (statusDot) statusDot.style.background = "var(--color-security)";
+                break;
+        }
+    }
+}
+
+function runHowWorksAnimation() {
+    let animFrame;
+    function loop() {
+        const { canvas, ctx } = howWorksState;
+        if (!canvas) return;
+        const w = canvas.offsetWidth;
+        const h = canvas.offsetHeight;
+        ctx.clearRect(0, 0, w, h);
+
+        howWorksState.time++;
+        howWorksState.phaseTime++;
+
+        if (howWorksState.phaseTime >= howWorksState.phaseDuration) {
+            howWorksState.currentPhase = (howWorksState.currentPhase + 1) % 4;
+            howWorksState.phaseTime = 0;
+            howWorksState.particles = [];
+            howWorksState.nodes.forEach(n => {
+                n.hasBlock = false;
+                n.verified = false;
+            });
+            updateUIHowWorksStep(howWorksState.currentPhase);
+        }
+
+        drawNetworkConnections(ctx);
+
+        switch (howWorksState.currentPhase) {
+            case 0:
+                drawPhase0Broadcast(ctx, w, h);
+                break;
+            case 1:
+                drawPhase1Proposal(ctx, w, h);
+                break;
+            case 2:
+                drawPhase2Validation(ctx, w, h);
+                break;
+            case 3:
+                drawPhase3Commit(ctx, w, h);
+                break;
+        }
+
+        drawNodes(ctx);
+
+        animFrame = requestAnimationFrame(loop);
+    }
+    loop();
+}
+
+function drawNetworkConnections(ctx) {
+    ctx.strokeStyle = "rgba(0, 242, 254, 0.08)";
+    ctx.lineWidth = 1;
+    const nodes = howWorksState.nodes;
+    
+    for (let i = 0; i < nodes.length; i++) {
+        for (let j = i + 1; j < nodes.length; j++) {
+            ctx.beginPath();
+            ctx.moveTo(nodes[i].x, nodes[i].y);
+            ctx.lineTo(nodes[j].x, nodes[j].y);
+            ctx.stroke();
+        }
+    }
+    
+    const client = howWorksState.clientNode;
+    ctx.strokeStyle = "rgba(0, 242, 254, 0.04)";
+    nodes.forEach(node => {
+        ctx.beginPath();
+        ctx.moveTo(client.x, client.y);
+        ctx.lineTo(node.x, node.y);
+        ctx.stroke();
+    });
+}
+
+function drawNodes(ctx) {
+    const nodes = howWorksState.nodes;
+    const client = howWorksState.clientNode;
+    
+    // Draw Client
+    client.pulse += 0.03;
+    const clientPulseRadius = client.radius + Math.sin(client.pulse) * 4;
+    ctx.beginPath();
+    ctx.arc(client.x, client.y, clientPulseRadius, 0, Math.PI * 2);
+    ctx.fillStyle = "rgba(0, 242, 254, 0.08)";
+    ctx.strokeStyle = "rgba(0, 242, 254, 0.25)";
+    ctx.lineWidth = 1.5;
+    ctx.fill();
+    ctx.stroke();
+    
+    ctx.beginPath();
+    ctx.arc(client.x, client.y, client.radius - 4, 0, Math.PI * 2);
+    ctx.fillStyle = "#050811";
+    ctx.strokeStyle = "#00f2fe";
+    ctx.lineWidth = 2.5;
+    ctx.fill();
+    ctx.stroke();
+    
+    ctx.font = "bold 9px system-ui, sans-serif";
+    ctx.fillStyle = "#fff";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("WALLET", client.x, client.y);
+    
+    // Draw Validators
+    nodes.forEach((node, idx) => {
+        node.pulse += 0.02;
+        
+        const isProposer = node.isProposer && howWorksState.currentPhase === 1;
+        const isValidating = howWorksState.currentPhase === 2;
+        const isCommitting = howWorksState.currentPhase === 3;
+        
+        let ringColor = "rgba(255, 255, 255, 0.04)";
+        let bodyBorderColor = "rgba(255, 255, 255, 0.2)";
+        let glowColor = "transparent";
+        let glowBlur = 0;
+        
+        if (isProposer) {
+            ringColor = "rgba(255, 176, 0, 0.12)";
+            bodyBorderColor = "#ffb000";
+            glowColor = "rgba(255, 176, 0, 0.35)";
+            glowBlur = 8;
+        } else if (isValidating) {
+            if (node.verified) {
+                ringColor = "rgba(5, 201, 140, 0.12)";
+                bodyBorderColor = "#05c98c";
+                glowColor = "rgba(5, 201, 140, 0.25)";
+                glowBlur = 6;
+            } else {
+                ringColor = "rgba(0, 242, 254, 0.08)";
+                bodyBorderColor = "#00f2fe";
+            }
+        } else if (isCommitting) {
+            ringColor = "rgba(5, 201, 140, 0.18)";
+            bodyBorderColor = "#05c98c";
+            glowColor = "rgba(5, 201, 140, 0.35)";
+            glowBlur = 10;
+        }
+        
+        const pulseAmt = Math.sin(node.pulse) * 2;
+        const pulseRad = node.radius + (isProposer || isCommitting ? pulseAmt + 2 : 0);
+        
+        ctx.shadowColor = glowColor;
+        ctx.shadowBlur = glowBlur;
+        
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, pulseRad, 0, Math.PI * 2);
+        ctx.fillStyle = ringColor;
+        ctx.strokeStyle = bodyBorderColor;
+        ctx.lineWidth = isProposer || isCommitting ? 2 : 1.5;
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.shadowBlur = 0;
+        
+        ctx.beginPath();
+        ctx.arc(node.x, node.y, node.radius - 4, 0, Math.PI * 2);
+        ctx.fillStyle = "#0c1424";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.08)";
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.font = "bold 9px system-ui, sans-serif";
+        ctx.fillStyle = isProposer ? "#ffb000" : "#fff";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText(`Node ${idx + 1}`, node.x, node.y);
+        
+        if (isCommitting) {
+            drawLocalBlockchain(ctx, node);
+        }
+    });
+}
+
+function drawLocalBlockchain(ctx, node) {
+    const size = 6;
+    const gap = 3;
+    const startX = node.x - (size * 3 + gap * 2) / 2;
+    const startY = node.y + 20;
+    
+    for (let i = 0; i < 3; i++) {
+        const bx = startX + i * (size + gap);
+        const by = startY;
+        const isNew = i === 2;
+        
+        ctx.fillStyle = isNew ? "#05c98c" : "rgba(255,255,255,0.15)";
+        ctx.strokeStyle = isNew ? "#05c98c" : "rgba(255,255,255,0.3)";
+        ctx.lineWidth = 0.8;
+        
+        ctx.beginPath();
+        ctx.roundRect(bx, by, size, size, 1.5);
+        ctx.fill();
+        ctx.stroke();
+        
+        if (i > 0) {
+            ctx.beginPath();
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.moveTo(bx, by + size/2);
+            ctx.lineTo(bx - gap, by + size/2);
+            ctx.stroke();
+        }
+    }
+}
+
+function drawPhase0Broadcast(ctx, w, h) {
+    const client = howWorksState.clientNode;
+    const nodes = howWorksState.nodes;
+    const phaseTime = howWorksState.phaseTime;
+    
+    if (phaseTime % 15 === 0 && phaseTime < 160) {
+        const targetNode = nodes[Math.floor(Math.random() * nodes.length)];
+        howWorksState.particles.push({
+            type: "tx",
+            x: client.x,
+            y: client.y,
+            startX: client.x,
+            startY: client.y,
+            endX: targetNode.x,
+            endY: targetNode.y,
+            progress: 0,
+            speed: 0.025,
+            targetNode: targetNode
+        });
+    }
+    
+    for (let i = howWorksState.particles.length - 1; i >= 0; i--) {
+        const p = howWorksState.particles[i];
+        p.progress += p.speed;
+        if (p.progress >= 1) {
+            p.targetNode.pulse = 0;
+            howWorksState.particles.splice(i, 1);
+            continue;
+        }
+        
+        const px = p.startX + (p.endX - p.startX) * p.progress;
+        const py = p.startY + (p.endY - p.startY) * p.progress;
+        
+        ctx.beginPath();
+        ctx.arc(px, py, 3.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#00f2fe";
+        ctx.shadowColor = "#00f2fe";
+        ctx.shadowBlur = 6;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+}
+
+function drawPhase1Proposal(ctx, w, h) {
+    const nodes = howWorksState.nodes;
+    const proposer = nodes[0];
+    const phaseTime = howWorksState.phaseTime;
+    
+    if (phaseTime < 50) {
+        const progress = phaseTime / 50;
+        ctx.strokeStyle = "#ffb000";
+        ctx.lineWidth = 1.5;
+        ctx.shadowColor = "#ffb000";
+        ctx.shadowBlur = 6;
+        
+        ctx.beginPath();
+        const rectSize = 12 * progress;
+        ctx.roundRect(proposer.x - rectSize/2, proposer.y - 28, rectSize, rectSize, 2);
+        ctx.stroke();
+        
+        ctx.fillStyle = "rgba(255, 176, 0, 0.15)";
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    } else {
+        if (phaseTime === 50) {
+            for (let i = 1; i < nodes.length; i++) {
+                howWorksState.particles.push({
+                    type: "block",
+                    x: proposer.x,
+                    y: proposer.y - 22,
+                    startX: proposer.x,
+                    startY: proposer.y - 22,
+                    endX: nodes[i].x,
+                    endY: nodes[i].y,
+                    progress: 0,
+                    speed: 0.025,
+                    targetNode: nodes[i]
+                });
+            }
+        }
+        
+        ctx.fillStyle = "rgba(255, 176, 0, 0.25)";
+        ctx.strokeStyle = "#ffb000";
+        ctx.lineWidth = 1.8;
+        ctx.beginPath();
+        ctx.roundRect(proposer.x - 6, proposer.y - 34, 12, 12, 2.5);
+        ctx.fill();
+        ctx.stroke();
+        
+        for (let i = howWorksState.particles.length - 1; i >= 0; i--) {
+            const p = howWorksState.particles[i];
+            p.progress += p.speed;
+            if (p.progress >= 1) {
+                p.targetNode.hasBlock = true;
+                p.targetNode.pulse = 0;
+                howWorksState.particles.splice(i, 1);
+                continue;
+            }
+            
+            const px = p.startX + (p.endX - p.startX) * p.progress;
+            const py = p.startY + (p.endY - p.startY) * p.progress;
+            
+            ctx.fillStyle = "rgba(255, 176, 0, 0.3)";
+            ctx.strokeStyle = "#ffb000";
+            ctx.lineWidth = 1.2;
+            ctx.beginPath();
+            ctx.roundRect(px - 4, py - 4, 8, 8, 1.5);
+            ctx.fill();
+            ctx.stroke();
+        }
+        
+        nodes.forEach(node => {
+            if (node.hasBlock && node !== proposer) {
+                ctx.fillStyle = "rgba(255, 176, 0, 0.15)";
+                ctx.strokeStyle = "rgba(255, 176, 0, 0.5)";
+                ctx.lineWidth = 1;
+                ctx.beginPath();
+                ctx.roundRect(node.x - 4, node.y - 22, 8, 8, 1.5);
+                ctx.fill();
+                ctx.stroke();
+            }
+        });
+    }
+}
+
+function drawPhase2Validation(ctx, w, h) {
+    const nodes = howWorksState.nodes;
+    const phaseTime = howWorksState.phaseTime;
+    
+    nodes.forEach((node, idx) => {
+        const verifyStart = idx * 12;
+        const verifiedAt = verifyStart + 35;
+        
+        if (phaseTime > verifyStart && phaseTime < verifiedAt) {
+            ctx.strokeStyle = "#00f2fe";
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            const startAngle = (phaseTime * 0.12) % (2 * Math.PI);
+            ctx.arc(node.x, node.y, node.radius + 5, startAngle, startAngle + Math.PI * 0.6);
+            ctx.stroke();
+        } else if (phaseTime >= verifiedAt) {
+            node.verified = true;
+            ctx.fillStyle = "#05c98c";
+            ctx.font = "bold 9px system-ui, sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText("✓", node.x + 15, node.y - 10);
+        }
+    });
+    
+    if (phaseTime === 50) {
+        for (let i = 0; i < nodes.length; i++) {
+            const nextNode = nodes[(i + 1) % nodes.length];
+            const prevNode = nodes[(i - 1 + nodes.length) % nodes.length];
+            
+            howWorksState.particles.push({
+                type: "vote",
+                startX: nodes[i].x,
+                startY: nodes[i].y,
+                endX: nextNode.x,
+                endY: nextNode.y,
+                progress: 0,
+                speed: 0.03
+            });
+            howWorksState.particles.push({
+                type: "vote",
+                startX: nodes[i].x,
+                startY: nodes[i].y,
+                endX: prevNode.x,
+                endY: prevNode.y,
+                progress: 0,
+                speed: 0.03
+            });
+        }
+    }
+    
+    for (let i = howWorksState.particles.length - 1; i >= 0; i--) {
+        const p = howWorksState.particles[i];
+        p.progress += p.speed;
+        if (p.progress >= 1) {
+            howWorksState.particles.splice(i, 1);
+            continue;
+        }
+        
+        const px = p.startX + (p.endX - p.startX) * p.progress;
+        const py = p.startY + (p.endY - p.startY) * p.progress;
+        
+        ctx.beginPath();
+        ctx.arc(px, py, 2.5, 0, Math.PI * 2);
+        ctx.fillStyle = "#05c98c";
+        ctx.shadowColor = "#05c98c";
+        ctx.shadowBlur = 4;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+    }
+}
+
+function drawPhase3Commit(ctx, w, h) {
+    const phaseTime = howWorksState.phaseTime;
+    const cx = w / 2;
+    const cy = h / 2 - 30;
+    
+    if (phaseTime < 180) {
+        ctx.fillStyle = "rgba(5, 201, 140, " + Math.max(0, Math.min(0.85, (120 - phaseTime) / 30)) + ")";
+        ctx.font = "bold 13px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("CONSENSUS ACHIEVED", cx, cy);
+    }
 }
 
 // ==========================================================================
