@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Consensus Algorithms in Blockchain — A Comparative Explorer</title>
+    <meta name="description"
+        content="An interactive visual explorer comparing major blockchain consensus algorithms like PoW, PoS, PoH, DPoS, PoA, and PBFT across Scalability, Security, and Decentralisation.">
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <header>
+        <h1>Consensus Algorithms in Blockchain</h1>
+        <p>A Comparative Interactive Explorer of Protocol Security, Decentralisation, and Scalability Trade-offs</p>
+
+        <div class="trilemma-intro">
+            <div class="trilemma-term term-scale" id="term-scalability">
+                <span></span>Scalability
+                <div class="tooltip-text">Measured by transactions per second (TPS) and block finality times. Higher
+                    scalability allows for higher throughput but often sacrifices decentralisation or security.</div>
+            </div>
+            <div class="trilemma-term term-sec" id="term-security">
+                <span></span>Security
+                <div class="tooltip-text">Resistance to attacks (like 51% hash power or Sybil attacks). Highly secure
+                    networks prevent malicious actors from rewriting transactions.</div>
+            </div>
+            <div class="trilemma-term term-dec" id="term-decentralisation">
+                <span></span>Decentralisation
+                <div class="tooltip-text">Degree of independent node participation. Greater decentralisation prevents
+                    single points of failure and censorship.</div>
+            </div>
+        </div>
+    </header>
+    <main class="container">
+
+        <!-- Algorithm Card Selector -->
+        <section class="selector-grid" aria-label="Consensus Algorithm Selector">
+            <button class="algo-card card-pow active" data-algo="pow" aria-pressed="true">
+                <h3>Proof of Work</h3>
+                <span>PoW</span>
+            </button>
+            <button class="algo-card card-pos" data-algo="pos" aria-pressed="false">
+                <h3>Proof of Stake</h3>
+                <span>PoS</span>
+            </button>
+            <button class="algo-card card-poh" data-algo="poh" aria-pressed="false">
+                <h3>Proof of History</h3>
+                <span>PoH + PoS</span>
+            </button>
+            <button class="algo-card card-dpos" data-algo="dpos" aria-pressed="false">
+                <h3>Delegated PoS</h3>
+                <span>DPoS</span>
+            </button>
+            <button class="algo-card card-poa" data-algo="poa" aria-pressed="false">
+                <h3>Proof of Authority</h3>
+                <span>PoA</span>
+            </button>
+            <button class="algo-card card-pbft" data-algo="pbft" aria-pressed="false">
+                <h3>Byzantine Fault Tolerance</h3>
+                <span>PBFT / FBA</span>
+            </button>
+        </section>
+        <!-- Main Dynamic Panels -->
+        <div class="dashboard-grid">
+
+            <!-- Panel 1: Overview & Step-by-Step Flow -->
+            <section class="panel panel-pow" id="panel-overview">
+                <h2 class="panel-title">Algorithm Overview & Flow</h2>
+                <div class="overview-text">
+                    <p id="algo-description">...</p>
+                    <div class="tagline" id="algo-tagline">...</div>
+                </div>
+
+                <h3 style="font-size: 1.05rem; margin-top: 1.5rem; margin-bottom: 0.75rem;">Step-by-Step Transaction
+                    Flow</h3>
+                <div class="timeline-container" id="timeline-flow" aria-live="polite">
+                    <!-- Timeline steps dynamically loaded here -->
+                </div>
+            </section>
+            <!-- Panel 2: Trilemma Scorecard & Custom Radar -->
+            <section class="panel panel-pow" id="panel-trilemma">
+                <h2 class="panel-title">Blockchain Trilemma Analysis</h2>
+
+                <div class="trilemma-grid">
+                    <div class="radar-container">
+                        <svg class="radar-chart" viewBox="0 0 240 240" aria-hidden="true">
+                            <!-- Radial Grid Circles -->
+                            <circle cx="120" cy="120" r="100" class="radar-grid-line"></circle>
+                            <circle cx="120" cy="120" r="75" class="radar-grid-line"></circle>
+                            <circle cx="120" cy="120" r="50" class="radar-grid-line"></circle>
+                            <circle cx="120" cy="120" r="25" class="radar-grid-line"></circle>
+
+                            <!-- Axis Lines -->
+                            <!-- Scalability Axis (Upwards: 0 deg) -->
+                            <line x1="120" y1="120" x2="120" y2="20" class="radar-axis"></line>
+                            <!-- Security Axis (Bottom-Right: 120 deg) -->
+                            <line x1="120" y1="120" x2="206.6" y2="170" class="radar-axis"></line>
+                            <!-- Decentralisation Axis (Bottom-Left: 240 deg) -->
+                            <line x1="120" y1="120" x2="33.4" y2="170" class="radar-axis"></line>
+
+                            <!-- Labels -->
+                            <text x="120" y="12" class="radar-label">Scalability</text>
+                            <text x="210" y="185" class="radar-label">Security</text>
+                            <text x="30" y="185" class="radar-label">Decentralisation</text>
+
+                            <!-- Filled Radar Shape -->
+                            <polygon id="radar-shape" points="120,120 120,120 120,120" class="radar-polygon"></polygon>
+
+                            <!-- Data Dots -->
+                            <circle id="dot-scalability" cx="120" cy="120" r="4" class="radar-dot"></circle>
+                            <circle id="dot-security" cx="120" cy="120" r="4" class="radar-dot"></circle>
+                            <circle id="dot-decentralisation" cx="120" cy="120" r="4" class="radar-dot"></circle>
+                        </svg>
+                    </div>
+
+                    <div class="score-details">
+                        <div class="score-bar-group">
+                            <div class="score-bar-label">
+                                <span>Scalability</span>
+                                <span id="score-scalability-val">0/10</span>
+                            </div>
+                            <div class="score-bar-track">
+                                <div class="score-bar-fill fill-scale" id="fill-scalability"></div>
+                            </div>
+                        </div>
+                        <div class="score-bar-group">
+                            <div class="score-bar-label">
+                                <span>Security</span>
+                                <span id="score-security-val">0/10</span>
+                            </div>
+                            <div class="score-bar-track">
+                                <div class="score-bar-fill fill-sec" id="fill-security"></div>
+                            </div>
+                        </div>
+                        <div class="score-bar-group">
+                            <div class="score-bar-label">
+                                <span>Decentralisation</span>
+                                <span id="score-decentralisation-val">0/10</span>
+                            </div>
+                            <div class="score-bar-track">
+                                <div class="score-bar-fill fill-dec" id="fill-decentralisation"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Quantitative Specs -->
+                <div class="spec-grid">
+                    <div class="spec-item">
+                        <div class="spec-label">Avg Block Time</div>
+                        <div class="spec-value" id="spec-blocktime">-</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Peak TPS</div>
+                        <div class="spec-value" id="spec-tps">-</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Approx Node Count</div>
+                        <div class="spec-value" id="spec-nodes">-</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Min. Stake/Cost</div>
+                        <div class="spec-value" id="spec-stake">-</div>
+                    </div>
+                </div>
+            </section>
+            <!-- Panel 3: Real-World Blockchain & Cryptocurrency Mapping -->
+            <section class="panel panel-pow" id="panel-mapping" style="grid-column: 1 / -1;">
+                <h2 class="panel-title">Real-World Blockchain & Cryptocurrencies</h2>
+                <div class="mapping-cards" id="mapping-container">
+                    <!-- Blockchain mapping cards dynamically loaded here -->
+                </div>
+
+                <div class="layer-exp-block">
+                    <strong>Layer Classification Guide:</strong>
+                    <ul>
+                        <li><strong>Layer 1 (L1)</strong> represents the base consensus blockchain that establishes
+                            ultimate trust, settles transactions, and hosts smart contract states.</li>
+                        <li><strong>Layer 2 (L2)</strong> is a secondary framework built on top of Layer 1 to scale
+                            transaction throughput. L2s process transactions off-chain and batch-settle them back to
+                            Layer 1, inheriting its high security guarantees.</li>
+                    </ul>
+                </div>
+            </section>
+            <!-- Panel 4: Compatibility Heatmap / Matrix -->
+            <section class="panel panel-pow" id="panel-matrix" style="grid-column: 1 / -1;">
+                <h2 class="panel-title">Protocol Compatibility Heatmap</h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.25rem;">
+                    Cross-chain compatibility is highly driven by consensus architectures. Blockchains sharing the same
+                    consensus type (compatible) can form direct trustless bridges or validation relays, whereas
+                    incompatible networks require custodial intermediaries or complex multi-signature bridges.
+                </p>
+
+                <div class="matrix-wrapper">
+                    <table class="matrix-table" id="compatibility-matrix">
+                        <thead>
+                            <!-- Table Headers generated by JS -->
+                        </thead>
+                        <tbody id="compatibility-matrix-body">
+                            <!-- Grid Rows generated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="matrix-info-box" id="matrix-info" aria-live="polite">
+                    <span class="title">Hover over a grid cell</span>
+                    Hover or click on compatibility intersections to explore technical details of cross-chain bridging.
+                </div>
+            </section>
+            <!-- Panel 5: Interactive Attack Simulator -->
+            <section class="panel panel-pow" id="panel-simulator" style="grid-column: 1 / -1;">
+                <h2 class="panel-title">Interactive Protocol Attack Simulator</h2>
+                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1.5rem;">
+                    Select parameters to launch an attack and evaluate how the chosen consensus algorithm protects the
+                    network from Sybil identities or malicious takeover (e.g. 51% compute, 33%/51% stake, node
+                    collusion).
+                </p>
+
+                <div class="sim-grid">
+                    <div class="sim-controls">
+                        <div class="sim-control-group">
+                            <label for="slider-attacker-power">Attacker Resources / Share: <span
+                                    id="val-attacker-power">35%</span></label>
+                            <input type="range" id="slider-attacker-power" class="sim-slider" min="1" max="100"
+                                value="35">
+                        </div>
+
+                        <div class="sim-control-group">
+                            <label for="slider-nodes">Honest Network Participation Size: <span id="val-nodes">15,000
+                                    nodes</span></label>
+                            <input type="range" id="slider-nodes" class="sim-slider" min="5" max="50000" step="5"
+                                value="15000">
+                        </div>
+                        <div class="attack-buttons">
+                            <button class="sim-btn btn-primary" id="btn-sybil-attack">Simulate Sybil Attack</button>
+                            <button class="sim-btn btn-primary" id="btn-takeover-attack">Simulate 51% / Majority
+                                Takeover</button>
+                        </div>
+                    </div>
+
+                    <div class="sim-result-box">
+                        <div class="sim-result-header">Simulation Result</div>
+                        <div class="sim-outcome outcome-pending" id="sim-outcome-text">System Idle. Select parameters
+                            and launch attack.</div>
+                        <div class="sim-log" id="sim-log-text">Ready for simulation inputs...</div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+    <footer>
+        <p>Consensus Algorithms in Blockchain — A Comparative Explorer. Built for web visualization.</p>
+    </footer>
+    <script src="app.js"></script>
+</body>
+
+</html>
