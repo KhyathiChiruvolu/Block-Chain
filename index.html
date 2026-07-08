@@ -147,7 +147,18 @@
                 <div class="how-content scroll-reveal">
                     <div class="algo-description" id="algo-description">...</div>
 
-                    <h3 class="flow-title">Transaction Lifecycle</h3>
+                    <div class="flow-header">
+                        <h3 class="flow-title">Transaction Lifecycle</h3>
+                        <div class="flow-controls">
+                            <button class="sim-btn" id="btn-flow-play" title="Play/Pause">⏸ Pause</button>
+                            <button class="sim-btn" id="btn-flow-step" title="Next Step">⏭ Step</button>
+                            <button class="sim-btn" id="btn-flow-reset" title="Reset">⟳ Reset</button>
+                        </div>
+                    </div>
+                    <div class="flow-progress-bar">
+                        <div class="flow-progress-fill" id="flow-progress-fill"></div>
+                    </div>
+
                     <div class="timeline-container" id="timeline-flow" aria-live="polite">
                         <!-- Timeline steps dynamically loaded here -->
                     </div>
@@ -317,23 +328,6 @@
                 <div id="currency-deepdive-container"></div>
             </div>
 
-            <!-- Workflow Animation -->
-            <div class="scroll-reveal" style="margin-top: 2.5rem;">
-                <h3 style="font-size: 1.4rem; font-weight: 700; color: var(--text-primary); margin-bottom: 0.5rem;">Interactive Workflow Animation</h3>
-                <p style="color: var(--text-secondary); font-size: 0.95rem; margin-bottom: 1rem;">
-                    Watch how the consensus process works step-by-step. Use the controls to play, pause, step through, or reset the animation.
-                </p>
-                <div class="anim-controls">
-                    <button class="sim-btn btn-primary" id="btn-anim-play">▶ Play</button>
-                    <button class="sim-btn btn-primary" id="btn-anim-step">⏭ Step</button>
-                    <button class="sim-btn btn-primary" id="btn-anim-reset">⟳ Reset</button>
-                </div>
-                <div class="anim-progress-bar">
-                    <div class="anim-progress-fill" id="anim-progress-fill"></div>
-                </div>
-                <div class="anim-frame-label" id="anim-frame-label">Ready to animate...</div>
-                <div id="workflow-anim-container"></div>
-            </div>
 
             <!-- Layer Stack (L0–L3) -->
             <div class="scroll-reveal" style="margin-top: 2.5rem;">

@@ -1055,27 +1055,89 @@ function runConsensusAnimation() {
 
         const color = accentColors[activeAlgoId];
         switch (activeAlgoId) {
-            case "pow": drawPoWAnimation(ctx, w, h, color, consensusState.time); break;
-            case "pos": drawPoSAnimation(ctx, w, h, color, consensusState.time); break;
-            case "poh": drawPoHAnimation(ctx, w, h, color, consensusState.time); break;
-            case "dpos": drawDPoSAnimation(ctx, w, h, color, consensusState.time); break;
-            case "poa": drawPoAAnimation(ctx, w, h, color, consensusState.time); break;
-            case "pbft": drawPBFTAnimation(ctx, w, h, color, consensusState.time); break;
-            case "pob": drawPoBAnimation(ctx, w, h, color, consensusState.time); break;
+            case "pow": drawPoWAnimation(ctx, w, h, color, currentFlowStep, consensusState.time); break;
+            case "pos": drawPoSAnimation(ctx, w, h, color, currentFlowStep, consensusState.time); break;
+            case "poh": drawPoHAnimation(ctx, w, h, color, currentFlowStep, consensusState.time); break;
+            case "dpos": drawDPoSAnimation(ctx, w, h, color, currentFlowStep, consensusState.time); break;
+            case "poa": drawPoAAnimation(ctx, w, h, color, currentFlowStep, consensusState.time); break;
+            case "pbft": drawPBFTAnimation(ctx, w, h, color, currentFlowStep, consensusState.time); break;
+            case "pob": drawPoBAnimation(ctx, w, h, color, currentFlowStep, consensusState.time); break;
         }
+
+        // ---- Draw step indicator overlay on canvas ----
+        const algo = algorithmsData[activeAlgoId];
+        if (algo && algo.steps) {
+            const totalSteps = algo.steps.length;
+            const currentStep = algo.steps[currentFlowStep];
+            const stepTitle = currentStep ? currentStep.title : "";
+
+            // Step badge (top-left)
+            ctx.save();
+            ctx.textAlign = "left";
+            const badgeX = 12, badgeY = 14;
+            const badgeText = `STEP ${currentFlowStep + 1} / ${totalSteps}`;
+            ctx.font = "bold 10px 'Fira Code', monospace";
+            const badgeW = ctx.measureText(badgeText).width + 16;
+            ctx.beginPath();
+            ctx.roundRect(badgeX, badgeY, badgeW, 22, 5);
+            ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.2)`;
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.6)`;
+            ctx.lineWidth = 1;
+            ctx.fill();
+            ctx.stroke();
+            ctx.fillStyle = color.hex;
+            ctx.fillText(badgeText, badgeX + 8, badgeY + 15);
+            ctx.restore();
+
+            // Step title (top-left, below badge)
+            ctx.save();
+            ctx.textAlign = "left";
+            ctx.font = "600 11px 'Outfit', sans-serif";
+            ctx.fillStyle = "rgba(255,255,255,0.75)";
+            ctx.fillText(stepTitle, 14, 52);
+            ctx.restore();
+
+            // Step progress dots (top-right)
+            ctx.save();
+            const dotRadius = 5;
+            const dotGap = 14;
+            const dotsStartX = w - (totalSteps * dotGap) - 8;
+            const dotsY = 25;
+            for (let i = 0; i < totalSteps; i++) {
+                const dx = dotsStartX + i * dotGap;
+                ctx.beginPath();
+                ctx.arc(dx, dotsY, dotRadius, 0, Math.PI * 2);
+                if (i === currentFlowStep) {
+                    ctx.fillStyle = color.hex;
+                    ctx.shadowColor = color.hex;
+                    ctx.shadowBlur = 8;
+                } else if (i < currentFlowStep) {
+                    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
+                    ctx.shadowBlur = 0;
+                } else {
+                    ctx.fillStyle = "rgba(255,255,255,0.12)";
+                    ctx.shadowBlur = 0;
+                }
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
         consensusAnimFrame = requestAnimationFrame(loop);
     }
     loop();
 }
 
 // ---- PoW: Mining Hash Animation ----
-function drawPoWAnimation(ctx, w, h, color, t) {
-    const cx = w / 2, cy = h / 2;
-    // Block chain at bottom
-    const blockW = 50, blockH = 35, gap = 12;
-    const chainY = h - 60;
+function drawPoWAnimation(ctx, w, h, color, step, t) {
+    const cx = w / 2, cy = h / 2 - 20;
+
+    // Blockchain display at the bottom
+    const blockW = 50, blockH = 32, gap = 10;
+    const chainY = h - 50;
     const blocksCount = Math.floor(w / (blockW + gap));
-    const chainOffset = (t * 0.3) % (blockW + gap);
+    const shiftSpeed = (step === 4) ? 1.0 : 0;
+    const chainOffset = (t * shiftSpeed) % (blockW + gap);
 
     for (let i = -1; i < blocksCount + 1; i++) {
         const bx = i * (blockW + gap) - chainOffset;
@@ -1086,7 +1148,6 @@ function drawPoWAnimation(ctx, w, h, color, t) {
         ctx.roundRect(bx, chainY, blockW, blockH, 5);
         ctx.fill();
         ctx.stroke();
-        // Link lines
         if (i > -1) {
             ctx.beginPath();
             ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.25)`;
@@ -1096,472 +1157,1095 @@ function drawPoWAnimation(ctx, w, h, color, t) {
         }
     }
 
-    // Mining nonces area
-    const fontSize = 11;
-    ctx.font = `${fontSize}px 'Fira Code', monospace`;
-    ctx.textAlign = "left";
-    const cols = 4, rows = 6;
-    const cellW = w / cols, cellH = 28;
-    const startY = 25;
+    if (step === 0) {
+        // Step 1: Transaction Broadcast
+        ctx.beginPath();
+        ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.3)`;
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+        
+        ctx.font = "bold 9px Fira Code";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.fillText("MEMPOOL", cx, cy + 3);
 
-    for (let r = 0; r < rows; r++) {
-        for (let c = 0; c < cols; c++) {
-            const hash = randomHex(8);
-            const isSolution = (t % 120 > 100) && r === rows - 1 && c === cols - 1;
-            if (isSolution) {
-                ctx.fillStyle = color.hex;
-                ctx.shadowColor = color.hex;
-                ctx.shadowBlur = 12;
-                ctx.fillText("✓ 0x00000" + randomHex(3), c * cellW + 10, startY + r * cellH);
-                ctx.shadowBlur = 0;
-            } else {
-                ctx.fillStyle = `rgba(255,255,255, ${0.15 + Math.random() * 0.15})`;
-                ctx.fillText("0x" + hash, c * cellW + 10, startY + r * cellH);
+        // Particle transactions flying in
+        for (let i = 0; i < 8; i++) {
+            const angle = (i / 8) * Math.PI * 2 + (t * 0.01);
+            const r = 90 - ((t + i * 20) % 60);
+            const px = cx + Math.cos(angle) * r;
+            const py = cy + Math.sin(angle) * r;
+            ctx.beginPath();
+            ctx.arc(px, py, 3, 0, Math.PI * 2);
+            ctx.fillStyle = color.hex;
+            ctx.fill();
+        }
+        
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Transactions Broadcasted to Mempool", cx, h - 15);
+
+    } else if (step === 1) {
+        // Step 2: Puzzle Competition
+        const fontSize = 10;
+        ctx.font = `${fontSize}px 'Fira Code', monospace`;
+        ctx.textAlign = "left";
+        const cols = 4, rows = 5;
+        const cellW = w / cols, cellH = 24;
+        const startY = 30;
+
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const hash = randomHex(8);
+                ctx.fillStyle = `rgba(255,255,255, ${0.12 + Math.random() * 0.15})`;
+                ctx.fillText("0x" + hash, c * cellW + 15, startY + r * cellH);
             }
         }
-    }
+        
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.textAlign = "center";
+        ctx.fillText("Miners Racing (Hashing Nonces...)", cx, h - 15);
 
-    // "Mining..." label
-    const dots = ".".repeat((Math.floor(t / 20) % 3) + 1);
-    ctx.font = "bold 13px Outfit, sans-serif";
-    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
-    ctx.textAlign = "center";
-    ctx.fillText(t % 120 > 100 ? "✨ BLOCK MINED!" : `Mining${dots}`, cx, cy + 15);
+    } else if (step === 2) {
+        // Step 3: Block Broadcast
+        ctx.beginPath();
+        ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.3)`;
+        ctx.strokeStyle = color.hex;
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "bold 9px Fira Code";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.fillText("WINNER", cx, cy + 3);
+
+        const maxR = 120;
+        const pr = (t * 2.5) % maxR;
+        ctx.beginPath();
+        ctx.arc(cx, cy, pr, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${1 - pr / maxR})`;
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("✨ Block Mined & Broadcasted!", cx, h - 15);
+
+    } else if (step === 3) {
+        // Step 4: Consensus Verification
+        const nodes = 3;
+        for (let i = 0; i < nodes; i++) {
+            const nx = cx + (i - 1) * 80;
+            const ny = cy;
+            ctx.beginPath();
+            ctx.arc(nx, ny, 20, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(5, 201, 140, 0.15)";
+            ctx.strokeStyle = "#05c98c";
+            ctx.lineWidth = 2;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "bold 11px sans-serif";
+            ctx.fillStyle = "#05c98c";
+            ctx.textAlign = "center";
+            ctx.fillText("✓", nx, ny + 4);
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.textAlign = "center";
+        ctx.fillText("Nodes Verifying Signatures & TXs", cx, h - 15);
+
+    } else if (step === 4) {
+        // Step 5: Reward & Confirmation
+        ctx.beginPath();
+        ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 179, 0, 0.15)";
+        ctx.strokeStyle = "#ffb300";
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+
+        const coinY = cy - 40 - Math.sin(t * 0.1) * 10;
+        ctx.font = "16px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("🪙 +6.25 BTC", cx, coinY);
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Block Confirmed! Reward Sent.", cx, h - 15);
+    }
 }
 
 // ---- PoS: Validator Selection ----
-function drawPoSAnimation(ctx, w, h, color, t) {
-    const cx = w / 2, cy = h / 2 - 10;
-    const validators = 8;
-    const radius = Math.min(w, h) * 0.3;
-    const selectedIdx = Math.floor(t / 90) % validators;
-    const selectionProgress = (t % 90) / 90;
+function drawPoSAnimation(ctx, w, h, color, step, t) {
+    const cx = w / 2, cy = h / 2 - 15;
+    const validators = 6;
+    const radius = Math.min(w, h) * 0.28;
 
-    // Draw stake amounts
-    for (let i = 0; i < validators; i++) {
-        const angle = (i / validators) * Math.PI * 2 - Math.PI / 2;
-        const x = cx + Math.cos(angle) * radius;
-        const y = cy + Math.sin(angle) * radius;
-        const isSelected = i === selectedIdx && selectionProgress > 0.6;
-        const nodeR = isSelected ? 18 : 12;
-
-        // Connection to center
+    if (step === 0) {
+        // Step 1: Collateral Registration
         ctx.beginPath();
-        ctx.strokeStyle = isSelected ? `rgba(${color.rgb.join(",")}, 0.6)` : `rgba(255,255,255, 0.06)`;
-        ctx.lineWidth = isSelected ? 2 : 1;
-        ctx.moveTo(cx, cy);
-        ctx.lineTo(x, y);
+        ctx.arc(cx, cy, 25, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        ctx.strokeStyle = color.hex;
+        ctx.lineWidth = 2;
+        ctx.fill();
         ctx.stroke();
+        
+        ctx.font = "bold 8px Fira Code";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.fillText("DEPOSIT", cx, cy - 2);
+        ctx.fillText("VAULT", cx, cy + 8);
 
-        // Node circle
+        for (let i = 0; i < validators; i++) {
+            const angle = (i / validators) * Math.PI * 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.stroke();
+
+            const progress = (t * 0.02 + i / validators) % 1;
+            const cx_coin = x + (cx - x) * progress;
+            const cy_coin = y + (cy - y) * progress;
+            ctx.font = "9px sans-serif";
+            ctx.fillText("🪙", cx_coin, cy_coin + 3);
+        }
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Stakers Depositing Collateral (32 ETH)", cx, h - 15);
+
+    } else if (step === 1) {
+        // Step 2: Proposer Selection
+        const selectedIdx = Math.floor(t / 60) % validators;
+        const spinProgress = (t % 60) / 60;
+        
+        for (let i = 0; i < validators; i++) {
+            const angle = (i / validators) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            const isSelected = i === selectedIdx && spinProgress > 0.6;
+            
+            ctx.beginPath();
+            ctx.arc(x, y, isSelected ? 15 : 10, 0, Math.PI * 2);
+            ctx.fillStyle = isSelected ? `rgba(${color.rgb.join(",")}, 0.3)` : "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = isSelected ? color.hex : "rgba(255,255,255,0.15)";
+            ctx.lineWidth = isSelected ? 2 : 1;
+            ctx.fill();
+            ctx.stroke();
+            
+            ctx.font = "bold 8px Fira Code";
+            ctx.fillStyle = isSelected ? color.hex : "rgba(255,255,255,0.3)";
+            ctx.fillText(`V${i + 1}`, x, y + 3);
+        }
+
+        const spinAngle = spinProgress * Math.PI * 4 + (selectedIdx / validators) * Math.PI * 2 - Math.PI / 2;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(spinAngle);
         ctx.beginPath();
-        ctx.arc(x, y, nodeR, 0, Math.PI * 2);
-        ctx.fillStyle = isSelected ? `rgba(${color.rgb.join(",")}, 0.3)` : `rgba(255,255,255, 0.05)`;
-        ctx.strokeStyle = isSelected ? color.hex : `rgba(255,255,255, 0.15)`;
-        ctx.lineWidth = isSelected ? 2.5 : 1;
+        ctx.moveTo(0, -6);
+        ctx.lineTo(radius * 0.4, 0);
+        ctx.lineTo(0, 6);
+        ctx.closePath();
+        ctx.fillStyle = color.hex;
+        ctx.fill();
+        ctx.restore();
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.textAlign = "center";
+        ctx.fillText(spinProgress > 0.6 ? `Validator ${selectedIdx + 1} Selected Proposer!` : "Selecting Next Proposer...", cx, h - 15);
+
+    } else if (step === 2) {
+        // Step 3: Attestation Phase
+        const proposerIdx = 0;
+        const px = cx + Math.cos(-Math.PI/2) * radius;
+        const py = cy + Math.sin(-Math.PI/2) * radius;
+
+        ctx.beginPath();
+        ctx.arc(px, py, 14, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.4)`;
+        ctx.strokeStyle = color.hex;
         ctx.fill();
         ctx.stroke();
 
-        if (isSelected) {
+        for (let i = 1; i < validators; i++) {
+            const angle = (i / validators) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
             ctx.beginPath();
-            ctx.arc(x, y, nodeR + 6, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.3 + Math.sin(t * 0.1) * 0.15})`;
-            ctx.lineWidth = 1;
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.fill();
             ctx.stroke();
+
+            const progress = (t * 0.02) % 1.0;
+            const vx = x + (px - x) * progress;
+            const vy = y + (py - y) * progress;
+            ctx.beginPath();
+            ctx.arc(vx, vy, 2.5, 0, Math.PI * 2);
+            ctx.fillStyle = "#05c98c";
+            ctx.fill();
         }
 
-        // Stake label
-        ctx.font = "bold 9px Fira Code, monospace";
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
         ctx.textAlign = "center";
-        ctx.fillStyle = isSelected ? color.hex : `rgba(255,255,255,0.4)`;
-        ctx.fillText(`${(i + 1) * 32}Ξ`, x, y + nodeR + 14);
+        ctx.fillText("Committee Voting (Attestation)", cx, h - 15);
+
+    } else if (step === 3) {
+        // Step 4: Consensus & Settlement
+        ctx.beginPath();
+        ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(5, 201, 140, 0.15)";
+        ctx.strokeStyle = "#05c98c";
+        ctx.lineWidth = 3;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "bold 18px sans-serif";
+        ctx.fillStyle = "#05c98c";
+        ctx.fillText("2/3+", cx, cy - 2);
+        ctx.font = "bold 8px Fira Code";
+        ctx.fillText("SUPERMAJORITY", cx, cy + 12);
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Block Justified & Finalized ✓", cx, h - 15);
+
+    } else if (step === 4) {
+        // Step 5: Yield & Slashing
+        for (let i = 0; i < validators; i++) {
+            const angle = (i / validators) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            const isSlashed = i === 3;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 11, 0, Math.PI * 2);
+            ctx.fillStyle = isSlashed ? "rgba(255, 107, 107, 0.25)" : "rgba(5, 201, 140, 0.2)";
+            ctx.strokeStyle = isSlashed ? "#ff6b6b" : "#05c98c";
+            ctx.lineWidth = 1.5;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "9px sans-serif";
+            if (isSlashed) {
+                ctx.fillStyle = "#ff6b6b";
+                ctx.fillText("✗ Slashed", x, y + 22);
+            } else {
+                ctx.fillStyle = "#05c98c";
+                ctx.fillText("+Yield", x, y + 22);
+            }
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.textAlign = "center";
+        ctx.fillText("Rewards Distributed / Offenders Slashed", cx, h - 15);
     }
-
-    // Center: Spinning selector
-    const spinAngle = selectionProgress * Math.PI * 4 + (selectedIdx / validators) * Math.PI * 2 - Math.PI / 2;
-    ctx.save();
-    ctx.translate(cx, cy);
-    ctx.rotate(spinAngle);
-    ctx.beginPath();
-    ctx.moveTo(0, -8);
-    ctx.lineTo(radius * 0.4, 0);
-    ctx.lineTo(0, 8);
-    ctx.closePath();
-    ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${0.5 + selectionProgress * 0.5})`;
-    ctx.fill();
-    ctx.restore();
-
-    // Center dot
-    ctx.beginPath();
-    ctx.arc(cx, cy, 6, 0, Math.PI * 2);
-    ctx.fillStyle = color.hex;
-    ctx.fill();
-
-    ctx.font = "bold 12px Outfit, sans-serif";
-    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
-    ctx.textAlign = "center";
-    ctx.fillText(selectionProgress > 0.6 ? `Validator ${selectedIdx + 1} Selected ✓` : "Selecting Proposer...", cx, h - 30);
 }
 
 // ---- PoH: Sequential Hash Chain ----
-function drawPoHAnimation(ctx, w, h, color, t) {
-    const nodeCount = 10;
-    const nodeR = 14;
-    const spacing = (w - 60) / (nodeCount - 1);
-    const startX = 30;
-    const cy = h / 2 - 10;
-    const progress = (t % 150) / 150;
-    const activeNode = Math.floor(progress * nodeCount);
+function drawPoHAnimation(ctx, w, h, color, step, t) {
+    const cx = w / 2, cy = h / 2 - 20;
 
-    // Draw chain line
-    ctx.beginPath();
-    ctx.moveTo(startX, cy);
-    ctx.lineTo(startX + (nodeCount - 1) * spacing, cy);
-    ctx.strokeStyle = `rgba(255,255,255, 0.06)`;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Active chain line
-    const activeX = startX + activeNode * spacing;
-    ctx.beginPath();
-    ctx.moveTo(startX, cy);
-    ctx.lineTo(activeX, cy);
-    ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // Draw nodes
-    for (let i = 0; i < nodeCount; i++) {
-        const x = startX + i * spacing;
-        const isActive = i <= activeNode;
-        const isCurrent = i === activeNode;
-
+    if (step === 0) {
+        // Step 1: Sequential VDF Hashing
         ctx.beginPath();
-        ctx.arc(x, cy, isCurrent ? nodeR + 3 : nodeR, 0, Math.PI * 2);
-        ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, ${isCurrent ? 0.35 : 0.15})` : `rgba(255,255,255, 0.03)`;
-        ctx.strokeStyle = isActive ? color.hex : `rgba(255,255,255, 0.1)`;
-        ctx.lineWidth = isCurrent ? 2.5 : 1;
+        ctx.roundRect(cx - 30, cy - 30, 60, 60, 8);
+        ctx.fillStyle = "rgba(255,255,255,0.06)";
+        ctx.strokeStyle = color.hex;
+        ctx.lineWidth = 2;
         ctx.fill();
         ctx.stroke();
 
-        if (isCurrent) {
-            ctx.beginPath();
-            ctx.arc(x, cy, nodeR + 10, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.2 + Math.sin(t * 0.15) * 0.15})`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-        }
-
-        // Hash text
-        ctx.font = "8px Fira Code, monospace";
+        ctx.font = "bold 10px Fira Code";
+        ctx.fillStyle = color.hex;
         ctx.textAlign = "center";
-        ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, 0.7)` : `rgba(255,255,255, 0.2)`;
-        ctx.fillText(isActive ? `H${i}` : "---", x, cy - nodeR - 8);
+        ctx.fillText("VDF", cx, cy - 10);
+        ctx.fillText("CLOCK", cx, cy + 2);
 
-        // Timestamp
-        if (isActive) {
-            ctx.font = "7px Fira Code, monospace";
-            ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
-            ctx.fillText(`t+${i * 400}ms`, x, cy + nodeR + 14);
+        const hash = randomHex(4);
+        ctx.font = "9px Fira Code";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+        ctx.fillText(`0x${hash}`, cx, cy + 18);
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, 38, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.25)`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        const angle = (t * 0.1) % (Math.PI * 2);
+        ctx.beginPath();
+        ctx.moveTo(cx, cy);
+        ctx.lineTo(cx + Math.cos(angle) * 38, cy + Math.sin(angle) * 38);
+        ctx.strokeStyle = color.hex;
+        ctx.stroke();
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Sequential Verifiable Delay Function (VDF)", cx, h - 15);
+
+    } else if (step === 1) {
+        // Step 2: Transaction Timestamping
+        const ticks = 5;
+        const boxW = 45, boxH = 30, gap = 12;
+        const startX = cx - (ticks * (boxW + gap) - gap) / 2;
+
+        for (let i = 0; i < ticks; i++) {
+            const bx = startX + i * (boxW + gap);
+            ctx.beginPath();
+            ctx.roundRect(bx, cy - 15, boxW, boxH, 4);
+            ctx.fillStyle = "rgba(255,255,255,0.04)";
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.3)`;
+            ctx.lineWidth = 1;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "8px Fira Code";
+            ctx.fillStyle = color.hex;
+            ctx.textAlign = "center";
+            ctx.fillText(`Hash ${i * 100}`, bx + boxW / 2, cy - 2);
+
+            if (i < 3) {
+                ctx.fillStyle = "#05c98c";
+                ctx.fillText(`TX ${i + 1} ✓`, bx + boxW / 2, cy + 10);
+            } else {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+                ctx.fillText("empty", bx + boxW / 2, cy + 10);
+            }
         }
-    }
 
-    ctx.font = "bold 12px Outfit, sans-serif";
-    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
-    ctx.textAlign = "center";
-    ctx.fillText("Sequential VDF Hash Chain →", w / 2, h - 25);
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Transactions Encoded into Hashing Sequence", cx, h - 15);
+
+    } else if (step === 2) {
+        // Step 3: Pipelined Distribution
+        ctx.beginPath();
+        ctx.arc(cx - 100, cy, 18, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.25)`;
+        ctx.strokeStyle = color.hex;
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "bold 9px Fira Code";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.fillText("LEADER", cx - 100, cy + 3);
+
+        const valCount = 3;
+        for (let i = 0; i < valCount; i++) {
+            const vy = cy - 40 + i * 40;
+            ctx.beginPath();
+            ctx.arc(cx + 80, vy, 12, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.fill();
+            ctx.stroke();
+
+            const progress = (t * 0.02 + i / 3) % 1;
+            const px = cx - 100 + 180 * progress;
+            const py = cy + (vy - cy) * progress;
+            ctx.beginPath();
+            ctx.arc(px, py, 4, 0, Math.PI * 2);
+            ctx.fillStyle = color.hex;
+            ctx.fill();
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Streaming Hashed Segments to Validators", cx, h - 15);
+
+    } else if (step === 3) {
+        // Step 4: Parallel Verification
+        const gpus = 3;
+        for (let i = 0; i < gpus; i++) {
+            const gx = cx - 80 + i * 80;
+            ctx.beginPath();
+            ctx.roundRect(gx - 28, cy - 25, 56, 40, 5);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.2)`;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "bold 8px Fira Code";
+            ctx.fillStyle = color.hex;
+            ctx.textAlign = "center";
+            ctx.fillText(`GPU Core ${i + 1}`, gx, cy - 10);
+
+            const wProg = 40;
+            const percent = ((t + i * 40) % 100) / 100;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.1)";
+            ctx.fillRect(gx - wProg / 2, cy + 2, wProg, 5);
+            ctx.fillStyle = "#05c98c";
+            ctx.fillRect(gx - wProg / 2, cy + 2, wProg * percent, 5);
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Validators Verifying Timestamps in Parallel", cx, h - 15);
+
+    } else if (step === 4) {
+        // Step 5: Tower BFT Agreement
+        ctx.beginPath();
+        ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(5, 201, 140, 0.2)";
+        ctx.strokeStyle = "#05c98c";
+        ctx.lineWidth = 2.5;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "18px sans-serif";
+        ctx.fillText("🔒", cx, cy + 6);
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.textAlign = "center";
+        ctx.fillText("Block Finalized via Tower BFT! (~400ms)", cx, h - 15);
+    }
 }
 
 // ---- DPoS: Delegate Voting ----
-function drawDPoSAnimation(ctx, w, h, color, t) {
-    const cx = w / 2, cy = h / 2 - 5;
-    const delegates = 6;
-    const voters = 12;
-    const innerR = Math.min(w, h) * 0.15;
-    const outerR = Math.min(w, h) * 0.36;
-    const activeDelegate = Math.floor(t / 80) % delegates;
+function drawDPoSAnimation(ctx, w, h, color, step, t) {
+    const cx = w / 2, cy = h / 2 - 15;
+    const delegates = 5;
+    const radius = Math.min(w, h) * 0.28;
 
-    // Draw voters (outer ring)
-    for (let i = 0; i < voters; i++) {
-        const angle = (i / voters) * Math.PI * 2 - Math.PI / 2;
-        const x = cx + Math.cos(angle) * outerR;
-        const y = cy + Math.sin(angle) * outerR;
-        const targetDelegate = i % delegates;
+    if (step === 0) {
+        // Step 1: Continuous Voting
+        for (let i = 0; i < delegates; i++) {
+            const angle = (i / delegates) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
 
-        // Vote line to delegate
-        const dAngle = (targetDelegate / delegates) * Math.PI * 2 - Math.PI / 2;
-        const dx = cx + Math.cos(dAngle) * innerR;
-        const dy = cy + Math.sin(dAngle) * innerR;
-
-        ctx.beginPath();
-        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${targetDelegate === activeDelegate ? 0.3 : 0.08})`;
-        ctx.lineWidth = 1;
-        ctx.setLineDash([3, 3]);
-        ctx.moveTo(x, y);
-        ctx.lineTo(dx, dy);
-        ctx.stroke();
-        ctx.setLineDash([]);
-
-        // Voter node
-        ctx.beginPath();
-        ctx.arc(x, y, 6, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255, 0.08)`;
-        ctx.strokeStyle = `rgba(255,255,255, 0.15)`;
-        ctx.lineWidth = 1;
-        ctx.fill();
-        ctx.stroke();
-    }
-
-    // Draw delegates (inner ring)
-    for (let i = 0; i < delegates; i++) {
-        const angle = (i / delegates) * Math.PI * 2 - Math.PI / 2;
-        const x = cx + Math.cos(angle) * innerR;
-        const y = cy + Math.sin(angle) * innerR;
-        const isActive = i === activeDelegate;
-
-        ctx.beginPath();
-        ctx.arc(x, y, isActive ? 16 : 12, 0, Math.PI * 2);
-        ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, 0.3)` : `rgba(255,255,255, 0.05)`;
-        ctx.strokeStyle = isActive ? color.hex : `rgba(255,255,255, 0.15)`;
-        ctx.lineWidth = isActive ? 2.5 : 1;
-        ctx.fill();
-        ctx.stroke();
-
-        if (isActive) {
             ctx.beginPath();
-            ctx.arc(x, y, 22, 0, Math.PI * 2);
-            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.2 + Math.sin(t * 0.1) * 0.15})`;
-            ctx.lineWidth = 1;
+            ctx.arc(x, y, 14, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.fill();
             ctx.stroke();
+            
+            ctx.font = "bold 8px Fira Code";
+            ctx.fillStyle = "rgba(255,255,255,0.4)";
+            ctx.textAlign = "center";
+            ctx.fillText(`D${i+1}`, x, y + 3);
+
+            for (let j = 0; j < 3; j++) {
+                const voterAngle = angle + (j - 1) * 0.3 + Math.PI;
+                const vx = cx + Math.cos(voterAngle) * (radius * 1.3);
+                const vy = cy + Math.sin(voterAngle) * (radius * 1.3);
+                
+                const progress = (t * 0.02 + j / 3) % 1;
+                const fx = vx + (x - vx) * progress;
+                const fy = vy + (y - vy) * progress;
+                ctx.beginPath();
+                ctx.arc(fx, fy, 2, 0, Math.PI * 2);
+                ctx.fillStyle = color.hex;
+                ctx.fill();
+            }
+        }
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Token Holders Voting for Representatives", cx, h - 15);
+
+    } else if (step === 1) {
+        // Step 2: Representative Selection
+        for (let i = 0; i < delegates; i++) {
+            const angle = (i / delegates) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            
+            const votes = [80, 50, 95, 40, 70][i];
+            const barH = votes * 0.25;
+
+            ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+            ctx.fillRect(x - 5, y - 25, 10, 20);
+            ctx.fillStyle = color.hex;
+            ctx.fillRect(x - 5, y - 5 - barH, 10, barH);
+
+            ctx.beginPath();
+            ctx.arc(x, y + 10, 10, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "bold 7px Fira Code";
+            ctx.fillStyle = "#fff";
+            ctx.textAlign = "center";
+            ctx.fillText(`D${i+1}`, x, y + 13);
         }
 
-        ctx.font = "bold 9px Fira Code";
-        ctx.textAlign = "center";
-        ctx.fillStyle = isActive ? color.hex : `rgba(255,255,255, 0.35)`;
-        ctx.fillText(`D${i + 1}`, x, y + 4);
-    }
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Top Voted Delegates Selected as Block Producers", cx, h - 15);
 
-    ctx.font = "bold 12px Outfit, sans-serif";
-    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
-    ctx.textAlign = "center";
-    ctx.fillText(`Delegate ${activeDelegate + 1} producing block...`, cx, h - 25);
+    } else if (step === 2) {
+        // Step 3: Round-Robin Scheduling
+        const activeIdx = Math.floor(t / 50) % delegates;
+        for (let i = 0; i < delegates; i++) {
+            const angle = (i / delegates) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            const isActive = i === activeIdx;
+
+            ctx.beginPath();
+            ctx.arc(x, y, isActive ? 16 : 10, 0, Math.PI * 2);
+            ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, 0.3)` : "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = isActive ? color.hex : "rgba(255,255,255,0.15)";
+            ctx.lineWidth = isActive ? 2 : 1;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "bold 8px Fira Code";
+            ctx.fillStyle = isActive ? color.hex : "rgba(255,255,255,0.4)";
+            ctx.textAlign = "center";
+            ctx.fillText(`BP${i+1}`, x, y + 3);
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText(`Active Producer: BP${activeIdx + 1} (Rotating Slots)`, cx, h - 15);
+
+    } else if (step === 3) {
+        // Step 4: Rapid Attestation
+        const proposerIdx = 0;
+        const px = cx + Math.cos(-Math.PI/2) * radius;
+        const py = cy + Math.sin(-Math.PI/2) * radius;
+
+        ctx.beginPath();
+        ctx.arc(px, py, 15, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.35)`;
+        ctx.strokeStyle = color.hex;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "bold 8px Fira Code";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.fillText("SIGN", px, py + 3);
+
+        for (let i = 1; i < delegates; i++) {
+            const angle = (i / delegates) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(5, 201, 140, 0.15)";
+            ctx.strokeStyle = "#05c98c";
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "bold 8px Fira Code";
+            ctx.fillStyle = "#05c98c";
+            ctx.fillText("CO", x, y + 3);
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Delegates Rapidly Co-Signing Block (~2-3s)", cx, h - 15);
+
+    } else if (step === 4) {
+        // Step 5: Democratic Demotion
+        for (let i = 0; i < delegates; i++) {
+            const angle = (i / delegates) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            const isOffline = i === 1;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 11, 0, Math.PI * 2);
+            ctx.fillStyle = isOffline ? "rgba(255, 107, 107, 0.25)" : "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = isOffline ? "#ff6b6b" : "rgba(255,255,255,0.2)";
+            ctx.lineWidth = isOffline ? 2 : 1;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "9px sans-serif";
+            if (isOffline) {
+                ctx.fillStyle = "#ff6b6b";
+                ctx.fillText("Offline", x, y + 22);
+            } else {
+                ctx.fillStyle = "rgba(255,255,255,0.5)";
+                ctx.fillText(`BP${i+1}`, x, y + 22);
+            }
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Offline Delegate Demoted and Replaced Automatically", cx, h - 15);
+    }
 }
 
 // ---- PoA: Authority Rotation ----
-function drawPoAAnimation(ctx, w, h, color, t) {
-    const cx = w / 2, cy = h / 2 - 10;
-    const authorities = 5;
+function drawPoAAnimation(ctx, w, h, color, step, t) {
+    const cx = w / 2, cy = h / 2 - 15;
+    const authorities = 4;
     const radius = Math.min(w, h) * 0.28;
-    const activeAuth = Math.floor(t / 100) % authorities;
-    const rotProgress = (t % 100) / 100;
 
-    // Draw rotation arc
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius + 20, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(255,255,255, 0.04)`;
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    // Rotation indicator
-    const arcStart = (activeAuth / authorities) * Math.PI * 2 - Math.PI / 2;
-    const arcEnd = arcStart + (1 / authorities) * Math.PI * 2 * rotProgress;
-    ctx.beginPath();
-    ctx.arc(cx, cy, radius + 20, arcStart, arcEnd);
-    ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
-    ctx.lineWidth = 3;
-    ctx.stroke();
-
-    for (let i = 0; i < authorities; i++) {
-        const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
-        const x = cx + Math.cos(angle) * radius;
-        const y = cy + Math.sin(angle) * radius;
-        const isActive = i === activeAuth;
-
-        // Shield shape for authority
-        ctx.save();
-        ctx.translate(x, y);
-        const shieldR = isActive ? 20 : 14;
+    if (step === 0) {
+        // Step 1: Vetting & KYC Check
         ctx.beginPath();
-        ctx.moveTo(0, -shieldR);
-        ctx.quadraticCurveTo(shieldR, -shieldR * 0.5, shieldR * 0.8, shieldR * 0.3);
-        ctx.lineTo(0, shieldR);
-        ctx.lineTo(-shieldR * 0.8, shieldR * 0.3);
-        ctx.quadraticCurveTo(-shieldR, -shieldR * 0.5, 0, -shieldR);
-        ctx.closePath();
-        ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, 0.25)` : `rgba(255,255,255, 0.04)`;
-        ctx.strokeStyle = isActive ? color.hex : `rgba(255,255,255, 0.12)`;
-        ctx.lineWidth = isActive ? 2 : 1;
+        ctx.roundRect(cx - 30, cy - 35, 60, 50, 6);
+        ctx.fillStyle = "rgba(255,255,255,0.05)";
+        ctx.strokeStyle = color.hex;
+        ctx.lineWidth = 1.5;
         ctx.fill();
         ctx.stroke();
 
-        // Checkmark for active
-        if (isActive) {
-            ctx.font = "bold 12px sans-serif";
-            ctx.fillStyle = color.hex;
-            ctx.textAlign = "center";
-            ctx.fillText("✓", 0, 5);
-        }
-        ctx.restore();
-
-        ctx.font = "bold 8px Fira Code";
-        ctx.textAlign = "center";
-        ctx.fillStyle = isActive ? color.hex : `rgba(255,255,255, 0.3)`;
-        ctx.fillText(`AUTH ${i + 1}`, x, y + (isActive ? 28 : 22));
-    }
-
-    // Center
-    ctx.beginPath();
-    ctx.arc(cx, cy, 5, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.6)`;
-    ctx.fill();
-
-    ctx.font = "bold 12px Outfit, sans-serif";
-    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
-    ctx.textAlign = "center";
-    ctx.fillText(`Authority ${activeAuth + 1} signing block`, cx, h - 25);
-}
-
-// ---- PBFT: Quorum Message Passing ----
-function drawPBFTAnimation(ctx, w, h, color, t) {
-    const cx = w / 2, cy = h / 2 - 10;
-    const nodes = 7;
-    const radius = Math.min(w, h) * 0.3;
-    const phase = Math.floor(t / 80) % 3; // 0=prepare, 1=commit, 2=finalize
-    const phaseProgress = (t % 80) / 80;
-    const phaseLabels = ["Prepare", "Commit", "Finalize ✓"];
-
-    for (let i = 0; i < nodes; i++) {
-        const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
-        const x = cx + Math.cos(angle) * radius;
-        const y = cy + Math.sin(angle) * radius;
-
-        // Connections to other nodes (message passing)
-        for (let j = i + 1; j < nodes; j++) {
-            const angle2 = (j / nodes) * Math.PI * 2 - Math.PI / 2;
-            const x2 = cx + Math.cos(angle2) * radius;
-            const y2 = cy + Math.sin(angle2) * radius;
-
-            ctx.beginPath();
-            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.06)`;
-            ctx.lineWidth = 0.5;
-            ctx.moveTo(x, y);
-            ctx.lineTo(x2, y2);
-            ctx.stroke();
-        }
-
-        // Animated message dots
-        if (phaseProgress > 0.2 && phaseProgress < 0.8) {
-            const nextNode = (i + 1) % nodes;
-            const angle2 = (nextNode / nodes) * Math.PI * 2 - Math.PI / 2;
-            const x2 = cx + Math.cos(angle2) * radius;
-            const y2 = cy + Math.sin(angle2) * radius;
-            const msgProgress = (phaseProgress - 0.2) / 0.6;
-            const mx = x + (x2 - x) * msgProgress;
-            const my = y + (y2 - y) * msgProgress;
-
-            ctx.beginPath();
-            ctx.arc(mx, my, 3, 0, Math.PI * 2);
-            ctx.fillStyle = color.hex;
-            ctx.fill();
-        }
-
-        // Node
-        const isAgreed = phase > 0 || phaseProgress > 0.7;
         ctx.beginPath();
-        ctx.arc(x, y, 14, 0, Math.PI * 2);
-        ctx.fillStyle = isAgreed ? `rgba(${color.rgb.join(",")}, 0.2)` : `rgba(255,255,255, 0.04)`;
-        ctx.strokeStyle = isAgreed ? color.hex : `rgba(255,255,255, 0.12)`;
-        ctx.lineWidth = isAgreed ? 2 : 1;
+        ctx.arc(cx - 15, cy - 10, 10, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.2)`;
+        ctx.strokeStyle = color.hex;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        ctx.fillRect(cx + 2, cy - 18, 20, 3);
+        ctx.fillRect(cx + 2, cy - 10, 20, 3);
+        ctx.fillRect(cx - 20, cy + 8, 40, 3);
+
+        const scanY = cy - 35 + ((t * 0.8) % 50);
+        ctx.beginPath();
+        ctx.moveTo(cx - 30, scanY);
+        ctx.lineTo(cx + 30, scanY);
+        ctx.strokeStyle = "rgba(255, 107, 107, 0.7)";
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.textAlign = "center";
+        ctx.fillText("Rigorous KYC & Identity Vetting", cx, h - 15);
+
+    } else if (step === 1) {
+        // Step 2: Authority Whitelisting
+        ctx.beginPath();
+        ctx.roundRect(cx - 50, cy - 25, 100, 40, 5);
+        ctx.fillStyle = "rgba(5, 201, 140, 0.1)";
+        ctx.strokeStyle = "#05c98c";
+        ctx.lineWidth = 2;
         ctx.fill();
         ctx.stroke();
 
         ctx.font = "bold 9px Fira Code";
+        ctx.fillStyle = "#05c98c";
         ctx.textAlign = "center";
-        ctx.fillStyle = isAgreed ? color.hex : `rgba(255,255,255, 0.3)`;
-        ctx.fillText(`N${i + 1}`, x, y + 4);
-    }
+        ctx.fillText("WHITELIST DB", cx, cy - 8);
+        ctx.font = "7px Fira Code";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+        ctx.fillText("KEY added: 0x8a92... ✓", cx, cy + 8);
 
-    ctx.font = "bold 12px Outfit, sans-serif";
-    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
-    ctx.textAlign = "center";
-    ctx.fillText(`Phase: ${phaseLabels[phase]}`, cx, h - 25);
-}
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Vetted Public Key Whitelisted by Council", cx, h - 15);
 
-// ---- PoB: Token Burn Animation ----
-function drawPoBAnimation(ctx, w, h, color, t) {
-    const cx = w / 2, cy = h / 2 - 10;
+    } else if (step === 2) {
+        // Step 3: Block Generation
+        const activeIdx = Math.floor(t / 50) % authorities;
+        for (let i = 0; i < authorities; i++) {
+            const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            const isActive = i === activeIdx;
 
-    // Burn address at center
-    const burnPulse = 0.5 + Math.sin(t * 0.08) * 0.3;
-    ctx.beginPath();
-    ctx.arc(cx, cy, 25, 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${0.15 + burnPulse * 0.15})`;
-    ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.5 + burnPulse * 0.3})`;
-    ctx.lineWidth = 2.5;
-    ctx.fill();
-    ctx.stroke();
-
-    // Burn glow
-    ctx.beginPath();
-    ctx.arc(cx, cy, 35 + burnPulse * 8, 0, Math.PI * 2);
-    ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.08 + burnPulse * 0.08})`;
-    ctx.lineWidth = 1;
-    ctx.stroke();
-
-    ctx.font = "bold 16px sans-serif";
-    ctx.textAlign = "center";
-    ctx.fillStyle = color.hex;
-    ctx.fillText("🔥", cx, cy + 6);
-
-    // Token particles being sent toward the burn address
-    const tokenCount = 8;
-    const outerR = Math.min(w, h) * 0.38;
-    for (let i = 0; i < tokenCount; i++) {
-        const angle = (i / tokenCount) * Math.PI * 2 - Math.PI / 2;
-        const phase = ((t * 1.2 + i * 50) % 200) / 200;
-
-        const sx = cx + Math.cos(angle) * outerR;
-        const sy = cy + Math.sin(angle) * outerR;
-        const tx = sx + (cx - sx) * phase;
-        const ty = sy + (cy - sy) * phase;
-
-        // Trail
-        if (phase < 0.9) {
             ctx.beginPath();
-            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${(1 - phase) * 0.25})`;
-            ctx.lineWidth = 1;
-            ctx.setLineDash([2, 4]);
-            ctx.moveTo(sx, sy);
-            ctx.lineTo(tx, ty);
-            ctx.stroke();
-            ctx.setLineDash([]);
-
-            // Token dot
-            ctx.beginPath();
-            ctx.arc(tx, ty, 4 - phase * 3, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${1 - phase})`;
+            ctx.arc(x, y, isActive ? 15 : 10, 0, Math.PI * 2);
+            ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, 0.35)` : "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = isActive ? color.hex : "rgba(255,255,255,0.15)";
+            ctx.lineWidth = isActive ? 2 : 1;
             ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "bold 8px Fira Code";
+            ctx.fillStyle = isActive ? color.hex : "rgba(255,255,255,0.4)";
+            ctx.textAlign = "center";
+            ctx.fillText(`A${i+1}`, x, y + 3);
         }
 
-        // Source node
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText(`Validator A${activeIdx + 1} Signing Block (Scheduled Turn)`, cx, h - 15);
+
+    } else if (step === 3) {
+        // Step 4: Signature Verification
         ctx.beginPath();
-        ctx.arc(sx, sy, 8, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255, 0.05)`;
-        ctx.strokeStyle = `rgba(255,255,255, 0.15)`;
-        ctx.lineWidth = 1;
+        ctx.arc(cx, cy, 30, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(5, 201, 140, 0.15)";
+        ctx.strokeStyle = "#05c98c";
+        ctx.lineWidth = 2.5;
         ctx.fill();
         ctx.stroke();
 
-        ctx.font = "7px Fira Code, monospace";
+        ctx.font = "bold 12px sans-serif";
+        ctx.fillStyle = "#05c98c";
         ctx.textAlign = "center";
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
-        ctx.fillText(`V${i + 1}`, sx, sy + 3);
-    }
+        ctx.fillText("VALID SIGN", cx, cy + 4);
 
-    ctx.font = "bold 12px Outfit, sans-serif";
-    ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.8)`;
-    ctx.textAlign = "center";
-    ctx.fillText("Tokens → Burn Address (0x000...dead)", cx, h - 25);
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Authorities Verify Proposer's Signature", cx, h - 15);
+
+    } else if (step === 4) {
+        // Step 5: Council Revocation
+        for (let i = 0; i < authorities; i++) {
+            const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            const isRevoked = i === 2;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 11, 0, Math.PI * 2);
+            ctx.fillStyle = isRevoked ? "rgba(255, 107, 107, 0.25)" : "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = isRevoked ? "#ff6b6b" : "rgba(255,255,255,0.2)";
+            ctx.lineWidth = isRevoked ? 2 : 1;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "9px sans-serif";
+            if (isRevoked) {
+                ctx.fillStyle = "#ff6b6b";
+                ctx.fillText("REVOKED", x, y + 22);
+            } else {
+                ctx.fillStyle = "rgba(255,255,255,0.5)";
+                ctx.fillText(`A${i+1}`, x, y + 22);
+            }
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Governing Council Revokes Malicious Keys", cx, h - 15);
+    }
+}
+
+// ---- PBFT: Federated Byzantine Agreement ----
+function drawPBFTAnimation(ctx, w, h, color, step, t) {
+    const cx = w / 2, cy = h / 2 - 15;
+    const nodes = 4;
+    const radius = Math.min(w, h) * 0.28;
+
+    if (step === 0) {
+        // Step 1: Trust Configuration
+        for (let i = 0; i < nodes; i++) {
+            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 22, 0, Math.PI * 2);
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.2)`;
+            ctx.setLineDash([2, 2]);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.fill();
+            ctx.stroke();
+            ctx.font = "bold 7px Fira Code";
+            ctx.fillStyle = "#fff";
+            ctx.fillText(`N${i+1}`, x, y + 3);
+        }
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.textAlign = "center";
+        ctx.fillText("Nodes Configured with Local Quorum Slices", cx, h - 15);
+
+    } else if (step === 1) {
+        // Step 2: Nomination Phase
+        for (let i = 0; i < nodes; i++) {
+            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.stroke();
+
+            const targetIdx = (i + 1) % nodes;
+            const targetAngle = (targetIdx / nodes) * Math.PI * 2 - Math.PI / 2;
+            const tx = cx + Math.cos(targetAngle) * radius;
+            const ty = cy + Math.sin(targetAngle) * radius;
+
+            const progress = (t * 0.02) % 1;
+            const fx = x + (tx - x) * progress;
+            const fy = y + (ty - y) * progress;
+            ctx.beginPath();
+            ctx.arc(fx, fy, 3, 0, Math.PI * 2);
+            ctx.fillStyle = color.hex;
+            ctx.fill();
+        }
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Nodes Nominating Transaction Candidates", cx, h - 15);
+
+    } else if (step === 2) {
+        // Step 3: Ballot Selection
+        ctx.beginPath();
+        ctx.arc(cx - 15, cy, 25, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.3)`;
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.arc(cx + 15, cy, 25, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.3)`;
+        ctx.stroke();
+
+        ctx.font = "bold 10px sans-serif";
+        ctx.fillStyle = color.hex;
+        ctx.textAlign = "center";
+        ctx.fillText("Quorum Slice", cx - 25, cy - 30);
+        ctx.fillText("Quorum Slice", cx + 25, cy - 30);
+
+        ctx.beginPath();
+        ctx.arc(cx, cy, 14, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.35)`;
+        ctx.strokeStyle = color.hex;
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "bold 8px Fira Code";
+        ctx.fillStyle = "#fff";
+        ctx.fillText("BALLOT", cx, cy + 3);
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Ballot Prepared in Overlapping Quorums", cx, h - 15);
+
+    } else if (step === 3) {
+        // Step 4: Commit Phase
+        for (let i = 0; i < nodes; i++) {
+            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = color.hex;
+            ctx.lineWidth = 1.5;
+            ctx.fill();
+            ctx.stroke();
+
+            for (let j = i + 1; j < nodes; j++) {
+                const angle2 = (j / nodes) * Math.PI * 2 - Math.PI / 2;
+                const x2 = cx + Math.cos(angle2) * radius;
+                const y2 = cy + Math.sin(angle2) * radius;
+
+                ctx.beginPath();
+                ctx.moveTo(x, y);
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = `rgba(${color.rgb.join(",")}, ${0.15 + Math.sin(t * 0.15) * 0.08})`;
+                ctx.stroke();
+            }
+        }
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Commit Stage: Nodes Broadcasting Lock Signatures", cx, h - 15);
+
+    } else if (step === 4) {
+        // Step 5: Final Externalization
+        for (let i = 0; i < nodes; i++) {
+            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(5, 201, 140, 0.25)";
+            ctx.strokeStyle = "#05c98c";
+            ctx.lineWidth = 2;
+            ctx.fill();
+            ctx.stroke();
+            
+            ctx.font = "bold 7px Fira Code";
+            ctx.fillStyle = "#fff";
+            ctx.fillText("LEDG", x, y + 3);
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Ledger Updated Simultaneously (Instant Finality)", cx, h - 15);
+    }
+}
+
+// ---- PoB: Token Burn Animation ----
+function drawPoBAnimation(ctx, w, h, color, step, t) {
+    const cx = w / 2, cy = h / 2 - 15;
+    const radius = Math.min(w, h) * 0.28;
+    const nodes = 4;
+
+    if (step === 0) {
+        // Step 1: Token Acquisition
+        for (let i = 0; i < nodes; i++) {
+            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            ctx.beginPath();
+            ctx.roundRect(x - 18, y - 12, 36, 24, 4);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "bold 7px Fira Code";
+            ctx.fillStyle = "rgba(255,255,255,0.4)";
+            ctx.fillText(`WL ${i+1}`, x, y - 2);
+
+            const progress = (t * 0.02 + i / 4) % 1;
+            ctx.font = "9px sans-serif";
+            ctx.fillText("🪙", x, y - 25 + progress * 20);
+        }
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Validators Acquiring Native Tokens", cx, h - 15);
+
+    } else if (step === 1) {
+        // Step 2: Burn Transaction
+        ctx.font = "24px sans-serif";
+        ctx.fillText("🔥", cx, cy + 8);
+
+        ctx.font = "7px Fira Code";
+        ctx.fillStyle = "rgba(255, 107, 107, 0.7)";
+        ctx.fillText("0x000...dead", cx, cy + 24);
+
+        for (let i = 0; i < nodes; i++) {
+            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 8, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255,255,255,0.05)";
+            ctx.stroke();
+
+            const progress = (t * 0.025 + i / 4) % 1;
+            const cx_coin = x + (cx - x) * progress;
+            const cy_coin = y + (cy - y) * progress;
+            ctx.font = "9px sans-serif";
+            ctx.fillText("🪙", cx_coin, cy_coin + 3);
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Sending Tokens to Unspendable Burn Address", cx, h - 15);
+
+    } else if (step === 2) {
+        // Step 3: Virtual Mining Power
+        ctx.font = "24px sans-serif";
+        ctx.fillText("🔥", cx, cy + 8);
+
+        for (let i = 0; i < nodes; i++) {
+            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.25)`;
+            ctx.strokeStyle = color.hex;
+            ctx.lineWidth = 1.5;
+            ctx.fill();
+            ctx.stroke();
+
+            const power = [85, 40, 70, 50][i];
+            ctx.fillStyle = "rgba(255,255,255,0.1)";
+            ctx.fillRect(x - 12, y + 16, 24, 4);
+            ctx.fillStyle = color.hex;
+            ctx.fillRect(x - 12, y + 16, 24 * (power / 100), 4);
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Burn Value Converted to Virtual Mining Power", cx, h - 15);
+
+    } else if (step === 3) {
+        // Step 4: Block Selection
+        const selectedIdx = Math.floor(t / 60) % nodes;
+        const spinProgress = (t % 60) / 60;
+
+        for (let i = 0; i < nodes; i++) {
+            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            const isSelected = i === selectedIdx && spinProgress > 0.6;
+
+            ctx.beginPath();
+            ctx.arc(x, y, isSelected ? 15 : 10, 0, Math.PI * 2);
+            ctx.fillStyle = isSelected ? `rgba(${color.rgb.join(",")}, 0.3)` : "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = isSelected ? color.hex : "rgba(255,255,255,0.15)";
+            ctx.lineWidth = isSelected ? 2 : 1;
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        const spinAngle = spinProgress * Math.PI * 4 + (selectedIdx / nodes) * Math.PI * 2 - Math.PI / 2;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(spinAngle);
+        ctx.beginPath();
+        ctx.moveTo(0, -6);
+        ctx.lineTo(radius * 0.4, 0);
+        ctx.lineTo(0, 6);
+        ctx.closePath();
+        ctx.fillStyle = color.hex;
+        ctx.fill();
+        ctx.restore();
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText(spinProgress > 0.6 ? `Validator ${selectedIdx + 1} Selected!` : "Weighted Random Selection...", cx, h - 15);
+
+    } else if (step === 4) {
+        // Step 5: Reward & Decay
+        for (let i = 0; i < nodes; i++) {
+            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+            const isWinner = i === 0;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = isWinner ? "rgba(5, 201, 140, 0.2)" : "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = isWinner ? "#05c98c" : "rgba(255,255,255,0.15)";
+            ctx.fill();
+            ctx.stroke();
+
+            if (isWinner) {
+                ctx.font = "9px sans-serif";
+                ctx.fillText("🪙+Reward", x, y - 18);
+            } else {
+                ctx.font = "7px Fira Code";
+                ctx.fillStyle = "rgba(255, 107, 107, 0.5)";
+                ctx.fillText("Decaying...", x, y - 18);
+            }
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Block Minted! Burn Power Gradually Decays", cx, h - 15);
+    }
 }
 
 // Helper
@@ -1570,6 +2254,126 @@ function randomHex(len) {
     const chars = "0123456789abcdef";
     for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * 16)];
     return s;
+}
+
+// ==========================================================================
+// 9b. TRANSACTION LIFECYCLE FLOW ANIMATION
+// ==========================================================================
+let flowInterval = null;
+let currentFlowStep = 0;
+let isFlowPlaying = true; // Auto-play by default!
+
+function initFlowAnimation() {
+    const playBtn = document.getElementById("btn-flow-play");
+    const stepBtn = document.getElementById("btn-flow-step");
+    const resetBtn = document.getElementById("btn-flow-reset");
+    
+    if (!playBtn) return;
+    
+    // Reset state
+    stopFlowAnimation();
+    currentFlowStep = 0;
+    
+    // Auto start play
+    isFlowPlaying = true;
+    playBtn.textContent = "⏸ Pause";
+    
+    updateFlowUI();
+    startFlowInterval();
+    
+    // Bind listeners by cloning (to remove existing listeners)
+    const newPlayBtn = playBtn.cloneNode(true);
+    const newStepBtn = stepBtn.cloneNode(true);
+    const newResetBtn = resetBtn.cloneNode(true);
+    
+    playBtn.parentNode.replaceChild(newPlayBtn, playBtn);
+    stepBtn.parentNode.replaceChild(newStepBtn, stepBtn);
+    resetBtn.parentNode.replaceChild(newResetBtn, resetBtn);
+    
+    newPlayBtn.addEventListener("click", () => {
+        if (isFlowPlaying) {
+            stopFlowAnimation();
+            newPlayBtn.textContent = "▶ Play";
+        } else {
+            isFlowPlaying = true;
+            newPlayBtn.textContent = "⏸ Pause";
+            startFlowInterval();
+        }
+    });
+    
+    newStepBtn.addEventListener("click", () => {
+        stopFlowAnimation();
+        newPlayBtn.textContent = "▶ Play";
+        advanceFlowStep();
+    });
+    
+    newResetBtn.addEventListener("click", () => {
+        stopFlowAnimation();
+        newPlayBtn.textContent = "▶ Play";
+        currentFlowStep = 0;
+        updateFlowUI();
+    });
+}
+
+function startFlowInterval() {
+    const steps = algorithmsData[activeAlgoId].steps;
+    const duration = 3000; // 3 seconds per step
+    
+    flowInterval = setInterval(() => {
+        advanceFlowStep();
+    }, duration);
+}
+
+function stopFlowAnimation() {
+    isFlowPlaying = false;
+    if (flowInterval) {
+        clearInterval(flowInterval);
+        flowInterval = null;
+    }
+}
+
+function advanceFlowStep() {
+    const steps = algorithmsData[activeAlgoId].steps;
+    currentFlowStep = (currentFlowStep + 1) % steps.length;
+    updateFlowUI();
+}
+
+function updateFlowUI() {
+    const steps = algorithmsData[activeAlgoId].steps;
+    const stepEls = timelineFlowEl.querySelectorAll(".timeline-step");
+    const progressFill = document.getElementById("flow-progress-fill");
+    
+    stepEls.forEach((el, idx) => {
+        el.classList.remove("timeline-step-active", "timeline-step-done", "timeline-step-pending");
+        if (idx === currentFlowStep) {
+            el.classList.add("timeline-step-active");
+            // Scroll the active step into view smoothly
+            el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        } else if (idx < currentFlowStep) {
+            el.classList.add("timeline-step-done");
+        } else {
+            el.classList.add("timeline-step-pending");
+        }
+    });
+    
+    if (progressFill) {
+        const percent = ((currentFlowStep + 1) / steps.length) * 100;
+        progressFill.style.width = `${percent}%`;
+    }
+
+    // Pulse the canvas border on step change
+    const animContainer = document.querySelector(".anim-container");
+    if (animContainer) {
+        animContainer.classList.remove("step-pulse");
+        // Force reflow to restart animation
+        void animContainer.offsetWidth;
+        animContainer.classList.add("step-pulse");
+    }
+
+    // Reset canvas time so new step animation starts fresh
+    if (consensusState) {
+        consensusState.time = 0;
+    }
 }
 
 // ==========================================================================
@@ -1647,7 +2451,9 @@ function updateDashboard(algoId) {
     if (typeof renderConsensusPatterns === 'function') renderConsensusPatterns(algoId);
     if (typeof renderCurrencyDeepDive === 'function') renderCurrencyDeepDive(algoId);
     if (typeof renderLayerStack === 'function') renderLayerStack(algoId);
-    if (typeof initWorkflowAnimation === 'function') initWorkflowAnimation(algoId);
+    
+    // Initialize transaction lifecycle flow animation
+    initFlowAnimation();
 
     resetSimulator();
 }

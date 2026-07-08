@@ -533,10 +533,20 @@ body {
 .anim-container {
     position: relative;
     background: rgba(0,0,0,0.3);
-    border: 1px solid var(--border-color);
+    border: 2px solid var(--border-color);
     border-radius: 16px;
     overflow: hidden;
     aspect-ratio: 4/3;
+    transition: border-color 0.4s ease, box-shadow 0.4s ease;
+}
+
+.anim-container.step-pulse {
+    animation: canvasPulse 0.8s ease-out;
+}
+
+@keyframes canvasPulse {
+    0%   { border-color: var(--accent-theme); box-shadow: 0 0 20px rgba(var(--accent-rgb, 0,242,254), 0.4), inset 0 0 30px rgba(var(--accent-rgb, 0,242,254), 0.05); }
+    100% { border-color: var(--border-color); box-shadow: none; }
 }
 
 #consensus-canvas {
@@ -1774,135 +1784,168 @@ footer {
 }
 
 /* ========================================
-   WORKFLOW ANIMATION
+   TRANSACTION LIFECYCLE FLOW ANIMATION
    ======================================== */
-.anim-controls {
+.flow-header {
     display: flex;
-    gap: 0.75rem;
-    margin-bottom: 1rem;
-    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 1.75rem;
+    margin-bottom: 0.5rem;
 }
 
-.anim-controls .sim-btn {
+.flow-title {
+    margin: 0 !important;
+}
+
+.flow-controls {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.flow-controls .sim-btn {
     flex: none;
-    padding: 0.6rem 1.25rem;
-    font-size: 0.85rem;
+    padding: 0.35rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    border-radius: 6px;
+    height: auto;
+    line-height: 1;
 }
 
-.anim-progress-bar {
+.flow-progress-bar {
     height: 4px;
     background: rgba(255, 255, 255, 0.06);
     border-radius: 2px;
     overflow: hidden;
-    margin-bottom: 0.5rem;
+    margin-bottom: 1.5rem;
 }
 
-.anim-progress-fill {
+.flow-progress-fill {
     height: 100%;
     width: 0%;
-    background: linear-gradient(90deg, #00f2fe, #a55eea);
+    background: var(--accent-theme);
     border-radius: 2px;
-    transition: width 0.4s ease-out;
+    transition: width 0.4s ease, background-color 0.4s ease;
 }
 
-.anim-frame-label {
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    font-family: var(--font-mono);
-    margin-bottom: 1.25rem;
-}
-
-.anim-title {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 1rem;
-}
-
-.anim-frames {
-    display: flex;
-    flex-direction: column;
-    gap: 0;
-}
-
-.anim-frame {
-    display: flex;
-    gap: 0.75rem;
-    align-items: flex-start;
-    padding: 0.85rem 1rem;
+/* Timeline Step Animations & States */
+.timeline-step {
+    position: relative;
+    margin-bottom: 1.5rem;
+    transition: opacity 0.4s ease, transform 0.4s ease, background 0.4s ease;
+    padding: 0.6rem 0.75rem;
     border-radius: 10px;
-    border: 1px solid transparent;
-    transition: all 0.4s ease;
-    opacity: 0.4;
+    border-left: 3px solid transparent;
 }
 
-.anim-frame-active {
+.timeline-step:last-child {
+    margin-bottom: 0;
+}
+
+.timeline-step.timeline-step-active {
     opacity: 1;
-    background: rgba(0, 242, 254, 0.06);
-    border-color: rgba(0, 242, 254, 0.2);
-    box-shadow: 0 0 20px rgba(0, 242, 254, 0.08);
-    transform: scale(1.02);
+    transform: translateX(4px);
+    background: rgba(255, 255, 255, 0.04);
+    border-left-color: var(--accent-theme);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
 }
 
-.anim-frame-done {
+.timeline-step.timeline-step-active .step-content h4 {
+    color: var(--accent-theme);
+}
+
+.timeline-step.timeline-step-active .step-content h4::after {
+    content: '  ◀ NOW PLAYING';
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    color: var(--accent-theme);
     opacity: 0.7;
-    border-color: rgba(29, 209, 161, 0.15);
+    margin-left: 0.5rem;
+    vertical-align: middle;
+    animation: nowPlayingBlink 1.5s ease-in-out infinite;
 }
 
-.anim-frame-done .anim-frame-icon {
-    background: rgba(29, 209, 161, 0.1);
+@keyframes nowPlayingBlink {
+    0%, 100% { opacity: 0.7; }
+    50% { opacity: 0.3; }
 }
 
-.anim-frame-pending {
-    opacity: 0.35;
+.timeline-step.timeline-step-active .step-node {
+    background: var(--accent-theme);
+    border-color: #fff;
+    box-shadow: 0 0 15px var(--accent-theme), 0 0 5px #fff;
+    transform: scale(1.25);
 }
 
-.anim-frame-icon {
-    font-size: 1.25rem;
-    width: 40px;
-    height: 40px;
-    display: flex;
+.timeline-step.timeline-step-done {
+    opacity: 0.65;
+    transform: translateX(0);
+    border-left-color: rgba(5, 201, 140, 0.3);
+}
+
+.timeline-step.timeline-step-done .step-node {
+    background: rgba(5, 201, 140, 0.2);
+    border-color: #05c98c;
+    box-shadow: 0 0 6px rgba(5, 201, 140, 0.3);
+    transform: scale(1.0);
+}
+
+.timeline-step.timeline-step-done .step-node::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 8px;
+    color: #05c98c;
+    font-weight: bold;
+}
+
+.timeline-step.timeline-step-pending {
+    opacity: 0.3;
+    transform: translateX(0);
+}
+
+.timeline-step.timeline-step-pending .step-node {
+    background: var(--bg-deep);
+    border-color: rgba(255, 255, 255, 0.1);
+    box-shadow: none;
+    transform: scale(1.0);
+}
+
+/* Universal Button Style Enhancement */
+.sim-btn {
+    display: inline-flex;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.03);
+    gap: 0.35rem;
+    padding: 0.5rem 1rem;
     border-radius: 8px;
-    flex-shrink: 0;
-    transition: all 0.3s ease;
-}
-
-.anim-frame-active .anim-frame-icon {
-    background: rgba(0, 242, 254, 0.12);
-    box-shadow: 0 0 12px rgba(0, 242, 254, 0.15);
-}
-
-.anim-frame-content {
-    flex: 1;
-}
-
-.anim-frame-step {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin-bottom: 0.15rem;
-}
-
-.anim-frame-desc {
+    font-family: var(--font-sans);
+    font-weight: 600;
     font-size: 0.8rem;
-    color: var(--text-secondary);
-    line-height: 1.3;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
 }
 
-.anim-connector {
-    display: flex;
-    justify-content: center;
-    padding: 0.15rem 0;
-    color: rgba(255, 255, 255, 0.12);
-    font-size: 0.9rem;
+.sim-btn:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--accent-theme);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    transform: translateY(-1px);
+}
+
+.sim-btn:active {
+    transform: translateY(0);
+}
+
+.step-node {
     transition: all 0.3s ease;
-}
-
-.anim-connector.connector-done {
-    color: rgba(29, 209, 161, 0.4);
 }
 
 /* ========================================
