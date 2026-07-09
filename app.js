@@ -325,7 +325,6 @@ const sliderAttackerPower = document.getElementById("slider-attacker-power");
 const sliderNodes = document.getElementById("slider-nodes");
 const valAttackerPower = document.getElementById("val-attacker-power");
 const valNodes = document.getElementById("val-nodes");
-const btnSybil = document.getElementById("btn-sybil-attack");
 const btnTakeover = document.getElementById("btn-takeover-attack");
 const simOutcomeText = document.getElementById("sim-outcome-text");
 const simLogText = document.getElementById("sim-log-text");
@@ -368,7 +367,6 @@ function bindEvents() {
     sliderNodes.addEventListener("input", (e) => {
         valNodes.textContent = `${Number(e.target.value).toLocaleString()} nodes`;
     });
-    btnSybil.addEventListener("click", () => runAttackSimulation("sybil"));
     btnTakeover.addEventListener("click", () => runAttackSimulation("takeover"));
 }
 
@@ -2602,13 +2600,11 @@ function resetSimulator() {
     simOutcomeText.textContent = "System Idle. Ready for input.";
     simOutcomeText.className = "sim-outcome outcome-pending";
     simLogText.textContent = `Targeting: ${algorithmsData[activeAlgoId].name}\nSelect attack specifications to begin...`;
-    btnSybil.disabled = false;
     btnTakeover.disabled = false;
 }
 
 function runAttackSimulation(attackType) {
     if (simTimeoutId) clearTimeout(simTimeoutId);
-    btnSybil.disabled = true;
     btnTakeover.disabled = true;
 
     const attackerPower = parseInt(sliderAttackerPower.value, 10);
@@ -2622,53 +2618,7 @@ function runAttackSimulation(attackType) {
 
     let steps = [];
 
-    if (attackType === "sybil") {
-        steps.push(`[1/4] Spawning ${honestNodes.toLocaleString()} malicious Sybil identities...`);
-        if (algoId === "pow") {
-            steps.push(`[2/4] Sybils flooding peer mempools with transactions...`);
-            steps.push(`[3/4] Honest miners verify SHA-256 hash puzzle target check.`);
-            steps.push(`[4/4] Sybil count ignored. Nakamoto consensus allocates weight by hashrate.`);
-            steps.push(`[RESULT] Attack Defeated. PoW relies on hardware work, not virtual node counts. Attacker holds only ${attackerPower}% of hash rate.`);
-            steps.push("FAIL");
-        } else if (algoId === "pos") {
-            steps.push(`[2/4] Launching virtual validators without staking balance...`);
-            steps.push(`[3/4] Staking Deposit Contract checks credentials. Sybil balance = 0 ETH.`);
-            steps.push(`[4/4] Validator filter rejects attackers — minimum 32 ETH required.`);
-            steps.push(`[RESULT] Attack Defeated. PoS requires physical capital backing.`);
-            steps.push("FAIL");
-        } else if (algoId === "poh") {
-            steps.push(`[2/4] Flooding Solana gossip network with virtual validator IDs...`);
-            steps.push(`[3/4] Leader checks timing slot alignment. Sybils lack VDF clock inputs.`);
-            steps.push(`[4/4] Pipeline drops un-staked, out-of-sync nodes from Tower BFT voting.`);
-            steps.push(`[RESULT] Attack Defeated. High-speed timing + PoS voting requirements filter Sybils.`);
-            steps.push("FAIL");
-        } else if (algoId === "dpos") {
-            steps.push(`[2/4] Deploying Sybil nodes requesting scheduling slots...`);
-            steps.push(`[3/4] Ledger checks delegation database. Slots filled by voter-backed nodes.`);
-            steps.push(`[4/4] Attackers hold 0 delegation tokens. System bypasses un-voted nodes.`);
-            steps.push(`[RESULT] Attack Defeated. DPoS locks proposals to top N delegates.`);
-            steps.push("FAIL");
-        } else if (algoId === "poa") {
-            steps.push(`[2/4] Connecting Sybil nodes to authority networks...`);
-            steps.push(`[3/4] Whitelist signature validation. Keys checked against certificate directory.`);
-            steps.push(`[4/4] Vetting fails. Sybil keys missing from governing consortium.`);
-            steps.push(`[RESULT] Attack Defeated. PoA permits only pre-vetted whitelisted addresses.`);
-            steps.push("FAIL");
-        } else if (algoId === "pbft") {
-            steps.push(`[2/4] Deploying fake nodes querying for quorum inclusion...`);
-            steps.push(`[3/4] Existing nodes examine Quorum Slices. Sybils excluded from trust configs.`);
-            steps.push(`[4/4] Quorum slices closed to unknown actors. Zero consensus influence.`);
-            steps.push(`[RESULT] Attack Defeated. FBA relies on peer-defined trust trees.`);
-            steps.push("FAIL");
-        } else if (algoId === "pob") {
-            steps.push(`[2/4] Launching zero-cost Sybil nodes seeking block production...`);
-            steps.push(`[3/4] Protocol checks on-chain burn history. Sybil addresses have 0 burns.`);
-            steps.push(`[4/4] Virtual mining power = 0. Block selection probability = 0%.`);
-            steps.push(`[RESULT] Attack Defeated. PoB requires irreversible token destruction.`);
-            steps.push("FAIL");
-        }
-    } else {
-        steps.push(`[1/4] Aggregating resources... Attacker commands ${attackerPower}% of consensus weight.`);
+    steps.push(`[1/4] Aggregating resources... Attacker commands ${attackerPower}% of consensus weight.`);
         if (algoId === "pow") {
             steps.push(`[2/4] Constructing private block series...`);
             if (attackerPower >= 51) {
@@ -2776,7 +2726,6 @@ function runAttackSimulation(attackType) {
                 steps.push("FAIL");
             }
         }
-    }
 
     // Animate log
     let logText = "";
@@ -2800,7 +2749,6 @@ function runAttackSimulation(attackType) {
                 simOutcomeText.textContent = "ATTACK DEFEATED ✅";
                 simOutcomeText.className = "sim-outcome outcome-fail";
             }
-            btnSybil.disabled = false;
             btnTakeover.disabled = false;
         }
     }
