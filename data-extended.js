@@ -100,18 +100,18 @@ const blockStructureData = {
     },
     pob: {
         model: "UTXO-Based (Bitcoin-derived)",
-        blockSize: "Variable (~1 MB, Slimcoin)",
+        blockSize: "Similar to Bitcoin (implementation dependent)",
         headerFields: [
-            { name: "Block Hash", desc: "SHA-256d hash of the block header, must meet difficulty target" },
+            { name: "Block Hash", desc: "Unique cryptographic hash identifying the block." },
             { name: "Previous Block Hash", desc: "Hash linking to the parent block in the chain" },
             { name: "Merkle Root", desc: "Root hash of all transactions in the block" },
             { name: "Timestamp", desc: "Unix time of block creation" },
-            { name: "Burn Score", desc: "Cumulative burned-coin weight used for block selection probability" },
-            { name: "Nonce", desc: "Variable iterated to satisfy the combined PoW/PoB difficulty target" }
+            { name: "Burn Score", desc: "Effective burn weight used by the consensus algorithm (implementation-specific)." },
+            { name: "Burn Reference", desc: "Reference to the participant's historical burn record used by the consensus algorithm." }
         ],
         merkleType: "Binary Merkle Tree (SHA-256d)",
         forkRule: "Longest Chain Rule weighted by cumulative burn score — more burns = higher chain weight",
-        specialNote: "Burn transactions send coins to a provably unspendable address (e.g., 1CounterpartyXXX…). The protocol tracks burn history on-chain; virtual mining power decays over time, requiring periodic re-burns to maintain block production priority."
+        specialNote: "Burn transactions permanently destroy coins by sending them to verifiably unspendable addresses. Different Proof of Burn implementations define how burn history influences future block production."
     }
 };
 
@@ -174,11 +174,11 @@ const consensusPatternsData = {
         energyModel: "Negligible — voting-based with minimal computation"
     },
     pob: {
-        selectionType: "Weighted Random Lottery (burn-amount proportional, decay-adjusted)",
+        selectionType: "Weighted Random Lottery (burn-weight proportional)",
         communicationType: "Gossip Protocol — flood broadcast inherited from Bitcoin codebase",
         forkResolution: "Longest Chain Rule weighted by cumulative burn score",
         finalityType: "Probabilistic — increases with successive blocks (~6 confirmations)",
-        byzantineTolerance: "50% of total network burn power",
+        byzantineTolerance: "Secure while honest participants collectively control the majority of effective burn weight.",
         patternCategory: "Burn-Based Nakamoto Consensus — irreversible capital commitment replaces hash computation",
         energyModel: "Low — no ongoing hash competition; cost is front-loaded into token burn transactions"
     }
@@ -414,8 +414,8 @@ const currencyDetailsData = {
         launchYear: 2014,
         founder: "slimcoin-project (pseudonymous open-source community)",
         maxSupply: "250,000,000 SLM (soft cap via burn decay)",
-        circulatingModel: "Hybrid PoW/PoS/PoB emissions — burners earn virtual mining power that decays over time",
-        currentPhase: "Active niche network — first blockchain to implement a pure Proof of Burn mechanism",
+        circulatingModel: "Hybrid PoW/PoS/PoB emissions — participants earn virtual mining power by burning coins; burn weight decays over time (Slimcoin-specific)",
+        currentPhase: "Active niche network — first blockchain to implement native Proof of Burn consensus in a hybrid PoW/PoS/PoB model",
         keyMilestones: [
             { year: 2014, event: "Launched as first cryptocurrency with native Proof of Burn consensus" },
             { year: 2014, event: "Hybrid PoW/PoS/PoB model introduced — all three mechanisms operate simultaneously" },
@@ -515,12 +515,12 @@ const workflowAnimationData = {
     pob: {
         title: "Proof of Burn Block Selection",
         frames: [
-            { icon: "💰", label: "Token Acquisition", desc: "Participants purchase native tokens from the open market or earn them via prior block rewards.", duration: 2000 },
-            { icon: "🔥", label: "Burn Transaction", desc: "Validators send tokens to a provably unspendable address (e.g., 0x000...dead). The burn is recorded immutably on-chain.", duration: 2500 },
-            { icon: "⚖️", label: "Virtual Mining Power", desc: "The protocol assigns virtual mining power proportional to total tokens burned. Older burns decay in weight over time.", duration: 2000 },
-            { icon: "🎲", label: "Block Selection", desc: "A weighted random selection algorithm picks the next block producer based on cumulative, decay-adjusted burn history.", duration: 2500 },
-            { icon: "📦", label: "Block Creation", desc: "The selected validator assembles pending transactions, signs the block header, and broadcasts it to the network.", duration: 2000 },
-            { icon: "♻️", label: "Reward & Decay", desc: "Block reward received. Burn power gradually decays, incentivizing validators to periodically re-burn to stay competitive.", duration: 2000 }
+            { icon: "💰", label: "Token Acquisition", desc: "Participants acquire native cryptocurrency through exchanges, mining rewards, or previous ownership before participating in the burn process.", duration: 2000 },
+            { icon: "🔥", label: "Burn Transaction", desc: "Participants permanently destroy coins by sending them to a verifiably unspendable (burn) address. The burn transaction is permanently recorded on the blockchain.", duration: 2500 },
+            { icon: "⚖️", label: "Burn Weight", desc: "The protocol converts burned coins into burn weight (also called virtual mining power or burn score depending on the implementation), increasing the participant's probability of creating future blocks.", duration: 2000 },
+            { icon: "🎲", label: "Block Selection", desc: "The protocol selects the next block producer according to each participant's effective burn weight. Selection is probabilistic — higher burn weight increases but does not guarantee selection.", duration: 2500 },
+            { icon: "📦", label: "Block Creation", desc: "The selected participant assembles pending transactions, signs the block, and broadcasts it to the network.", duration: 2000 },
+            { icon: "♻️", label: "Reward", desc: "The selected participant receives block rewards. Depending on the implementation, burn influence may remain permanent or gradually decay over time (burn decay is Slimcoin-specific).", duration: 2000 }
         ]
     }
 };

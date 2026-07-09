@@ -163,23 +163,23 @@ const algorithmsData = {
         name: "Proof of Burn",
         acronym: "PoB",
         tagline: "Security through provable token destruction",
-        description: "Proof of Burn is a consensus mechanism where validators demonstrate commitment by permanently destroying (burning) cryptocurrency tokens by sending them to a verifiably unspendable address. The more tokens a validator burns, the higher their probability of being selected to mine the next block. This creates a long-term economic commitment without the energy waste of PoW, as the burned tokens represent 'virtual mining rigs' that cannot be recovered.",
+        description: "Proof of Burn (PoB) is a consensus mechanism in which participants permanently destroy cryptocurrency by sending it to a verifiably unspendable address. The protocol uses the amount and history of burned coins to determine a participant's probability of creating future blocks. Burning represents a long-term economic commitment instead of expending computational power as in Proof of Work.",
         scores: { scalability: 5.0, security: 6.5, decentralisation: 6.0 },
         specs: {
             blockTime: "10 mins (Slimcoin)",
-            tps: "10 - 50 TPS",
-            nodes: "~50 - 200 validators",
+            tps: "3 - 10 TPS (Slimcoin)",
+            nodes: "~50 - 200 active full nodes",
             stake: "Permanent token burn (irreversible cost)"
         },
         steps: [
-            { title: "Token Acquisition", desc: "Participants acquire native tokens from the open market or through prior mining/staking rewards." },
-            { title: "Burn Transaction", desc: "Validators send tokens to a provably unspendable address (e.g., 0x000...dead). The transaction is recorded on-chain as proof of burn." },
-            { title: "Virtual Mining Power", desc: "The protocol assigns virtual mining power proportional to the amount of tokens burned. More burns = higher probability of block selection." },
-            { title: "Block Selection", desc: "A weighted random selection picks the next block producer based on cumulative burn history and a decay function over time." },
-            { title: "Reward & Decay", desc: "The selected validator creates the block and earns rewards. Burn power gradually decays, requiring periodic re-burning to maintain position." }
+            { title: "Token Acquisition", desc: "Participants acquire native cryptocurrency through exchanges, mining rewards, or previous ownership before participating in the burn process." },
+            { title: "Burn Transaction", desc: "Participants permanently destroy coins by sending them to a verifiably unspendable (burn) address. The burn transaction is permanently recorded on the blockchain." },
+            { title: "Burn Weight Assignment", desc: "The protocol converts burned coins into burn weight (also called virtual mining power or burn score depending on the implementation), increasing the participant's probability of creating future blocks." },
+            { title: "Block Producer Selection", desc: "The protocol selects the next block producer according to each participant's effective burn weight. Some implementations, such as Slimcoin, also apply burn decay over time." },
+            { title: "Block Creation \u0026 Reward", desc: "The selected participant produces the next block and receives block rewards. Depending on the implementation, burn influence may remain permanent or gradually decay over time." }
         ],
         blockchains: [
-            { name: "Slimcoin", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "The first cryptocurrency to implement Proof of Burn. Uses a hybrid PoW/PoS/PoB model where burning coins creates long-term virtual mining power.", languages: ["C++ (Bitcoin Core fork)"] },
+            { name: "Slimcoin", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "First blockchain to implement native Proof of Burn consensus in a hybrid PoW/PoS/PoB model. Burning coins creates long-term virtual mining power that decays over time (Slimcoin-specific).", languages: ["C++ (Bitcoin Core fork)"] },
             { name: "Counterparty", layer: "Layer 2 (Bitcoin Metaprotocol)", layerType: "L2", rationale: "Used PoB in its genesis — 2,130 BTC were permanently burned to create XCP tokens, ensuring a fair distribution with no pre-mine.", languages: ["Python", "Bitcoin Script (OP_RETURN)"] }
         ]
     }
@@ -2283,155 +2283,403 @@ function drawPoBAnimation(ctx, w, h, color, step, t) {
     const nodes = 4;
 
     if (step === 0) {
-        // Step 1: Token Acquisition
-        for (let i = 0; i < nodes; i++) {
-            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
-            const x = cx + Math.cos(angle) * radius;
-            const y = cy + Math.sin(angle) * radius;
+        // Step 1: Token Acquisition — coins flow from exchange into wallet, balance grows, wallet glows
 
+        // Exchange box (left)
+        const exX = cx - 90, exY = cy - 22;
+        ctx.beginPath();
+        ctx.roundRect(exX - 30, exY - 10, 60, 32, 6);
+        ctx.fillStyle = "rgba(255,255,255,0.04)";
+        ctx.strokeStyle = "rgba(255,255,255,0.25)";
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "bold 7px Fira Code";
+        ctx.fillStyle = "rgba(255,255,255,0.5)";
+        ctx.textAlign = "center";
+        ctx.fillText("EXCHANGE", exX, exY + 6);
+        ctx.font = "6px Fira Code";
+        ctx.fillStyle = "rgba(255,255,255,0.3)";
+        ctx.fillText("Market", exX, exY + 16);
+
+        // Wallet box (right) with glow when coins arrive
+        const walX = cx + 90, walY = cy - 22;
+        const walletGlow = 0.15 + Math.sin(t * 0.08) * 0.1;
+        ctx.beginPath();
+        ctx.roundRect(walX - 30, walY - 10, 60, 32, 6);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${walletGlow})`;
+        ctx.strokeStyle = color.hex;
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "bold 7px Fira Code";
+        ctx.fillStyle = color.hex;
+        ctx.textAlign = "center";
+        ctx.fillText("WALLET", walX, walY + 4);
+
+        // Balance growing
+        const balance = Math.floor((t % 120) / 120 * 500) + 100;
+        ctx.font = "bold 8px Fira Code";
+        ctx.fillStyle = "#05c98c";
+        ctx.fillText(`+${balance} SLM`, walX, walY + 16);
+
+        // Animated coins flying from exchange to wallet
+        for (let i = 0; i < 3; i++) {
+            const progress = (t * 0.018 + i * 0.33) % 1;
+            const coinX = exX + 30 + (walX - 30 - exX - 30) * progress;
+            const coinY = cy - 10 + Math.sin(progress * Math.PI) * -18;
+            ctx.font = "10px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("🪙", coinX, coinY);
+        }
+
+        // Wallet glow ring
+        ctx.beginPath();
+        ctx.arc(walX, walY + 6, 36 + Math.sin(t * 0.08) * 3, 0, Math.PI * 2);
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.2)`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.textAlign = "center";
+        ctx.fillText("Acquiring Coins — Wallet Balance Growing", cx, h - 15);
+
+    } else if (step === 1) {
+        // Step 2: Burn Transaction — coins travel from wallet to burn address and permanently disappear
+
+        // Wallet (left)
+        ctx.beginPath();
+        ctx.roundRect(cx - 110, cy - 18, 56, 28, 5);
+        ctx.fillStyle = "rgba(255,255,255,0.04)";
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.4)`;
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "bold 7px Fira Code";
+        ctx.fillStyle = color.hex;
+        ctx.textAlign = "center";
+        ctx.fillText("WALLET", cx - 82, cy - 5);
+        ctx.font = "6px Fira Code";
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        ctx.fillText("500 SLM", cx - 82, cy + 6);
+
+        // Burn address (right) — locked flame icon
+        const burnX = cx + 80;
+        ctx.beginPath();
+        ctx.arc(burnX, cy, 22, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255, 107, 107, 0.12)";
+        ctx.strokeStyle = "#ff6b6b";
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "16px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("🔥", burnX, cy + 2);
+        ctx.font = "bold 6px Fira Code";
+        ctx.fillStyle = "#ff6b6b";
+        ctx.fillText("BURN ADDR", burnX, cy + 18);
+        ctx.fillText("0x000...dead", burnX, cy + 27);
+
+        // Lock icon overlay
+        ctx.font = "8px sans-serif";
+        ctx.fillText("🔒", burnX + 12, cy - 12);
+
+        // Coins flying toward burn address then disappearing
+        const numCoins = 3;
+        for (let i = 0; i < numCoins; i++) {
+            const progress = (t * 0.022 + i * 0.33) % 1;
+            if (progress < 0.85) {
+                const startX = cx - 82;
+                const coinX = startX + (burnX - 22 - startX) * (progress / 0.85);
+                const coinY = cy - 5 + Math.sin(progress * Math.PI) * -10;
+                const alpha = 1 - progress * 0.3;
+                ctx.globalAlpha = alpha;
+                ctx.font = "10px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("🪙", coinX, coinY);
+                ctx.globalAlpha = 1;
+            }
+            // Disappear flash at burn address
+            if (progress >= 0.82 && progress < 0.92) {
+                const flashAlpha = 1 - (progress - 0.82) / 0.1;
+                ctx.beginPath();
+                ctx.arc(burnX, cy, 8, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 107, 107, ${flashAlpha * 0.6})`;
+                ctx.fill();
+            }
+        }
+
+        // Blockchain ledger recording — "Burn Recorded"
+        const ledgerY = cy + 45;
+        ctx.beginPath();
+        ctx.roundRect(cx - 60, ledgerY, 120, 20, 4);
+        ctx.fillStyle = "rgba(5, 201, 140, 0.1)";
+        ctx.strokeStyle = "rgba(5, 201, 140, 0.4)";
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "bold 7px Fira Code";
+        ctx.fillStyle = "#05c98c";
+        ctx.textAlign = "center";
+        ctx.fillText("LEDGER: Burn Recorded ✓", cx, ledgerY + 13);
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Coins Permanently Sent to Burn Address", cx, h - 15);
+
+    } else if (step === 2) {
+        // Step 3: Burn Weight Assignment — burn weight meter fills, Virtual Mining Power indicator glows
+
+        // Central burn icon (source)
+        ctx.font = "22px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("🔥", cx, cy - 30);
+
+        // Burn weight meter
+        const meterW = 130, meterH = 14;
+        const meterX = cx - meterW / 2;
+        const meterY = cy - 12;
+        const fillProgress = Math.min(1, (t % 150) / 100);
+
+        ctx.beginPath();
+        ctx.roundRect(meterX, meterY, meterW, meterH, 4);
+        ctx.fillStyle = "rgba(255,255,255,0.08)";
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.3)`;
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+
+        // Gradient fill
+        const grad = ctx.createLinearGradient(meterX, 0, meterX + meterW, 0);
+        grad.addColorStop(0, `rgba(${color.rgb.join(",")}, 0.7)`);
+        grad.addColorStop(1, color.hex);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.roundRect(meterX, meterY, meterW * fillProgress, meterH, 4);
+        ctx.fill();
+
+        ctx.font = "bold 8px Fira Code";
+        ctx.fillStyle = color.hex;
+        ctx.textAlign = "center";
+        ctx.fillText("BURN WEIGHT", cx, meterY - 4);
+
+        // Burn weight label
+        const burnWeight = Math.floor(fillProgress * 25);
+        ctx.font = "bold 10px Outfit";
+        ctx.fillStyle = "#05c98c";
+        ctx.fillText(`Burn Weight +${burnWeight}`, cx, meterY + meterH + 14);
+
+        // Virtual Mining Power indicator glowing
+        const vmpGlow = 0.3 + Math.sin(t * 0.12) * 0.15;
+        ctx.beginPath();
+        ctx.roundRect(cx - 75, cy + 32, 150, 22, 5);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${vmpGlow})`;
+        ctx.strokeStyle = color.hex;
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "bold 8px Outfit";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.fillText("⚡ Virtual Mining Power Increased", cx, cy + 46);
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Burn Score Converted to Block Selection Weight", cx, h - 15);
+
+    } else if (step === 3) {
+        // Step 4: Block Producer Selection — weighted probability bars, probabilistic lottery spinner
+
+        const participants = 4;
+        const burnWeights = [85, 40, 65, 30]; // different weights
+        const barMaxH = 50;
+        const barW = 24;
+        const barSpacing = 52;
+        const barBaseY = cy + 20;
+        const startX = cx - (participants * barSpacing) / 2 + barSpacing / 2;
+
+        // Lottery spinner in center
+        const spinProgress = (t * 0.018) % 1;
+        const spinAngle = spinProgress * Math.PI * 6;
+        const selectedIdx = Math.floor(t / 80) % participants;
+        const isSelected = (t % 80) > 50;
+
+        // Draw each participant with proportional probability bar
+        for (let i = 0; i < participants; i++) {
+            const bx = startX + i * barSpacing;
+            const weight = burnWeights[i];
+            const barH = (weight / 100) * barMaxH;
+            const isWinner = isSelected && i === selectedIdx;
+
+            // Glow ring for selected
+            if (isWinner) {
+                const pulse = 0.2 + Math.sin(t * 0.15) * 0.1;
+                ctx.beginPath();
+                ctx.arc(bx, barBaseY - barH - 18, 18, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${pulse})`;
+                ctx.fill();
+            }
+
+            // Probability bar background
             ctx.beginPath();
-            ctx.roundRect(x - 18, y - 12, 36, 24, 4);
-            ctx.fillStyle = "rgba(255,255,255,0.05)";
-            ctx.strokeStyle = "rgba(255,255,255,0.2)";
+            ctx.roundRect(bx - barW / 2, barBaseY - barMaxH, barW, barMaxH, 3);
+            ctx.fillStyle = "rgba(255,255,255,0.06)";
+            ctx.fill();
+
+            // Filled bar — proportional to burn weight
+            ctx.beginPath();
+            ctx.roundRect(bx - barW / 2, barBaseY - barH, barW, barH, 3);
+            ctx.fillStyle = isWinner ? "#05c98c" : `rgba(${color.rgb.join(",")}, 0.5)`;
+            ctx.fill();
+
+            // Participant circle
+            ctx.beginPath();
+            ctx.arc(bx, barBaseY - barH - 14, 10, 0, Math.PI * 2);
+            ctx.fillStyle = isWinner ? "rgba(5, 201, 140, 0.3)" : "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = isWinner ? "#05c98c" : `rgba(${color.rgb.join(",")}, 0.3)`;
+            ctx.lineWidth = isWinner ? 2 : 1;
             ctx.fill();
             ctx.stroke();
 
             ctx.font = "bold 7px Fira Code";
-            ctx.fillStyle = "rgba(255,255,255,0.4)";
-            ctx.fillText(`WL ${i+1}`, x, y - 2);
+            ctx.fillStyle = isWinner ? "#05c98c" : "rgba(255,255,255,0.5)";
+            ctx.textAlign = "center";
+            ctx.fillText(`P${i+1}`, bx, barBaseY - barH - 11);
 
-            const progress = (t * 0.02 + i / 4) % 1;
-            ctx.font = "9px sans-serif";
-            ctx.fillText("🪙", x, y - 25 + progress * 20);
-        }
-        ctx.font = "bold 12px Outfit";
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Validators Acquiring Native Tokens", cx, h - 15);
-
-    } else if (step === 1) {
-        // Step 2: Burn Transaction
-        ctx.font = "24px sans-serif";
-        ctx.fillText("🔥", cx, cy + 8);
-
-        ctx.font = "7px Fira Code";
-        ctx.fillStyle = "rgba(255, 107, 107, 0.7)";
-        ctx.fillText("0x000...dead", cx, cy + 24);
-
-        for (let i = 0; i < nodes; i++) {
-            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
-            const x = cx + Math.cos(angle) * radius;
-            const y = cy + Math.sin(angle) * radius;
-
-            ctx.beginPath();
-            ctx.arc(x, y, 8, 0, Math.PI * 2);
-            ctx.fillStyle = "rgba(255,255,255,0.05)";
-            ctx.stroke();
-
-            const progress = (t * 0.025 + i / 4) % 1;
-            const cx_coin = x + (cx - x) * progress;
-            const cy_coin = y + (cy - y) * progress;
-            ctx.font = "9px sans-serif";
-            ctx.fillText("🪙", cx_coin, cy_coin + 3);
+            // Weight label
+            ctx.font = "6px Fira Code";
+            ctx.fillStyle = "rgba(255,255,255,0.35)";
+            ctx.fillText(`${weight}%`, bx, barBaseY + 10);
         }
 
-        ctx.font = "bold 12px Outfit";
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Sending Tokens to Unspendable Burn Address", cx, h - 15);
-
-    } else if (step === 2) {
-        // Step 3: Virtual Mining Power
-        ctx.font = "24px sans-serif";
-        ctx.fillText("🔥", cx, cy + 8);
-
-        for (let i = 0; i < nodes; i++) {
-            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
-            const x = cx + Math.cos(angle) * radius;
-            const y = cy + Math.sin(angle) * radius;
-
+        // Arrow pointing to winner
+        if (isSelected) {
+            const winX = startX + selectedIdx * barSpacing;
+            const winWeight = burnWeights[selectedIdx];
+            const winBarH = (winWeight / 100) * barMaxH;
             ctx.beginPath();
-            ctx.arc(x, y, 12, 0, Math.PI * 2);
-            ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.25)`;
-            ctx.strokeStyle = color.hex;
+            ctx.moveTo(cx, cy - 30);
+            ctx.lineTo(winX, barBaseY - winBarH - 28);
+            ctx.strokeStyle = `rgba(5, 201, 140, 0.6)`;
             ctx.lineWidth = 1.5;
-            ctx.fill();
+            ctx.setLineDash([3, 3]);
             ctx.stroke();
+            ctx.setLineDash([]);
 
-            const power = [85, 40, 70, 50][i];
-            ctx.fillStyle = "rgba(255,255,255,0.1)";
-            ctx.fillRect(x - 12, y + 16, 24, 4);
-            ctx.fillStyle = color.hex;
-            ctx.fillRect(x - 12, y + 16, 24 * (power / 100), 4);
+            ctx.font = "bold 7px Fira Code";
+            ctx.fillStyle = "#05c98c";
+            ctx.textAlign = "center";
+            ctx.fillText("SELECTED", winX, barBaseY - winBarH - 32);
         }
+
+        // "Weighted Probability" label
+        ctx.font = "bold 7px Fira Code";
+        ctx.fillStyle = "rgba(255,255,255,0.4)";
+        ctx.textAlign = "center";
+        ctx.fillText("← Weighted Burn Probability →", cx, cy - 36);
 
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Burn Value Converted to Virtual Mining Power", cx, h - 15);
-
-    } else if (step === 3) {
-        // Step 4: Block Selection
-        const selectedIdx = Math.floor(t / 60) % nodes;
-        const spinProgress = (t % 60) / 60;
-
-        for (let i = 0; i < nodes; i++) {
-            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
-            const x = cx + Math.cos(angle) * radius;
-            const y = cy + Math.sin(angle) * radius;
-            const isSelected = i === selectedIdx && spinProgress > 0.6;
-
-            ctx.beginPath();
-            ctx.arc(x, y, isSelected ? 15 : 10, 0, Math.PI * 2);
-            ctx.fillStyle = isSelected ? `rgba(${color.rgb.join(",")}, 0.3)` : "rgba(255,255,255,0.05)";
-            ctx.strokeStyle = isSelected ? color.hex : "rgba(255,255,255,0.15)";
-            ctx.lineWidth = isSelected ? 2 : 1;
-            ctx.fill();
-            ctx.stroke();
-        }
-
-        const spinAngle = spinProgress * Math.PI * 4 + (selectedIdx / nodes) * Math.PI * 2 - Math.PI / 2;
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.rotate(spinAngle);
-        ctx.beginPath();
-        ctx.moveTo(0, -6);
-        ctx.lineTo(radius * 0.4, 0);
-        ctx.lineTo(0, 6);
-        ctx.closePath();
-        ctx.fillStyle = color.hex;
-        ctx.fill();
-        ctx.restore();
-
-        ctx.font = "bold 12px Outfit";
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText(spinProgress > 0.6 ? `Validator ${selectedIdx + 1} Selected!` : "Weighted Random Selection...", cx, h - 15);
+        ctx.textAlign = "center";
+        ctx.fillText(isSelected ? `Participant ${selectedIdx + 1} Selected (Probabilistic)` : "Weighted Burn Lottery in Progress...", cx, h - 15);
 
     } else if (step === 4) {
-        // Step 5: Reward & Decay
-        for (let i = 0; i < nodes; i++) {
-            const angle = (i / nodes) * Math.PI * 2 - Math.PI / 2;
-            const x = cx + Math.cos(angle) * radius;
-            const y = cy + Math.sin(angle) * radius;
-            const isWinner = i === 0;
+        // Step 5: Block Creation & Reward — block built, chain extends, reward, burn weight decays
 
+        // Winner participant (proposer)
+        const proposerX = cx;
+        const proposerY = cy - 30;
+        const propGlow = 0.25 + Math.sin(t * 0.1) * 0.1;
+        ctx.beginPath();
+        ctx.arc(proposerX, proposerY, 18, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${propGlow})`;
+        ctx.strokeStyle = color.hex;
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "bold 7px Fira Code";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.fillText("PROD", proposerX, proposerY + 3);
+
+        // Arrow down to new block
+        ctx.beginPath();
+        ctx.moveTo(proposerX, proposerY + 18);
+        ctx.lineTo(proposerX, cy);
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Mini blockchain extending
+        const blockW = 32, blockH = 18, blockGap = 6;
+        const chainStartX = cx - 70;
+        const chainY = cy + 8;
+        for (let i = 0; i < 4; i++) {
+            const bx = chainStartX + i * (blockW + blockGap);
+            const isNew = i === 3;
+            const newBlockProgress = isNew ? Math.min(1, (t % 120) / 60) : 1;
+
+            ctx.globalAlpha = isNew ? newBlockProgress : 1;
             ctx.beginPath();
-            ctx.arc(x, y, 10, 0, Math.PI * 2);
-            ctx.fillStyle = isWinner ? "rgba(5, 201, 140, 0.2)" : "rgba(255,255,255,0.05)";
-            ctx.strokeStyle = isWinner ? "#05c98c" : "rgba(255,255,255,0.15)";
+            ctx.roundRect(bx, chainY, blockW, blockH, 3);
+            ctx.fillStyle = isNew ? `rgba(${color.rgb.join(",")}, 0.3)` : "rgba(255,255,255,0.08)";
+            ctx.strokeStyle = isNew ? color.hex : "rgba(255,255,255,0.2)";
+            ctx.lineWidth = isNew ? 1.5 : 1;
             ctx.fill();
             ctx.stroke();
+            ctx.globalAlpha = 1;
 
-            if (isWinner) {
-                ctx.font = "9px sans-serif";
-                ctx.fillText("🪙+Reward", x, y - 18);
-            } else {
-                ctx.font = "7px Fira Code";
-                ctx.fillStyle = "rgba(255, 107, 107, 0.5)";
-                ctx.fillText("Decaying...", x, y - 18);
+            if (i > 0) {
+                ctx.beginPath();
+                ctx.moveTo(bx, chainY + blockH / 2);
+                ctx.lineTo(bx - blockGap, chainY + blockH / 2);
+                ctx.strokeStyle = "rgba(255,255,255,0.15)";
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            if (isNew) {
+                ctx.font = "bold 6px Fira Code";
+                ctx.fillStyle = color.hex;
+                ctx.textAlign = "center";
+                ctx.fillText("NEW", bx + blockW / 2, chainY + 11);
             }
         }
 
+        // Block reward coin
+        const rewardY = cy + 8 + blockH + 18 + Math.sin(t * 0.08) * 4;
+        ctx.font = "13px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("🪙 Block Reward", cx + 35, rewardY);
+
+        // Burn weight decay meter
+        const decayW = 100, decayH = 8;
+        const decayX = cx - decayW / 2;
+        const decayY = cy + 50;
+        const decayFill = Math.max(0, 0.85 - (t % 200) / 200 * 0.35);
+
+        ctx.beginPath();
+        ctx.roundRect(decayX, decayY, decayW, decayH, 3);
+        ctx.fillStyle = "rgba(255,255,255,0.07)";
+        ctx.strokeStyle = "rgba(255, 107, 107, 0.3)";
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.beginPath();
+        ctx.roundRect(decayX, decayY, decayW * decayFill, decayH, 3);
+        ctx.fillStyle = "rgba(255, 107, 107, 0.6)";
+        ctx.fill();
+
+        ctx.font = "bold 7px Fira Code";
+        ctx.fillStyle = "rgba(255, 107, 107, 0.8)";
+        ctx.textAlign = "center";
+        ctx.fillText("↓ Burn Influence Decayed Slightly (Slimcoin)", cx, decayY + decayH + 10);
+
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Block Minted! Burn Power Gradually Decays", cx, h - 15);
+        ctx.fillText("Block Created, Reward Earned, Burn Weight Decays", cx, h - 15);
     }
 }
 
