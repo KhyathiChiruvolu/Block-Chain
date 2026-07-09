@@ -70,18 +70,18 @@ const blockStructureData = {
     },
     poa: {
         model: "Account-Based (EVM-compatible)",
-        blockSize: "Variable (~30M gas limit on BNB Chain)",
+        blockSize: "Variable (depends on the blockchain's configured gas/block limit). Example: BNB Chain ≈ 30M gas.",
         headerFields: [
             { name: "Block Number", desc: "Sequential block height" },
             { name: "Validator Signature", desc: "ECDSA signature from the whitelisted authority node" },
             { name: "Parent Hash", desc: "Keccak-256 hash of the previous block header" },
             { name: "State Root", desc: "Root of the account and storage state trie" },
             { name: "Transactions Root", desc: "Root hash of the transaction trie" },
-            { name: "Extra Data", desc: "Validator vanity bytes + RLP-encoded authority set metadata" }
+            { name: "Extra Data", desc: "Validator vanity bytes, validator metadata, and validator signature (implementation dependent)." }
         ],
-        merkleType: "Merkle Patricia Trie (Keccak-256)",
-        forkRule: "Authority Round — in-turn proposers score higher; out-of-turn blocks accepted only if in-turn is missing",
-        specialNote: "Block validity depends entirely on the proposer's identity being on the council-managed cryptographic whitelist."
+        merkleType: "Transactions (organized using a Merkle Patricia Trie, Keccak-256)",
+        forkRule: "Fork choice depends on the PoA implementation. Example (Clique/Parlia): In-turn validators are preferred while out-of-turn blocks may be accepted according to protocol rules.",
+        specialNote: "A block is valid only when it is proposed by an authorized validator and satisfies all protocol validation rules."
     },
     pbft: {
         model: "Account-Based (Stellar) / Custom Ledger Model",
@@ -157,10 +157,10 @@ const consensusPatternsData = {
     },
     poa: {
         selectionType: "Identity-Based (vetted consortium whitelisting)",
-        communicationType: "Authority Relay — direct communication between approved nodes",
-        forkResolution: "Authority Round Scoring — in-turn proposers prioritized over out-of-turn",
-        finalityType: "Instant — single block confirmation by authority signatures",
-        byzantineTolerance: "50%+1 of whitelisted authority node keys",
+        communicationType: "Direct peer-to-peer communication among authorized validators",
+        forkResolution: "Depends on the PoA implementation. Example — Clique/Parlia: In-turn validator preference. IBFT/QBFT: BFT voting.",
+        finalityType: "Fast finality (implementation dependent). Examples — IBFT/QBFT: Immediate deterministic finality. Clique: Probabilistic confirmation.",
+        byzantineTolerance: "Depends on the PoA implementation. IBFT/QBFT: Requires 3f+1 validators and tolerates up to f Byzantine validators. Clique: No formal Byzantine Fault Tolerance guarantee.",
         patternCategory: "Permissioned Authority — reputation-gated, no open participation",
         energyModel: "Negligible — no competition or stake required"
     },
@@ -376,21 +376,7 @@ const currencyDetailsData = {
         ],
         variants: []
     },
-    "Base": {
-        symbol: "ETH (no native token)",
-        launchYear: 2023,
-        founder: "Coinbase (Brian Armstrong, Jesse Pollak)",
-        maxSupply: "No native token — uses ETH for gas fees",
-        circulatingModel: "Sequencer fees collected by Coinbase; gas paid in ETH",
-        currentPhase: "OP Stack L2 rollup — moving toward decentralized sequencer",
-        keyMilestones: [
-            { year: 2023, event: "Base mainnet launch on OP Stack — onchain summer campaign" },
-            { year: 2023, event: "friend.tech social dApp drives early adoption" },
-            { year: 2024, event: "Dencun blob data reduces gas fees by 99%+" },
-            { year: 2024, event: "Surpasses Arbitrum in daily transactions" }
-        ],
-        variants: []
-    },
+
     "Stellar": {
         symbol: "XLM",
         launchYear: 2014,
@@ -507,12 +493,12 @@ const workflowAnimationData = {
     poa: {
         title: "PoA Authority Block Signing",
         frames: [
-            { icon: "🪪", label: "KYC Vetting", desc: "Organizations undergo rigorous identity verification, background checks, and legal review.", duration: 2000 },
-            { icon: "📋", label: "Whitelisting", desc: "Governing council adds the approved node's public key to the active validator whitelist.", duration: 2000 },
-            { icon: "🔄", label: "Deterministic Rotation", desc: "Authority nodes take turns proposing blocks in a fixed schedule — no competition.", duration: 2500 },
-            { icon: "🔐", label: "Signature", desc: "Current authority signs the block header with their registered private key.", duration: 2000 },
-            { icon: "🔍", label: "Authentication", desc: "Other authorities verify the proposer's ECDSA signature against the whitelist.", duration: 2000 },
-            { icon: "⚖️", label: "Governance", desc: "Misbehaving authorities have credentials revoked by the governing council.", duration: 2000 }
+            { icon: "🪪", label: "Vetting", desc: "Individuals or organizations undergo identity, reputation, governance, and technical evaluation before becoming validator candidates.", duration: 2000 },
+            { icon: "📋", label: "Whitelisting", desc: "Approved validator public keys are added to the active validator set through the blockchain's governance process.", duration: 2000 },
+            { icon: "🔄", label: "Block Proposal", desc: "An authorized validator is selected according to the blockchain's PoA protocol to propose the next block.", duration: 2500 },
+            { icon: "🔐", label: "Validation", desc: "Authorized validators verify the proposed block's digital signature, transactions, state transition, parent hash, timestamp, and all protocol validation rules.", duration: 2000 },
+            { icon: "🔍", label: "Consensus", desc: "Validators accept and append the block to the blockchain after full validation.", duration: 2000 },
+            { icon: "⚖️", label: "Governance", desc: "If a validator behaves maliciously or violates governance rules, its authority can be revoked and it is removed from the validator set.", duration: 2000 }
         ]
     },
     pbft: {
@@ -553,7 +539,7 @@ const layerDefinitions = [
             { name: "Polkadot", role: "Relay chain connecting parachains with shared security" },
             { name: "Cosmos (IBC)", role: "Inter-Blockchain Communication protocol for sovereign chains" },
             { name: "Avalanche Primary Network", role: "Subnet architecture for custom blockchain deployment" },
-            { name: "libp2p", role: "Peer-to-peer networking stack used by Ethereum, IPFS, Filecoin" }
+            { name: "LayerZero", role: "Omnichain messaging protocol for cross-chain communication" }
         ]
     },
     {
@@ -567,7 +553,8 @@ const layerDefinitions = [
             { name: "Ethereum", role: "PoS — programmable settlement with smart contracts" },
             { name: "Solana", role: "PoH+PoS — high-throughput single-layer execution" },
             { name: "Cardano", role: "PoS (Ouroboros) — peer-reviewed formal verification" },
-            { name: "BNB Chain", role: "PoSA — fast EVM-compatible execution" }
+            { name: "BNB Chain", role: "PoSA — fast EVM-compatible execution" },
+            { name: "VeChain", role: "PoA 2.0 — enterprise supply chain and sustainability" }
         ]
     },
     {

@@ -113,25 +113,24 @@ const algorithmsData = {
         name: "Proof of Authority",
         acronym: "PoA",
         tagline: "Security through identity, reputation, and vetting",
-        description: "Proof of Authority is a reputation-based consensus mechanism where validator identities are pre-vetted and approved by a central governing body. Validators are not required to spend computational energy or stake capital; their motivation to act honestly is tied to their real-world reputation and legal liability. This is highly suited for private or consortium blockchains.",
+        description: "Proof of Authority (PoA) is a reputation-based consensus mechanism in which validators are pre-approved through the blockchain's governance process before participating in consensus. Validators do not compete through computational mining. Depending on the implementation, they may also be required to stake tokens or satisfy governance requirements (for example, Proof of Staked Authority). PoA is commonly used in private, consortium, and permissioned public blockchains where trusted validators provide high throughput and predictable finality. Validators are motivated by reputation, accountability, and governance.",
         scores: { scalability: 9.5, security: 7.0, decentralisation: 1.5 },
         specs: {
             blockTime: "3 secs (BNB Chain - PoSA)",
-            tps: "2,200 - 5,000 TPS",
-            nodes: "21 - 40 validators",
-            stake: "Governance vetting + professional hardware hosting"
+            tps: "High throughput (implementation dependent). Example: BNB Chain — thousands of TPS under favorable conditions.",
+            nodes: "Validator count depends on the blockchain implementation. Example: BNB Chain ≈40 validators, VeChain 101 Authority Masternodes.",
+            stake: "Governance approval; hardware requirements depend on the blockchain implementation."
         },
         steps: [
-            { title: "Vetting & KYC Check", desc: "Individuals or organizations undergo rigorous identity, background, and legal checks to establish accountability." },
-            { title: "Authority Whitelisting", desc: "The governing council adds the approved node's cryptographic key to the active validator whitelist." },
-            { title: "Block Generation", desc: "Validators take turns proposing blocks in a deterministic rotation, reducing latency and communication overhead." },
-            { title: "Signature Authentication", desc: "Consensus is achieved when other whitelisted nodes verify the proposer's digital signature and append the block." },
-            { title: "Council Revocation", desc: "If a validator acts maliciously, the governing council revokes their credentials and keys, instantly removing them from consensus." }
+            { title: "Validator Vetting & Identity Verification", desc: "Individuals or organizations undergo identity, reputation, governance, and technical evaluation before becoming validator candidates." },
+            { title: "Authority Whitelisting", desc: "Approved validator public keys are added to the active validator set through the blockchain's governance process." },
+            { title: "Block Proposal", desc: "An authorized validator is selected according to the blockchain's Proof of Authority protocol to propose the next block." },
+            { title: "Block Validation \u0026 Consensus", desc: "Authorized validators verify the proposed block's digital signature, transactions, state transition, parent hash, timestamp, and all protocol validation rules before accepting and appending the block to the blockchain." },
+            { title: "Validator Revocation", desc: "If a validator behaves maliciously or violates governance rules, its authority can be revoked and it is removed from the validator set." }
         ],
         blockchains: [
             { name: "BNB Chain", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses a hybrid Proof of Staked Authority (PoSA). BNB Chain relies on a small validator set (currently ~40) to offer fast, cheap EVM-compatible execution.", languages: ["Solidity", "Vyper"] },
-            { name: "VeChain", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses PoA 2.0. VeChain tracks global supply chains and requires predictable enterprise transaction fees, secured by vetted Authority Masternodes.", languages: ["Solidity"] },
-            { name: "Base", layer: "Layer 2 (Ethereum Rollup)", layerType: "L2", rationale: "An optimistic rollup operated by Coinbase. It initially relies on a centralized PoA sequencer to execute and batch transactions before decentralizing.", languages: ["Solidity"] }
+            { name: "VeChain", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses PoA 2.0. VeChain tracks global supply chains and requires predictable enterprise transaction fees, secured by vetted Authority Masternodes.", languages: ["Solidity"] }
         ]
     },
     pbft: {
@@ -187,25 +186,27 @@ const algorithmsData = {
 };
 
 // Compatibility Heatmap Dataset
-const blockchainsList = ["Bitcoin", "Litecoin", "Ethereum", "Cardano", "Solana", "BNB Chain", "Stellar", "Arbitrum"];
+const blockchainsList = ["Bitcoin", "Litecoin", "Ethereum", "Cardano", "Solana", "BNB Chain", "VeChain", "Stellar", "Arbitrum"];
 const compatibilityMap = {
     "Bitcoin": {
         "Bitcoin": { status: "Compatible", detail: "Same protocol (PoW). Self-compatible." },
-        "Litecoin": { status: "Compatible", detail: "Both use Proof of Work (PoW). Bridges can verify hash proofs directly, enabling atomic swaps." },
+        "Litecoin": { status: "Partial", detail: "Similar PoW architecture but not directly interoperable. Atomic swaps are possible but require HTLC scripting; no native cross-chain protocol." },
         "Ethereum": { status: "Incompatible", detail: "PoW vs PoS. Requires custodial/wrapped assets (e.g. WBTC) or multi-signature bridging bridges." },
         "Cardano": { status: "Incompatible", detail: "PoW vs PoS. Different consensus structures; trustless bridging requires zero-knowledge proofs (e.g. NiPoPoWs)." },
         "Solana": { status: "Incompatible", detail: "PoW vs PoH+PoS. Different timing architectures; requires trust-assumed multi-sig validators (e.g. Wormhole)." },
         "BNB Chain": { status: "Incompatible", detail: "PoW vs PoA. BNB uses authority nodes; Bitcoin uses mining hash power. Incompatible at protocol level." },
+        "VeChain": { status: "Incompatible", detail: "PoW vs PoA. VeChain uses vetted Authority Masternodes; Bitcoin uses mining hash power. Incompatible at protocol level." },
         "Stellar": { status: "Incompatible", detail: "PoW vs FBA. Stellar relies on quorum slices; Bitcoin relies on hash power. Bridges must rely on validators." },
         "Arbitrum": { status: "Incompatible", detail: "PoW vs L2 Rollup. Arbitrum settles state roots directly on Ethereum's PoS, making direct Bitcoin bridging incompatible." }
     },
     "Litecoin": {
-        "Bitcoin": { status: "Compatible", detail: "Both use Proof of Work (PoW). Allows trustless atomic swaps and light client relay validation." },
+        "Bitcoin": { status: "Partial", detail: "Similar PoW architecture but not directly interoperable. Atomic swaps are possible but require HTLC scripting; no native cross-chain protocol." },
         "Litecoin": { status: "Compatible", detail: "Same protocol (PoW). Self-compatible." },
         "Ethereum": { status: "Incompatible", detail: "PoW vs PoS. Requires wrapper assets or validator-based bridge relays." },
         "Cardano": { status: "Incompatible", detail: "PoW vs PoS. Incompatible at consensus level. Bridging must rely on central wrapping services." },
         "Solana": { status: "Incompatible", detail: "PoW vs PoH+PoS. Requires multi-sig oracle bridges to verify cross-chain transactions." },
         "BNB Chain": { status: "Incompatible", detail: "PoW vs PoA. Incompatible at protocol level. Interoperability requires trusted bridge pools." },
+        "VeChain": { status: "Incompatible", detail: "PoW vs PoA. Incompatible at protocol level. Interoperability requires trusted bridge pools." },
         "Stellar": { status: "Incompatible", detail: "PoW vs FBA. Requires multi-signature anchors to bridge assets between Litecoin and Stellar." },
         "Arbitrum": { status: "Incompatible", detail: "PoW vs L2 Rollup. Litecoin lacks smart contracts to verify rollup fraud proofs natively." }
     },
@@ -213,19 +214,21 @@ const compatibilityMap = {
         "Bitcoin": { status: "Incompatible", detail: "PoS vs PoW. Bridging requires wrapped assets (e.g. WBTC) verified by custodian nodes." },
         "Litecoin": { status: "Incompatible", detail: "PoS vs PoW. Bridging requires collateralized wrapper vaults." },
         "Ethereum": { status: "Compatible", detail: "Same protocol (PoS). Self-compatible." },
-        "Cardano": { status: "Compatible", detail: "Both use Proof of Stake (PoS). Can construct trustless light client bridges (like Mithril) to check validator signatures." },
+        "Cardano": { status: "Incompatible", detail: "PoS (Casper FFG) vs PoS (Ouroboros). Different consensus architectures, finality mechanisms, and data models (account-based vs extended UTXO). Trustless bridging requires specialized cross-chain proofs." },
         "Solana": { status: "Incompatible", detail: "PoS vs PoH+PoS. Different clock finalities; bridged via multi-sig networks or ZK state proof relays." },
         "BNB Chain": { status: "Compatible", detail: "Both use Staking/Authority consensus with EVM support. Interoperability is highly compatible via trustless state relays." },
+        "VeChain": { status: "Partial", detail: "Both support EVM-compatible smart contracts, but VeChain uses a distinct PoA 2.0 consensus and dual-token model (VET/VTHO). Bridging requires specialized relayers." },
         "Stellar": { status: "Incompatible", detail: "PoS vs FBA. Requires trusted institutional portals or anchors to bridge assets." },
         "Arbitrum": { status: "Compatible", detail: "Native Layer 1 to Layer 2 relation. Arbitrum posts transaction state batches directly to Ethereum's PoS consensus." }
     },
     "Cardano": {
         "Bitcoin": { status: "Incompatible", detail: "PoS vs PoW. Direct bridging is impossible without wrapped or federated assets." },
         "Litecoin": { status: "Incompatible", detail: "PoS vs PoW. Requires federated bridge multi-signatures." },
-        "Ethereum": { status: "Compatible", detail: "Both use Proof of Stake (PoS). Validator signatures can be read to build decentralized bridges." },
+        "Ethereum": { status: "Incompatible", detail: "PoS (Ouroboros) vs PoS (Casper FFG). Different consensus architectures, finality mechanisms, and data models (extended UTXO vs account-based). Trustless bridging requires specialized cross-chain proofs." },
         "Cardano": { status: "Compatible", detail: "Same protocol (PoS). Self-compatible." },
         "Solana": { status: "Incompatible", detail: "PoS vs PoH+PoS. Requires cross-chain oracle nodes to relay state data." },
-        "BNB Chain": { status: "Compatible", detail: "PoSA vs PoS. Staking architectures align; requires relayers to map Cardano's UTXO and BNB's Account models." },
+        "BNB Chain": { status: "Incompatible", detail: "PoS (Ouroboros, extended UTXO) vs PoSA (account-based EVM). Different consensus and data models. Requires federated bridge relayers." },
+        "VeChain": { status: "Incompatible", detail: "PoS (Ouroboros, extended UTXO) vs PoA 2.0 (account-based EVM). Different consensus and data models. Requires federated bridge relayers." },
         "Stellar": { status: "Incompatible", detail: "PoS vs FBA. Requires external bridge portals." },
         "Arbitrum": { status: "Incompatible", detail: "Cardano (PoS L1) cannot natively read Arbitrum's Ethereum L2 optimistic rollup batches." }
     },
@@ -236,6 +239,7 @@ const compatibilityMap = {
         "Cardano": { status: "Incompatible", detail: "PoH+PoS vs PoS. Requires external relayers to verify and sign cross-chain transactions." },
         "Solana": { status: "Compatible", detail: "Same protocol (PoH+PoS). Self-compatible." },
         "BNB Chain": { status: "Incompatible", detail: "PoH+PoS vs PoA/PoSA. Different execution times; bridged via validator consensus relays." },
+        "VeChain": { status: "Incompatible", detail: "PoH+PoS vs PoA 2.0. Different consensus architectures; requires multi-sig bridge validators." },
         "Stellar": { status: "Incompatible", detail: "PoH+PoS vs FBA. Requires centralized or federated gateways to bridge assets." },
         "Arbitrum": { status: "Incompatible", detail: "Requires L1 Ethereum bridge as an intermediary to connect Solana to Arbitrum L2 rollup." }
     },
@@ -243,9 +247,10 @@ const compatibilityMap = {
         "Bitcoin": { status: "Incompatible", detail: "PoA vs PoW. Requires centralized or federated custodian wrapping." },
         "Litecoin": { status: "Incompatible", detail: "PoA vs PoW. Assets must be bridged through custodian pools." },
         "Ethereum": { status: "Compatible", detail: "Both use validator-based consensus (PoS/PoSA) and EVM, allowing clean smart contract relay bridges." },
-        "Cardano": { status: "Compatible", detail: "PoSA vs PoS. Staking frameworks enable cross-chain validation contracts." },
+        "Cardano": { status: "Incompatible", detail: "PoSA (account-based EVM) vs PoS (Ouroboros, extended UTXO). Different consensus and data models. Requires federated bridge relayers." },
         "Solana": { status: "Incompatible", detail: "PoA vs PoH+PoS. Requires multi-signature validator bridge nodes." },
         "BNB Chain": { status: "Compatible", detail: "Same protocol (PoA/PoSA). Self-compatible." },
+        "VeChain": { status: "Partial", detail: "Both use PoA-family consensus and EVM-compatible smart contracts. VeChain's dual-token model (VET/VTHO) and PoA 2.0 VRF differ from BNB's PoSA. Bridging possible via relayers." },
         "Stellar": { status: "Incompatible", detail: "PoA vs FBA. Requires anchor networks or third-party wrappers." },
         "Arbitrum": { status: "Compatible", detail: "Both run EVM architectures, enabling smooth token bridges (via liquidity pool relays like Stargate)." }
     },
@@ -256,6 +261,7 @@ const compatibilityMap = {
         "Cardano": { status: "Incompatible", detail: "FBA vs PoS. Requires specialized bridge validators." },
         "Solana": { status: "Incompatible", detail: "FBA vs PoH+PoS. Bridged via federated node integrations." },
         "BNB Chain": { status: "Incompatible", detail: "FBA vs PoA. Requires institutional anchors to bridge tokens." },
+        "VeChain": { status: "Incompatible", detail: "FBA vs PoA 2.0. Different consensus architectures. Requires institutional anchors to bridge tokens." },
         "Stellar": { status: "Compatible", detail: "Same protocol (FBA). Self-compatible." },
         "Arbitrum": { status: "Incompatible", detail: "FBA vs L2 Rollup. Incompatible at protocol level; requires bridging to L1 Ethereum first." }
     },
@@ -266,8 +272,20 @@ const compatibilityMap = {
         "Cardano": { status: "Incompatible", detail: "Arbitrum is an Ethereum L2 and cannot settle or bridge natively to Cardano's PoS." },
         "Solana": { status: "Incompatible", detail: "Requires L1 bridge relays or cross-chain messaging routers." },
         "BNB Chain": { status: "Compatible", detail: "Both share EVM foundations, enabling highly efficient bridge contracts." },
+        "VeChain": { status: "Partial", detail: "VeChain is EVM-compatible but uses PoA 2.0 consensus and a dual-token model. Bridge contracts possible but require VeChain-specific relayer support." },
         "Stellar": { status: "Incompatible", detail: "Incompatible at consensus level. Must route assets through L1 gateways." },
         "Arbitrum": { status: "Compatible", detail: "Same protocol (L2 Rollup). Self-compatible." }
+    },
+    "VeChain": {
+        "Bitcoin": { status: "Incompatible", detail: "PoA 2.0 vs PoW. Incompatible at protocol level. Requires custodial wrapping." },
+        "Litecoin": { status: "Incompatible", detail: "PoA 2.0 vs PoW. Incompatible at protocol level. Requires custodial wrapping." },
+        "Ethereum": { status: "Partial", detail: "VeChain is EVM-compatible but uses PoA 2.0 consensus with a dual-token model (VET/VTHO). Bridging requires specialized relayers." },
+        "Cardano": { status: "Incompatible", detail: "PoA 2.0 (account-based EVM) vs PoS (Ouroboros, extended UTXO). Different consensus and data models. Requires federated bridge relayers." },
+        "Solana": { status: "Incompatible", detail: "PoA 2.0 vs PoH+PoS. Different consensus architectures; requires multi-sig bridge validators." },
+        "BNB Chain": { status: "Partial", detail: "Both use PoA-family consensus and EVM-compatible smart contracts. VeChain's dual-token model and PoA 2.0 VRF differ from BNB's PoSA. Bridging possible via relayers." },
+        "VeChain": { status: "Compatible", detail: "Same protocol (PoA 2.0). Self-compatible." },
+        "Stellar": { status: "Incompatible", detail: "PoA 2.0 vs FBA. Different consensus architectures. Requires institutional anchors." },
+        "Arbitrum": { status: "Partial", detail: "VeChain is EVM-compatible but uses PoA 2.0 consensus and a dual-token model. Bridge contracts possible but require VeChain-specific relayer support." }
     }
 };
 
@@ -1797,45 +1815,64 @@ function drawPoAAnimation(ctx, w, h, color, step, t) {
     const radius = Math.min(w, h) * 0.28;
 
     if (step === 0) {
-        // Step 1: Vetting & KYC Check
+        // Step 1: Validator Vetting & Identity Verification
+        // Draw ID card
         ctx.beginPath();
-        ctx.roundRect(cx - 30, cy - 35, 60, 50, 6);
-        ctx.fillStyle = "rgba(255,255,255,0.05)";
+        ctx.roundRect(cx - 35, cy - 38, 70, 56, 8);
+        ctx.fillStyle = "rgba(255,255,255,0.04)";
         ctx.strokeStyle = color.hex;
         ctx.lineWidth = 1.5;
         ctx.fill();
         ctx.stroke();
 
+        // Profile icon
         ctx.beginPath();
-        ctx.arc(cx - 15, cy - 10, 10, 0, Math.PI * 2);
+        ctx.arc(cx - 16, cy - 14, 10, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.2)`;
-        ctx.strokeStyle = color.hex;
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
         ctx.fill();
         ctx.stroke();
+        ctx.font = "12px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = color.hex;
+        ctx.fillText("👤", cx - 16, cy - 10);
 
-        ctx.fillStyle = "rgba(255,255,255,0.4)";
-        ctx.fillRect(cx + 2, cy - 18, 20, 3);
-        ctx.fillRect(cx + 2, cy - 10, 20, 3);
-        ctx.fillRect(cx - 20, cy + 8, 40, 3);
+        // Data lines
+        ctx.fillStyle = "rgba(255,255,255,0.35)";
+        ctx.fillRect(cx + 2, cy - 22, 22, 3);
+        ctx.fillRect(cx + 2, cy - 14, 18, 3);
+        ctx.fillRect(cx + 2, cy - 6, 22, 3);
+        ctx.fillRect(cx - 28, cy + 4, 56, 3);
+        ctx.fillRect(cx - 28, cy + 11, 40, 3);
 
-        const scanY = cy - 35 + ((t * 0.8) % 50);
+        // Scanning line
+        const scanY = cy - 38 + ((t * 0.8) % 56);
         ctx.beginPath();
-        ctx.moveTo(cx - 30, scanY);
-        ctx.lineTo(cx + 30, scanY);
-        ctx.strokeStyle = "rgba(255, 107, 107, 0.7)";
+        ctx.moveTo(cx - 35, scanY);
+        ctx.lineTo(cx + 35, scanY);
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.6)`;
         ctx.lineWidth = 1.5;
         ctx.stroke();
+
+        // Animated checkmarks appearing
+        const checks = Math.min(3, Math.floor(t / 40));
+        ctx.font = "bold 8px sans-serif";
+        ctx.fillStyle = "#05c98c";
+        if (checks > 0) ctx.fillText("✓ ID", cx + 42, cy - 18);
+        if (checks > 1) ctx.fillText("✓ Rep", cx + 42, cy - 6);
+        if (checks > 2) ctx.fillText("✓ Gov", cx + 42, cy + 6);
 
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
         ctx.textAlign = "center";
-        ctx.fillText("Rigorous KYC & Identity Vetting", cx, h - 15);
+        ctx.fillText("Validator Identity & Reputation Vetting", cx, h - 15);
 
     } else if (step === 1) {
         // Step 2: Authority Whitelisting
+        // Registry container
         ctx.beginPath();
-        ctx.roundRect(cx - 50, cy - 25, 100, 40, 5);
-        ctx.fillStyle = "rgba(5, 201, 140, 0.1)";
+        ctx.roundRect(cx - 55, cy - 30, 110, 50, 6);
+        ctx.fillStyle = "rgba(5, 201, 140, 0.08)";
         ctx.strokeStyle = "#05c98c";
         ctx.lineWidth = 2;
         ctx.fill();
@@ -1844,90 +1881,242 @@ function drawPoAAnimation(ctx, w, h, color, step, t) {
         ctx.font = "bold 9px Fira Code";
         ctx.fillStyle = "#05c98c";
         ctx.textAlign = "center";
-        ctx.fillText("WHITELIST DB", cx, cy - 8);
+        ctx.fillText("ACTIVE VALIDATOR SET", cx, cy - 16);
+
+        // Validator entries appearing
+        const entries = Math.min(3, Math.floor(t / 30));
         ctx.font = "7px Fira Code";
         ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-        ctx.fillText("KEY added: 0x8a92... ✓", cx, cy + 8);
+        if (entries > 0) ctx.fillText("0x8a92...3f7e ✓", cx, cy - 2);
+        if (entries > 1) ctx.fillText("0xb4c1...9d2a ✓", cx, cy + 8);
+        if (entries > 2) {
+            ctx.fillStyle = color.hex;
+            ctx.fillText("0xf7e3...6b1c ✓ NEW", cx, cy + 18);
+        }
+
+        // Animated key flying in
+        const keyProgress = Math.min(1, (t % 80) / 60);
+        const keyX = cx - 80 + keyProgress * 80;
+        const keyY = cy + 18;
+        ctx.font = "11px sans-serif";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${keyProgress})`;
+        ctx.fillText("🔑", keyX - 55, keyY + 1);
 
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Vetted Public Key Whitelisted by Council", cx, h - 15);
+        ctx.fillText("Validator Public Key Added to Active Set", cx, h - 15);
 
     } else if (step === 2) {
-        // Step 3: Block Generation
+        // Step 3: Block Proposal
         const activeIdx = Math.floor(t / 50) % authorities;
+
+        // Draw all authority nodes
         for (let i = 0; i < authorities; i++) {
             const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
             const x = cx + Math.cos(angle) * radius;
             const y = cy + Math.sin(angle) * radius;
             const isActive = i === activeIdx;
 
+            // Pulsing glow for active proposer
+            if (isActive) {
+                const pulse = 0.15 + Math.sin(t * 0.1) * 0.1;
+                ctx.beginPath();
+                ctx.arc(x, y, 22, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${pulse})`;
+                ctx.fill();
+            }
+
             ctx.beginPath();
             ctx.arc(x, y, isActive ? 15 : 10, 0, Math.PI * 2);
             ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, 0.35)` : "rgba(255,255,255,0.05)";
             ctx.strokeStyle = isActive ? color.hex : "rgba(255,255,255,0.15)";
-            ctx.lineWidth = isActive ? 2 : 1;
+            ctx.lineWidth = isActive ? 2.5 : 1;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = isActive ? "bold 9px Fira Code" : "bold 8px Fira Code";
+            ctx.fillStyle = isActive ? color.hex : "rgba(255,255,255,0.4)";
+            ctx.textAlign = "center";
+            ctx.fillText(isActive ? "PROP" : `A${i+1}`, x, y + 3);
+        }
+
+        // Block broadcasting lines from proposer to all others
+        const proposerAngle = (activeIdx / authorities) * Math.PI * 2 - Math.PI / 2;
+        const px = cx + Math.cos(proposerAngle) * radius;
+        const py = cy + Math.sin(proposerAngle) * radius;
+
+        for (let i = 0; i < authorities; i++) {
+            if (i === activeIdx) continue;
+            const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            // Animated broadcast particles
+            const progress = (t * 0.025 + i * 0.25) % 1;
+            const fx = px + (x - px) * progress;
+            const fy = py + (y - py) * progress;
+
+            ctx.beginPath();
+            ctx.moveTo(px, py);
+            ctx.lineTo(x, y);
+            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.1)`;
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.arc(fx, fy, 3, 0, Math.PI * 2);
+            ctx.fillStyle = color.hex;
+            ctx.fill();
+        }
+
+        // Floating block icon at center
+        const blockY = cy + Math.sin(t * 0.06) * 4;
+        ctx.font = "16px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("📦", cx, blockY + 5);
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText(`Validator A${activeIdx + 1} Proposing Block`, cx, h - 15);
+
+    } else if (step === 3) {
+        // Step 4: Block Validation & Consensus
+        // Central block being validated
+        const ringPulse = 0.6 + Math.sin(t * 0.08) * 0.2;
+        ctx.beginPath();
+        ctx.arc(cx, cy, 35, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(5, 201, 140, ${0.05 + Math.sin(t * 0.1) * 0.03})`;
+        ctx.strokeStyle = `rgba(5, 201, 140, ${ringPulse})`;
+        ctx.lineWidth = 2;
+        ctx.fill();
+        ctx.stroke();
+
+        // Inner block representation
+        ctx.beginPath();
+        ctx.roundRect(cx - 14, cy - 16, 28, 22, 4);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.2)`;
+        ctx.strokeStyle = color.hex;
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+
+        // Block content lines
+        ctx.fillStyle = "rgba(255,255,255,0.3)";
+        ctx.fillRect(cx - 9, cy - 11, 18, 2);
+        ctx.fillRect(cx - 9, cy - 6, 14, 2);
+        ctx.fillRect(cx - 9, cy - 1, 18, 2);
+
+        // Validators around verifying with animated checkmarks
+        for (let i = 0; i < authorities; i++) {
+            const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            const verified = t > (i * 20 + 20);
+
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.fillStyle = verified ? "rgba(5, 201, 140, 0.2)" : "rgba(255,255,255,0.05)";
+            ctx.strokeStyle = verified ? "#05c98c" : "rgba(255,255,255,0.2)";
+            ctx.lineWidth = verified ? 2 : 1;
             ctx.fill();
             ctx.stroke();
 
             ctx.font = "bold 8px Fira Code";
-            ctx.fillStyle = isActive ? color.hex : "rgba(255,255,255,0.4)";
             ctx.textAlign = "center";
-            ctx.fillText(`A${i+1}`, x, y + 3);
+            ctx.fillStyle = verified ? "#05c98c" : "rgba(255,255,255,0.4)";
+            ctx.fillText(verified ? "✓" : `A${i+1}`, x, y + 3);
+
+            // Verification beam from block to validator
+            if (verified) {
+                ctx.beginPath();
+                ctx.moveTo(cx, cy);
+                ctx.lineTo(x, y);
+                ctx.strokeStyle = `rgba(5, 201, 140, ${0.1 + Math.sin(t * 0.12 + i) * 0.08})`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
         }
 
-        ctx.font = "bold 12px Outfit";
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText(`Validator A${activeIdx + 1} Signing Block (Scheduled Turn)`, cx, h - 15);
-
-    } else if (step === 3) {
-        // Step 4: Signature Verification
+        // Consensus progress ring
+        const consensusProgress = Math.min(1, t / 100);
         ctx.beginPath();
-        ctx.arc(cx, cy, 30, 0, Math.PI * 2);
-        ctx.fillStyle = "rgba(5, 201, 140, 0.15)";
-        ctx.strokeStyle = "#05c98c";
-        ctx.lineWidth = 2.5;
-        ctx.fill();
+        ctx.arc(cx, cy, 42, -Math.PI / 2, -Math.PI / 2 + consensusProgress * Math.PI * 2);
+        ctx.strokeStyle = `rgba(5, 201, 140, 0.4)`;
+        ctx.lineWidth = 2;
         ctx.stroke();
 
-        ctx.font = "bold 12px sans-serif";
-        ctx.fillStyle = "#05c98c";
-        ctx.textAlign = "center";
-        ctx.fillText("VALID SIGN", cx, cy + 4);
-
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Authorities Verify Proposer's Signature", cx, h - 15);
+        ctx.fillText("Block Validation & Consensus", cx, h - 15);
 
     } else if (step === 4) {
-        // Step 5: Council Revocation
+        // Step 5: Validator Revocation
         for (let i = 0; i < authorities; i++) {
             const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
             const x = cx + Math.cos(angle) * radius;
             const y = cy + Math.sin(angle) * radius;
             const isRevoked = i === 2;
 
+            // Red pulse for revoked node
+            if (isRevoked) {
+                const pulse = 0.15 + Math.sin(t * 0.15) * 0.1;
+                ctx.beginPath();
+                ctx.arc(x, y, 18, 0, Math.PI * 2);
+                ctx.fillStyle = `rgba(255, 107, 107, ${pulse})`;
+                ctx.fill();
+            }
+
             ctx.beginPath();
-            ctx.arc(x, y, 11, 0, Math.PI * 2);
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
             ctx.fillStyle = isRevoked ? "rgba(255, 107, 107, 0.25)" : "rgba(255,255,255,0.05)";
             ctx.strokeStyle = isRevoked ? "#ff6b6b" : "rgba(255,255,255,0.2)";
-            ctx.lineWidth = isRevoked ? 2 : 1;
+            ctx.lineWidth = isRevoked ? 2.5 : 1;
             ctx.fill();
             ctx.stroke();
 
-            ctx.font = "9px sans-serif";
             if (isRevoked) {
+                // X mark
+                ctx.font = "bold 10px sans-serif";
                 ctx.fillStyle = "#ff6b6b";
-                ctx.fillText("REVOKED", x, y + 22);
+                ctx.textAlign = "center";
+                ctx.fillText("✕", x, y + 4);
+
+                ctx.font = "bold 8px Fira Code";
+                ctx.fillText("REVOKED", x, y + 24);
+
+                // Strike-through lines
+                ctx.beginPath();
+                ctx.moveTo(x - 14, y - 14);
+                ctx.lineTo(x + 14, y + 14);
+                ctx.strokeStyle = "rgba(255, 107, 107, 0.4)";
+                ctx.lineWidth = 1.5;
+                ctx.stroke();
             } else {
+                ctx.font = "bold 8px Fira Code";
                 ctx.fillStyle = "rgba(255,255,255,0.5)";
-                ctx.fillText(`A${i+1}`, x, y + 22);
+                ctx.textAlign = "center";
+                ctx.fillText(`A${i+1}`, x, y + 3);
+
+                // Active indicator
+                ctx.beginPath();
+                ctx.arc(x + 10, y - 10, 3, 0, Math.PI * 2);
+                ctx.fillStyle = "#05c98c";
+                ctx.fill();
             }
         }
 
+        // Governance action indicator
+        ctx.font = "9px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "rgba(255, 107, 107, 0.7)";
+        ctx.fillText("⚠ Governance Action", cx, cy - 5);
+        ctx.font = "7px Fira Code";
+        ctx.fillText("Malicious behavior detected", cx, cy + 8);
+
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Governing Council Revokes Malicious Keys", cx, h - 15);
+        ctx.fillText("Malicious Validator Revoked from Active Set", cx, h - 15);
     }
 }
 
@@ -2511,8 +2700,9 @@ function renderCompatibilityMatrix() {
         blockchainsList.forEach(colChain => {
             const match = compatibilityMap[rowChain][colChain];
             const isCompat = match.status === "Compatible";
-            const cellClass = isCompat ? "cell-compat" : "cell-incompat";
-            const content = isCompat ? "COMPAT" : "INCOMPAT";
+            const isPartial = match.status === "Partial";
+            const cellClass = isCompat ? "cell-compat" : (isPartial ? "cell-partial" : "cell-incompat");
+            const content = isCompat ? "COMPAT" : (isPartial ? "PARTIAL" : "INCOMPAT");
             bodyHtml += `
                 <td class="${cellClass}"
                     data-row="${rowChain}"
@@ -2533,7 +2723,7 @@ function renderCompatibilityMatrix() {
             const row = cell.getAttribute("data-row");
             const col = cell.getAttribute("data-col");
             const data = compatibilityMap[row][col];
-            const statusText = data.status === "Compatible" ? "🟢 Compatible" : "🔴 Incompatible";
+            const statusText = data.status === "Compatible" ? "🟢 Compatible" : (data.status === "Partial" ? "🟡 Partial" : "🔴 Incompatible");
             matrixInfoEl.innerHTML = `<span class="title">${row} & ${col} — ${statusText}</span>${data.detail}`;
         };
         cell.addEventListener("mouseenter", showDetails);
@@ -2546,9 +2736,13 @@ function renderCompatibilityMatrix() {
 function restoreDefaultMatrixInfo() {
     const algo = algorithmsData[activeAlgoId];
     const blockchains = algo.blockchains.map(b => b.name).join(", ");
+    let activeDesc = `Highlighting ${algo.acronym} blockchains (${blockchains}). Hover cells to inspect bridging details.`;
+    if (activeAlgoId === 'poa') {
+        activeDesc = `Active Proof of Authority blockchains: ${blockchains}. Hover cells to inspect bridging details.`;
+    }
     matrixInfoEl.innerHTML = `
         <span class="title">Active: ${algo.name} Compatibility</span>
-        Highlighting ${algo.acronym} blockchains (${blockchains}). Hover cells to inspect bridging details.
+        ${activeDesc}
     `;
 }
 

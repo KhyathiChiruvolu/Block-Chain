@@ -1075,6 +1075,20 @@ body {
     background: rgba(255, 107, 107, 0.12);
 }
 
+.cell-partial {
+    background: rgba(255, 179, 0, 0.1);
+    color: #ffb300;
+    font-weight: 700;
+    cursor: pointer;
+    font-size: 0.75rem;
+    letter-spacing: 0.03em;
+}
+
+.cell-partial:hover {
+    background: rgba(255, 179, 0, 0.25);
+    box-shadow: inset 0 0 12px rgba(255, 179, 0, 0.25);
+}
+
 .matrix-table tr.active-row th {
     color: var(--text-primary);
     background: rgba(255,255,255,0.04);
