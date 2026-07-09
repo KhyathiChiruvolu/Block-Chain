@@ -2261,7 +2261,7 @@ function randomHex(len) {
 // ==========================================================================
 let flowInterval = null;
 let currentFlowStep = 0;
-let isFlowPlaying = true; // Auto-play by default!
+let isFlowPlaying = false; // Start paused — user must toggle to play
 
 function initFlowAnimation() {
     const playBtn = document.getElementById("btn-flow-play");
@@ -2274,12 +2274,11 @@ function initFlowAnimation() {
     stopFlowAnimation();
     currentFlowStep = 0;
     
-    // Auto start play
-    isFlowPlaying = true;
-    playBtn.textContent = "⏸ Pause";
+    // Start paused — user must click Play
+    isFlowPlaying = false;
+    playBtn.textContent = "▶ Play";
     
     updateFlowUI();
-    startFlowInterval();
     
     // Bind listeners by cloning (to remove existing listeners)
     const newPlayBtn = playBtn.cloneNode(true);
