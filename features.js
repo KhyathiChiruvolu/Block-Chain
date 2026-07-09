@@ -162,6 +162,15 @@ function renderCurrencyDeepDive(algoId) {
             `;
         }
 
+        let descHtml = "";
+        if (currency.description) {
+            descHtml = `
+                <p class="currency-description" style="color: var(--text-secondary); font-size: 0.92rem; line-height: 1.5; margin-bottom: 1.25rem; font-weight: normal;">
+                    ${currency.description}
+                </p>
+            `;
+        }
+
         html += `
             <div class="currency-card">
                 <div class="currency-card-header">
@@ -171,6 +180,7 @@ function renderCurrencyDeepDive(algoId) {
                     </div>
                     <div class="currency-launch">Est. ${currency.launchYear}</div>
                 </div>
+                ${descHtml}
                 <div class="currency-info-grid">
                     <div class="currency-info-item">
                         <div class="currency-info-label">Founder</div>
@@ -215,10 +225,312 @@ function renderLayerStack(algoId) {
     const container = document.getElementById("layer-stack-container");
     if (!container) return;
 
-    const algo = algorithmsData[algoId];
-    if (!algo) return;
+    // Handle FBA (pbft) custom layout first (independent of algorithmsData)
+    if (algoId === 'pbft') {
+        container.innerHTML = `
+            <div class="layer-stack">
+                <!-- Layer 3 -->
+                <div class="layer-band" style="--layer-color: #ff9f43;">
+                    <div class="layer-band-header">
+                        <span class="layer-tag" style="background: #ff9f43;">L3</span>
+                        <span class="layer-band-name">Application & Protocol</span>
+                    </div>
+                    <div class="layer-band-desc">The user-facing application layer where decentralized protocols, dApps, and services operate.</div>
+                    <div class="layer-examples-grid">
+                        <div class="layer-example">
+                            <span class="layer-example-name">Uniswap</span>
+                            <span class="layer-example-role">Decentralized exchange (DEX) — automated market maker protocol</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Aave</span>
+                            <span class="layer-example-role">Decentralized lending and borrowing protocol</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">OpenSea</span>
+                            <span class="layer-example-role">NFT marketplace operating across multiple chains</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Chainlink</span>
+                            <span class="layer-example-role">Decentralized oracle network providing off-chain data feeds</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Lido</span>
+                            <span class="layer-example-role">Liquid staking protocol — stETH derivative for staked ETH</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-secondary); font-style: italic; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.5rem; padding-left: 0.2rem;">
+                        ℹ️ No major Layer-3 ecosystems currently operate directly on Federated Byzantine Agreement consensus.
+                    </div>
+                </div>
+
+                <!-- Layer 2 -->
+                <div class="layer-band" style="--layer-color: #a55eea;">
+                    <div class="layer-band-header">
+                        <span class="layer-tag" style="background: #a55eea;">L2</span>
+                        <span class="layer-band-name">Scaling & Execution</span>
+                    </div>
+                    <div class="layer-band-desc">Secondary frameworks built on top of Layer 1 to increase throughput.</div>
+                    <div class="layer-examples-grid">
+                        <div class="layer-example">
+                            <span class="layer-example-name">Arbitrum</span>
+                            <span class="layer-example-role">Optimistic rollup — settles fraud proofs on Ethereum</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Base</span>
+                            <span class="layer-example-role">OP Stack rollup — Coinbase-operated sequencer on Ethereum</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Lightning Network</span>
+                            <span class="layer-example-role">Payment channels for instant Bitcoin micropayments</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Rootstock (RSK)</span>
+                            <span class="layer-example-role">Merged-mining sidechain with EVM on Bitcoin</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">zkSync Era</span>
+                            <span class="layer-example-role">ZK rollup — validity proofs for instant L1 finality</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 1 -->
+                <div class="layer-band layer-band-active" style="--layer-color: #00f2fe;">
+                    <div class="layer-band-header">
+                        <span class="layer-tag" style="background: #00f2fe;">L1</span>
+                        <span class="layer-band-name">Base Consensus & Settlement</span>
+                    </div>
+                    <div class="layer-band-desc">The primary settlement layers that run or secure Federated Byzantine Agreement consensus.</div>
+                    <div class="layer-examples-grid">
+                        <!-- Stellar visually highlighted using active FBA theme -->
+                        <div class="layer-example layer-example-active" style="border: 1px solid var(--accent-theme); background: rgba(0, 210, 211, 0.12);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.15rem; gap: 0.5rem; flex-wrap: wrap;">
+                                <span class="layer-example-name" style="color: var(--accent-theme); font-weight: 700;">Stellar</span>
+                                <span style="font-size: 0.6rem; padding: 0.1rem 0.4rem; background: rgba(0, 210, 211, 0.15); color: var(--accent-theme); border-radius: 4px; font-weight: 600; white-space: nowrap;">SCP Consensus</span>
+                            </div>
+                            <span class="layer-example-role">Uses Stellar Consensus Protocol (SCP) — canonical implementation of Federated Byzantine Agreement with open quorum slices.</span>
+                        </div>
+                        <!-- Ripple visually highlighted using dashed FBA theme -->
+                        <div class="layer-example layer-example-active" style="border: 1px dashed var(--accent-theme); background: rgba(0, 210, 211, 0.08);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.15rem; gap: 0.5rem; flex-wrap: wrap;">
+                                <span class="layer-example-name" style="color: var(--accent-theme); font-weight: 700;">Ripple</span>
+                                <span style="font-size: 0.6rem; padding: 0.1rem 0.4rem; background: rgba(0, 210, 211, 0.15); color: var(--accent-theme); border-radius: 4px; font-weight: 600; white-space: nowrap;">RPCA Consensus</span>
+                            </div>
+                            <span class="layer-example-role">Uses Ripple Protocol Consensus Algorithm (RPCA) based on a curated Unique Node List (UNL) — related but architecturally distinct from SCP.</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Bitcoin</span>
+                            <span class="layer-example-role">PoW — original decentralized settlement layer</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Ethereum</span>
+                            <span class="layer-example-role">PoS — programmable settlement with smart contracts</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Solana</span>
+                            <span class="layer-example-role">PoH+PoS — high-throughput single-layer execution</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Cardano</span>
+                            <span class="layer-example-role">PoS (Ouroboros) — peer-reviewed formal verification</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">BNB Chain</span>
+                            <span class="layer-example-role">PoSA — fast EVM-compatible execution</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">VeChain</span>
+                            <span class="layer-example-role">PoA 2.0 — enterprise supply chain and sustainability</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 0 -->
+                <div class="layer-band" style="--layer-color: #718096;">
+                    <div class="layer-band-header">
+                        <span class="layer-tag" style="background: #718096;">L0</span>
+                        <span class="layer-band-name">Network & Transport Infrastructure</span>
+                    </div>
+                    <div class="layer-band-desc">The foundational network layer that enables communication between different blockchains.</div>
+                    <div class="layer-examples-grid">
+                        <div class="layer-example">
+                            <span class="layer-example-name">Polkadot</span>
+                            <span class="layer-example-role">Relay chain connecting parachains with shared security</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Cosmos (IBC)</span>
+                            <span class="layer-example-role">Inter-Blockchain Communication protocol for sovereign chains</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Avalanche Primary Network</span>
+                            <span class="layer-example-role">Subnet architecture for custom blockchain deployment</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">LayerZero</span>
+                            <span class="layer-example-role">Omnichain messaging protocol for cross-chain communication</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
+
+    // Handle PoB custom layout first (independent of algorithmsData)
+    if (algoId === 'pob') {
+        container.innerHTML = `
+            <div class="layer-stack">
+                <!-- Layer 3 -->
+                <div class="layer-band" style="--layer-color: #ff9f43;">
+                    <div class="layer-band-header">
+                        <span class="layer-tag" style="background: #ff9f43;">L3</span>
+                        <span class="layer-band-name">Application & Protocol</span>
+                    </div>
+                    <div class="layer-band-desc">The user-facing application layer where decentralized protocols, dApps, and services operate.</div>
+                    <div class="layer-examples-grid">
+                        <div class="layer-example">
+                            <span class="layer-example-name">Uniswap</span>
+                            <span class="layer-example-role">Decentralized exchange (DEX) — automated market maker protocol</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Aave</span>
+                            <span class="layer-example-role">Decentralized lending and borrowing protocol</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">OpenSea</span>
+                            <span class="layer-example-role">NFT marketplace operating across multiple chains</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Chainlink</span>
+                            <span class="layer-example-role">Decentralized oracle network providing off-chain data feeds</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Lido</span>
+                            <span class="layer-example-role">Liquid staking protocol — stETH derivative for staked ETH</span>
+                        </div>
+                    </div>
+                    <div style="margin-top: 0.75rem; font-size: 0.75rem; color: var(--text-secondary); font-style: italic; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.5rem; padding-left: 0.2rem;">
+                        ℹ️ No major Layer-3 ecosystems currently operate directly on native Proof of Burn consensus.
+                    </div>
+                </div>
+
+                <!-- Layer 2 -->
+                <div class="layer-band layer-band-active" style="--layer-color: #a55eea;">
+                    <div class="layer-band-header">
+                        <span class="layer-tag" style="background: #a55eea;">L2</span>
+                        <span class="layer-band-name">Scaling & Execution</span>
+                    </div>
+                    <div class="layer-band-desc">Secondary frameworks built on top of Layer 1 to increase throughput.</div>
+                    <div class="layer-examples-grid">
+                        <!-- Highlight Counterparty using a secondary Proof of Burn accent -->
+                        <div class="layer-example layer-example-active" style="border: 1px dashed var(--accent-theme); background: rgba(255, 159, 67, 0.08);">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.15rem; gap: 0.5rem; flex-wrap: wrap;">
+                                <span class="layer-example-name" style="color: var(--accent-theme); font-weight: 700;">Counterparty</span>
+                                <span style="font-size: 0.6rem; padding: 0.1rem 0.4rem; background: rgba(255, 159, 67, 0.15); color: var(--accent-theme); border-radius: 4px; font-weight: 600; white-space: nowrap;">Bitcoin Metaprotocol</span>
+                            </div>
+                            <span class="layer-example-role">Uses a one-time Proof-of-Burn genesis distribution while inheriting Bitcoin's Proof of Work consensus.</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Arbitrum</span>
+                            <span class="layer-example-role">Optimistic rollup — settles fraud proofs on Ethereum</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Base</span>
+                            <span class="layer-example-role">OP Stack rollup — Coinbase-operated sequencer on Ethereum</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Lightning Network</span>
+                            <span class="layer-example-role">Payment channels for instant Bitcoin micropayments</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Rootstock (RSK)</span>
+                            <span class="layer-example-role">Merged-mining sidechain with EVM on Bitcoin</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">zkSync Era</span>
+                            <span class="layer-example-role">ZK rollup — validity proofs for instant L1 finality</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 1 -->
+                <div class="layer-band layer-band-active" style="--layer-color: #00f2fe;">
+                    <div class="layer-band-header">
+                        <span class="layer-tag" style="background: #00f2fe;">L1</span>
+                        <span class="layer-band-name">Base Consensus & Settlement</span>
+                    </div>
+                    <div class="layer-band-desc">The primary settlement layers that run or secure Proof of Burn consensus.</div>
+                    <div class="layer-examples-grid">
+                        <!-- Slimcoin visually highlighted using active Proof of Burn theme -->
+                        <div class="layer-example layer-example-active" style="border: 1px solid var(--accent-theme); background: rgba(255, 159, 67, 0.12);">
+                            <span class="layer-example-name" style="color: var(--accent-theme); font-weight: 700;">Slimcoin</span>
+                            <span class="layer-example-role">Hybrid PoW/PoS/Proof of Burn blockchain implementing native Proof of Burn consensus.</span>
+                        </div>
+                        <!-- Bitcoin - show a secondary indicator: Host Chain for Counterparty -->
+                        <div class="layer-example layer-example-active">
+                            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.15rem; gap: 0.5rem; flex-wrap: wrap;">
+                                <span class="layer-example-name">Bitcoin</span>
+                                <span style="font-size: 0.6rem; padding: 0.1rem 0.4rem; background: rgba(255,255,255,0.06); color: rgba(255,255,255,0.5); border-radius: 4px; white-space: nowrap;">Host Chain for Counterparty</span>
+                            </div>
+                            <span class="layer-example-role">Proof of Work blockchain serving as the underlying host chain for Counterparty.</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Ethereum</span>
+                            <span class="layer-example-role">PoS — programmable settlement with smart contracts</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Solana</span>
+                            <span class="layer-example-role">PoH+PoS — high-throughput single-layer execution</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Cardano</span>
+                            <span class="layer-example-role">PoS (Ouroboros) — peer-reviewed formal verification</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">BNB Chain</span>
+                            <span class="layer-example-role">PoSA — fast EVM-compatible execution</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">VeChain</span>
+                            <span class="layer-example-role">PoA 2.0 — enterprise supply chain and sustainability</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Layer 0 -->
+                <div class="layer-band" style="--layer-color: #718096;">
+                    <div class="layer-band-header">
+                        <span class="layer-tag" style="background: #718096;">L0</span>
+                        <span class="layer-band-name">Network & Transport Infrastructure</span>
+                    </div>
+                    <div class="layer-band-desc">The foundational network layer that enables communication between different blockchains.</div>
+                    <div class="layer-examples-grid">
+                        <div class="layer-example">
+                            <span class="layer-example-name">Polkadot</span>
+                            <span class="layer-example-role">Relay chain connecting parachains with shared security</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Cosmos (IBC)</span>
+                            <span class="layer-example-role">Inter-Blockchain Communication protocol for sovereign chains</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Avalanche Primary Network</span>
+                            <span class="layer-example-role">Subnet architecture for custom blockchain deployment</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">LayerZero</span>
+                            <span class="layer-example-role">Omnichain messaging protocol for cross-chain communication</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        return;
+    }
 
     // Determine which layers the current algorithm's blockchains belong to
+    const algo = algorithmsData[algoId];
+    if (!algo) return;
     const activeChainNames = algo.blockchains.map(b => b.name);
 
     let html = `<div class="layer-stack">`;

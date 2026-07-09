@@ -122,11 +122,11 @@ const algorithmsData = {
             stake: "Governance approval; hardware requirements depend on the blockchain implementation."
         },
         steps: [
-            { title: "Validator Vetting & Identity Verification", desc: "Individuals or organizations undergo identity, reputation, governance, and technical evaluation before becoming validator candidates." },
-            { title: "Authority Whitelisting", desc: "Approved validator public keys are added to the active validator set through the blockchain's governance process." },
-            { title: "Block Proposal", desc: "An authorized validator is selected according to the blockchain's Proof of Authority protocol to propose the next block." },
-            { title: "Block Validation \u0026 Consensus", desc: "Authorized validators verify the proposed block's digital signature, transactions, state transition, parent hash, timestamp, and all protocol validation rules before accepting and appending the block to the blockchain." },
-            { title: "Validator Revocation", desc: "If a validator behaves maliciously or violates governance rules, its authority can be revoked and it is removed from the validator set." }
+            { title: "Authority Node Approval", desc: "Trusted organizations or entities are approved by the blockchain's governance mechanism to become Authority Nodes responsible for validating transactions and producing blocks." },
+            { title: "Transaction Submission", desc: "Users broadcast digitally signed transactions to the network. Pending transactions are collected in the transaction pool before validation." },
+            { title: "Transaction Validation", desc: "Authority Nodes independently verify transaction authenticity and protocol compliance before accepting transactions into the next candidate block." },
+            { title: "Authority Block Proposer Selection", desc: "The consensus protocol selects one approved Authority Node to propose the next block according to the network's proposer-selection mechanism." },
+            { title: "Block Creation and Network Acceptance", desc: "The selected Authority Node signs and broadcasts the proposed block. Other Authority Nodes verify its validity before the blockchain is extended." }
         ],
         blockchains: [
             { name: "BNB Chain", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses a hybrid Proof of Staked Authority (PoSA). BNB Chain relies on a small validator set (currently ~40) to offer fast, cheap EVM-compatible execution.", languages: ["Solidity", "Vyper"] },
@@ -136,26 +136,26 @@ const algorithmsData = {
     pbft: {
         id: "pbft",
         name: "Federated Byzantine Agreement",
-        acronym: "FBA / PBFT",
-        tagline: "Security through quorum consensus slices",
-        description: "Federated Byzantine Agreement (FBA) and PBFT solve consensus through direct communication and quorum voting among nodes, without mining or token staking. In FBA, nodes do not need a globally centralized list of validators; instead, they choose a set of other nodes they trust (a 'quorum slice'). When these slices overlap, they form a network-wide consensus, resolving double-spend issues within seconds.",
-        scores: { scalability: 9.0, security: 7.5, decentralisation: 4.5 },
+        acronym: "FBA",
+        tagline: "Security through overlapping trust-based quorum slices",
+        description: "Federated Byzantine Agreement (FBA) achieves consensus through overlapping quorum slices — each node independently selects a set of trusted peers rather than relying on a global validator list. The Stellar Consensus Protocol (SCP) implements FBA through four phases: Nominate, Prepare, Commit, and Externalize. When quorum slices overlap sufficiently, the network reaches agreement without mining or staking. Ripple uses a related but distinct protocol (RPCA) based on a curated Unique Node List (UNL).",
+        scores: { scalability: 8.5, security: 7.5, decentralisation: 5.5 },
         specs: {
-            blockTime: "2 - 5 secs (Stellar)",
-            tps: "1,000 - 4,000 TPS",
-            nodes: "~100 - 150 validators (Stellar)",
-            stake: "Low hardware + peer trust inclusion"
+            blockTime: "3–5 seconds (Stellar ledger close)",
+            tps: "1,000–4,000 TPS",
+            nodes: "~100–300 validators (Stellar)",
+            stake: "No stake — trust-based quorum slice membership"
         },
         steps: [
-            { title: "Trust Configuration", desc: "Each node defines its own subset of trusted peers (a 'Quorum Slice'). Nodes build decentralized networks of trust." },
-            { title: "Nomination Phase", desc: "Nodes propose candidate transactions for a ledger slot and broadcast their choices to peers in their quorum slices." },
-            { title: "Ballot Selection", desc: "Nodes vote on candidates, checking if a quorum of peers agrees. If a consensus slice matches, the ballot is prepared." },
-            { title: "Commit Phase", desc: "Nodes commit to the agreed-upon ballot and verify that their trusted peers have committed to the same ledger modifications." },
-            { title: "Final Externalization", desc: "The transaction set is finalized. Once a node's quorum slice reaches agreement, it updates its local ledger instantly." }
+            { title: "Trust Configuration", desc: "Each node independently selects its own set of trusted peers (a 'quorum slice'). Overlapping quorum slices form network-wide quorums without a centralized validator list." },
+            { title: "Nominate", desc: "Nodes propose candidate values (transaction sets) for the current ledger slot and broadcast nominations to their quorum slice peers." },
+            { title: "Prepare", desc: "The SCP ballot protocol begins. Nodes vote to prepare a ballot containing the nominated value. A ballot is prepared when a quorum agrees." },
+            { title: "Commit", desc: "Nodes vote to commit the prepared ballot. Once a quorum confirms commitment, the value is locked and cannot be rolled back." },
+            { title: "Externalize", desc: "The committed value is externalized — the transaction set is applied to the ledger. All agreeing nodes close the ledger simultaneously with instant, deterministic finality." }
         ],
         blockchains: [
-            { name: "Stellar", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses the Stellar Consensus Protocol (SCP) — an FBA model. Stellar targets cross-border asset tokenization and remittance, requiring sub-second finality.", languages: ["Rust (Soroban Smart Contracts)", "JavaScript", "Python", "Go (SDKs)"] },
-            { name: "Ripple", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses the Ripple Protocol Consensus Algorithm (RPCA). It relies on a Unique Node List (UNL) of trusted validators to settle global banking payments.", languages: ["C++ (XRPL Hooks)"] }
+            { name: "Stellar", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses the Stellar Consensus Protocol (SCP) — the canonical implementation of Federated Byzantine Agreement. Stellar closes ledgers every 3–5 seconds with deterministic finality for cross-border payments and asset tokenization.", languages: ["Rust (Soroban Smart Contracts)", "JavaScript", "Python", "Go (SDKs)"] },
+            { name: "Ripple", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "Uses the Ripple Protocol Consensus Algorithm (RPCA) — a related but architecturally distinct protocol based on a curated Unique Node List (UNL) rather than open quorum slices. RPCA is not SCP.", languages: ["C++ (XRPL Hooks)"] }
         ]
     },
     pob: {
@@ -167,20 +167,20 @@ const algorithmsData = {
         scores: { scalability: 5.0, security: 6.5, decentralisation: 6.0 },
         specs: {
             blockTime: "10 mins (Slimcoin)",
-            tps: "3 - 10 TPS (Slimcoin)",
-            nodes: "~50 - 200 active full nodes",
-            stake: "Permanent token burn (irreversible cost)"
+            tps: "3–10 TPS (Slimcoin)",
+            nodes: "50–200 active full nodes",
+            stake: "Permanent irreversible token burn."
         },
         steps: [
-            { title: "Token Acquisition", desc: "Participants acquire native cryptocurrency through exchanges, mining rewards, or previous ownership before participating in the burn process." },
-            { title: "Burn Transaction", desc: "Participants permanently destroy coins by sending them to a verifiably unspendable (burn) address. The burn transaction is permanently recorded on the blockchain." },
-            { title: "Burn Weight Assignment", desc: "The protocol converts burned coins into burn weight (also called virtual mining power or burn score depending on the implementation), increasing the participant's probability of creating future blocks." },
-            { title: "Block Producer Selection", desc: "The protocol selects the next block producer according to each participant's effective burn weight. Some implementations, such as Slimcoin, also apply burn decay over time." },
-            { title: "Block Creation \u0026 Reward", desc: "The selected participant produces the next block and receives block rewards. Depending on the implementation, burn influence may remain permanent or gradually decay over time." }
+            { title: "Token Acquisition", desc: "Participants acquire native cryptocurrency before participating in the Proof of Burn process." },
+            { title: "Burn Transaction", desc: "Coins are permanently destroyed by sending them to a verifiably unspendable burn address. The burn transaction is permanently recorded on-chain." },
+            { title: "Burn Weight Assignment", desc: "The protocol converts burned coins into burn weight (virtual mining power), increasing the participant's probability of producing future blocks." },
+            { title: "Block Producer Selection", desc: "The protocol probabilistically selects one participant to produce the next block according to effective burn weight." },
+            { title: "Block Creation and Reward", desc: "The selected participant creates the next block and receives block rewards. In Slimcoin, burn influence gradually decays over time." }
         ],
         blockchains: [
-            { name: "Slimcoin", layer: "Layer 1 (Base Chain)", layerType: "L1", rationale: "First blockchain to implement native Proof of Burn consensus in a hybrid PoW/PoS/PoB model. Burning coins creates long-term virtual mining power that decays over time (Slimcoin-specific).", languages: ["C++ (Bitcoin Core fork)"] },
-            { name: "Counterparty", layer: "Layer 2 (Bitcoin Metaprotocol)", layerType: "L2", rationale: "Used PoB in its genesis — 2,130 BTC were permanently burned to create XCP tokens, ensuring a fair distribution with no pre-mine.", languages: ["Python", "Bitcoin Script (OP_RETURN)"] }
+            { name: "Slimcoin", layer: "Layer 1 (Base Blockchain)", layerType: "L1", rationale: "Slimcoin was the first blockchain to implement a native Proof of Burn consensus mechanism within a hybrid PoW/PoS/PoB model. Burned coins generate virtual mining power that gradually decays over time, encouraging periodic re-burning (Slimcoin-specific).", languages: ["Bitcoin Core Fork (C++)"] },
+            { name: "Counterparty", layer: "Bitcoin Metaprotocol", layerType: "L2", rationale: "Counterparty used a one-time Proof-of-Burn event during its genesis to distribute XCP tokens fairly. Users permanently burned 2,130 BTC to receive XCP. The protocol continues to rely on Bitcoin's Proof of Work consensus rather than Proof of Burn.", languages: ["Bitcoin Script", "OP_RETURN Metadata", "Counterparty Protocol"] }
         ]
     }
 };
@@ -286,6 +286,213 @@ const compatibilityMap = {
         "VeChain": { status: "Compatible", detail: "Same protocol (PoA 2.0). Self-compatible." },
         "Stellar": { status: "Incompatible", detail: "PoA 2.0 vs FBA. Different consensus architectures. Requires institutional anchors." },
         "Arbitrum": { status: "Partial", detail: "VeChain is EVM-compatible but uses PoA 2.0 consensus and a dual-token model. Bridge contracts possible but require VeChain-specific relayer support." }
+    }
+};
+
+const pobBlockchainsList = ["Bitcoin", "Slimcoin", "Counterparty", "Ethereum", "BNB Chain", "VeChain", "Cardano", "Solana", "Stellar"];
+const pobCompatibilityMap = {
+    "Bitcoin": {
+        "Bitcoin": { status: "Partial", detail: "Host blockchain related to Proof of Burn through Counterparty." },
+        "Slimcoin": { status: "Partial", detail: "Slimcoin is Bitcoin-derived." },
+        "Counterparty": { status: "Partial", detail: "Counterparty operates on Bitcoin." },
+        "Ethereum": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "VeChain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Cardano": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Solana": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Stellar": { status: "Incompatible", detail: "No Proof of Burn relationship." }
+    },
+    "Slimcoin": {
+        "Bitcoin": { status: "Partial", detail: "Slimcoin is Bitcoin-derived." },
+        "Slimcoin": { status: "Compatible", detail: "Native hybrid PoW + PoS + Proof of Burn blockchain." },
+        "Counterparty": { status: "Partial", detail: "Both are associated with Proof of Burn but use it differently.<br><br>Slimcoin: Native PoB consensus.<br><br>Counterparty: Genesis Proof-of-Burn token distribution." },
+        "Ethereum": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "VeChain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Cardano": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Solana": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Stellar": { status: "Incompatible", detail: "No Proof of Burn relationship." }
+    },
+    "Counterparty": {
+        "Bitcoin": { status: "Partial", detail: "Counterparty operates on Bitcoin." },
+        "Slimcoin": { status: "Partial", detail: "Both are associated with Proof of Burn but use it differently.<br><br>Slimcoin: Native PoB consensus.<br><br>Counterparty: Genesis Proof-of-Burn token distribution." },
+        "Counterparty": { status: "Partial", detail: "Uses Proof of Burn only during genesis token distribution." },
+        "Ethereum": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "VeChain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Cardano": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Solana": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Stellar": { status: "Incompatible", detail: "No Proof of Burn relationship." }
+    },
+    "Ethereum": {
+        "Bitcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Slimcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Counterparty": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "VeChain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Cardano": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Solana": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Stellar": { status: "Incompatible", detail: "No Proof of Burn relationship." }
+    },
+    "BNB Chain": {
+        "Bitcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Slimcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Counterparty": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "VeChain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Cardano": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Solana": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Stellar": { status: "Incompatible", detail: "No Proof of Burn relationship." }
+    },
+    "VeChain": {
+        "Bitcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Slimcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Counterparty": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "VeChain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Cardano": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Solana": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Stellar": { status: "Incompatible", detail: "No Proof of Burn relationship." }
+    },
+    "Cardano": {
+        "Bitcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Slimcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Counterparty": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "VeChain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Cardano": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Solana": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Stellar": { status: "Incompatible", detail: "No Proof of Burn relationship." }
+    },
+    "Solana": {
+        "Bitcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Slimcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Counterparty": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "VeChain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Cardano": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Solana": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Stellar": { status: "Incompatible", detail: "No Proof of Burn relationship." }
+    },
+    "Stellar": {
+        "Bitcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Slimcoin": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Counterparty": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "VeChain": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Cardano": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Solana": { status: "Incompatible", detail: "No Proof of Burn relationship." },
+        "Stellar": { status: "Incompatible", detail: "No Proof of Burn relationship." }
+    }
+};
+
+// FBA Custom Heatmap Dataset
+const fbaBlockchainsList = ["Stellar", "Ripple", "Bitcoin", "Ethereum", "Cardano", "Solana", "BNB Chain", "VeChain", "Arbitrum"];
+const fbaCompatibilityMap = {
+    "Stellar": {
+        "Stellar": { status: "Compatible", detail: "Native Stellar Consensus Protocol (SCP) — the canonical implementation of Federated Byzantine Agreement." },
+        "Ripple": { status: "Partial", detail: "Both use trust-based consensus but implement different protocols.<br><br>Stellar: SCP (open quorum slices, Federated Byzantine Agreement).<br><br>Ripple: RPCA (curated Unique Node List)." },
+        "Bitcoin": { status: "Incompatible", detail: "FBA (SCP) vs Proof of Work. Stellar uses anchors to bridge assets from Bitcoin." },
+        "Ethereum": { status: "Incompatible", detail: "FBA (SCP) vs Proof of Stake. Interoperable via Soroban smart contracts or multi-sig portals." },
+        "Cardano": { status: "Incompatible", detail: "FBA (SCP) vs Proof of Stake (Ouroboros). Requires specialized bridge validators." },
+        "Solana": { status: "Incompatible", detail: "FBA (SCP) vs PoH+PoS. Bridged via federated node integrations." },
+        "BNB Chain": { status: "Incompatible", detail: "FBA (SCP) vs PoSA. Requires institutional anchors." },
+        "VeChain": { status: "Incompatible", detail: "FBA (SCP) vs PoA 2.0. Different consensus architectures." },
+        "Arbitrum": { status: "Incompatible", detail: "FBA (SCP) vs L2 Rollup. Must bridge through Ethereum L1 first." }
+    },
+    "Ripple": {
+        "Stellar": { status: "Partial", detail: "Both use trust-based consensus but implement different protocols.<br><br>Stellar: SCP (open quorum slices).<br><br>Ripple: RPCA (curated Unique Node List)." },
+        "Ripple": { status: "Partial", detail: "Ripple Protocol Consensus Algorithm (RPCA) uses a curated Unique Node List (UNL). Related to but architecturally distinct from Federated Byzantine Agreement (SCP)." },
+        "Bitcoin": { status: "Incompatible", detail: "RPCA vs Proof of Work. Different consensus architectures." },
+        "Ethereum": { status: "Incompatible", detail: "RPCA vs Proof of Stake. Different consensus architectures." },
+        "Cardano": { status: "Incompatible", detail: "RPCA vs Proof of Stake (Ouroboros). No direct relationship." },
+        "Solana": { status: "Incompatible", detail: "RPCA vs PoH+PoS. No direct relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "RPCA vs PoSA. No direct relationship." },
+        "VeChain": { status: "Incompatible", detail: "RPCA vs PoA 2.0. No direct relationship." },
+        "Arbitrum": { status: "Incompatible", detail: "RPCA vs L2 Rollup. No direct relationship." }
+    },
+    "Bitcoin": {
+        "Stellar": { status: "Incompatible", detail: "Proof of Work vs FBA (SCP). Requires anchors for asset bridging." },
+        "Ripple": { status: "Incompatible", detail: "Proof of Work vs RPCA. No direct relationship." },
+        "Bitcoin": { status: "Incompatible", detail: "Proof of Work — no FBA relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No FBA relationship." },
+        "Cardano": { status: "Incompatible", detail: "No FBA relationship." },
+        "Solana": { status: "Incompatible", detail: "No FBA relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No FBA relationship." },
+        "VeChain": { status: "Incompatible", detail: "No FBA relationship." },
+        "Arbitrum": { status: "Incompatible", detail: "No FBA relationship." }
+    },
+    "Ethereum": {
+        "Stellar": { status: "Incompatible", detail: "Proof of Stake vs FBA (SCP). Requires bridge validators." },
+        "Ripple": { status: "Incompatible", detail: "Proof of Stake vs RPCA. No direct relationship." },
+        "Bitcoin": { status: "Incompatible", detail: "No FBA relationship." },
+        "Ethereum": { status: "Incompatible", detail: "Proof of Stake — no FBA relationship." },
+        "Cardano": { status: "Incompatible", detail: "No FBA relationship." },
+        "Solana": { status: "Incompatible", detail: "No FBA relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No FBA relationship." },
+        "VeChain": { status: "Incompatible", detail: "No FBA relationship." },
+        "Arbitrum": { status: "Incompatible", detail: "No FBA relationship." }
+    },
+    "Cardano": {
+        "Stellar": { status: "Incompatible", detail: "Proof of Stake (Ouroboros) vs FBA (SCP). No direct relationship." },
+        "Ripple": { status: "Incompatible", detail: "No FBA relationship." },
+        "Bitcoin": { status: "Incompatible", detail: "No FBA relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No FBA relationship." },
+        "Cardano": { status: "Incompatible", detail: "Proof of Stake (Ouroboros) — no FBA relationship." },
+        "Solana": { status: "Incompatible", detail: "No FBA relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No FBA relationship." },
+        "VeChain": { status: "Incompatible", detail: "No FBA relationship." },
+        "Arbitrum": { status: "Incompatible", detail: "No FBA relationship." }
+    },
+    "Solana": {
+        "Stellar": { status: "Incompatible", detail: "PoH+PoS vs FBA (SCP). No direct relationship." },
+        "Ripple": { status: "Incompatible", detail: "No FBA relationship." },
+        "Bitcoin": { status: "Incompatible", detail: "No FBA relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No FBA relationship." },
+        "Cardano": { status: "Incompatible", detail: "No FBA relationship." },
+        "Solana": { status: "Incompatible", detail: "PoH+PoS — no FBA relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No FBA relationship." },
+        "VeChain": { status: "Incompatible", detail: "No FBA relationship." },
+        "Arbitrum": { status: "Incompatible", detail: "No FBA relationship." }
+    },
+    "BNB Chain": {
+        "Stellar": { status: "Incompatible", detail: "PoSA vs FBA (SCP). No direct relationship." },
+        "Ripple": { status: "Incompatible", detail: "No FBA relationship." },
+        "Bitcoin": { status: "Incompatible", detail: "No FBA relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No FBA relationship." },
+        "Cardano": { status: "Incompatible", detail: "No FBA relationship." },
+        "Solana": { status: "Incompatible", detail: "No FBA relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "PoSA — no FBA relationship." },
+        "VeChain": { status: "Incompatible", detail: "No FBA relationship." },
+        "Arbitrum": { status: "Incompatible", detail: "No FBA relationship." }
+    },
+    "VeChain": {
+        "Stellar": { status: "Incompatible", detail: "PoA 2.0 vs FBA (SCP). No direct relationship." },
+        "Ripple": { status: "Incompatible", detail: "No FBA relationship." },
+        "Bitcoin": { status: "Incompatible", detail: "No FBA relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No FBA relationship." },
+        "Cardano": { status: "Incompatible", detail: "No FBA relationship." },
+        "Solana": { status: "Incompatible", detail: "No FBA relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No FBA relationship." },
+        "VeChain": { status: "Incompatible", detail: "PoA 2.0 — no FBA relationship." },
+        "Arbitrum": { status: "Incompatible", detail: "No FBA relationship." }
+    },
+    "Arbitrum": {
+        "Stellar": { status: "Incompatible", detail: "L2 Rollup vs FBA (SCP). Must route through Ethereum L1." },
+        "Ripple": { status: "Incompatible", detail: "No FBA relationship." },
+        "Bitcoin": { status: "Incompatible", detail: "No FBA relationship." },
+        "Ethereum": { status: "Incompatible", detail: "No FBA relationship." },
+        "Cardano": { status: "Incompatible", detail: "No FBA relationship." },
+        "Solana": { status: "Incompatible", detail: "No FBA relationship." },
+        "BNB Chain": { status: "Incompatible", detail: "No FBA relationship." },
+        "VeChain": { status: "Incompatible", detail: "No FBA relationship." },
+        "Arbitrum": { status: "Incompatible", detail: "L2 Rollup — no FBA relationship." }
     }
 };
 
@@ -1815,111 +2022,341 @@ function drawPoAAnimation(ctx, w, h, color, step, t) {
     const radius = Math.min(w, h) * 0.28;
 
     if (step === 0) {
-        // Step 1: Validator Vetting & Identity Verification
-        // Draw ID card
+        // STEP 1 — AUTHORITY NODE APPROVAL
+        // Display 4 nodes in a circle
+        // Initially they are gray 'Pending' state (t < 40)
+        // Show verification checks and governance approval (t >= 40)
+        // After approval, nodes receive an 'Authority Node' badge and turn green (t >= 80)
+        
+        const phase = t < 40 ? 0 : (t < 80 ? 1 : 2); // 0: Pending, 1: Vetting, 2: Approved
+
+        for (let i = 0; i < authorities; i++) {
+            const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            // Draw Node Circle
+            ctx.beginPath();
+            ctx.arc(x, y, 14, 0, Math.PI * 2);
+            if (phase === 0) {
+                ctx.fillStyle = "rgba(100, 116, 139, 0.15)"; // Gray pending
+                ctx.strokeStyle = "rgba(100, 116, 139, 0.4)";
+            } else if (phase === 1) {
+                const pulse = 0.1 + Math.sin(t * 0.12 + i) * 0.05;
+                ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${pulse})`;
+                ctx.strokeStyle = color.hex;
+            } else {
+                ctx.fillStyle = "rgba(5, 201, 140, 0.18)"; // Approved Green
+                ctx.strokeStyle = "#05c98c";
+            }
+            ctx.lineWidth = 2;
+            ctx.fill();
+            ctx.stroke();
+
+            // Label: Node Name (Node A, Node B, Node C, Node D)
+            const labels = ["Node A", "Node B", "Node C", "Node D"];
+            ctx.font = "bold 7px Fira Code";
+            ctx.textAlign = "center";
+            if (phase === 0) {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+                ctx.fillText("Pending", x, y - 22);
+            } else if (phase === 1) {
+                ctx.fillStyle = color.hex;
+                ctx.fillText("Vetting", x, y - 22);
+            } else {
+                ctx.fillStyle = "#05c98c";
+                ctx.fillText("Approved", x, y - 22);
+            }
+            ctx.fillStyle = "#fff";
+            ctx.fillText(labels[i], x, y + 3);
+
+            // Badge / Icon
+            if (phase === 1) {
+                // Scanning radar line around nodes
+                ctx.beginPath();
+                ctx.arc(x, y, 20 + Math.sin(t * 0.1) * 3, 0, Math.PI * 2);
+                ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.2)`;
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            } else if (phase === 2) {
+                // Mini green badge '✓' or Shield/Star
+                ctx.beginPath();
+                ctx.arc(x + 11, y - 11, 5, 0, Math.PI * 2);
+                ctx.fillStyle = "#05c98c";
+                ctx.fill();
+                ctx.font = "bold 6px sans-serif";
+                ctx.fillStyle = "#000";
+                ctx.fillText("✓", x + 11, y - 9);
+            }
+        }
+
+        // Central Vetting Progress Box
         ctx.beginPath();
-        ctx.roundRect(cx - 35, cy - 38, 70, 56, 8);
-        ctx.fillStyle = "rgba(255,255,255,0.04)";
+        ctx.roundRect(cx - 50, cy - 16, 100, 32, 6);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
+        ctx.strokeStyle = phase === 2 ? "#05c98c" : (phase === 1 ? color.hex : "rgba(255, 255, 255, 0.15)");
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "bold 7px Fira Code";
+        ctx.textAlign = "center";
+        if (phase === 0) {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
+            ctx.fillText("GOVERNANCE", cx, cy - 2);
+            ctx.font = "6px Fira Code";
+            ctx.fillText("Evaluating Candidates...", cx, cy + 8);
+        } else if (phase === 1) {
+            ctx.fillStyle = color.hex;
+            ctx.fillText("ID VERIFICATION", cx, cy - 2);
+            ctx.font = "6px Fira Code";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+            ctx.fillText("Checking Rep & Tech...", cx, cy + 8);
+        } else {
+            ctx.fillStyle = "#05c98c";
+            ctx.fillText("WHITELIST COMPLETE", cx, cy - 2);
+            ctx.font = "6px Fira Code";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
+            ctx.fillText("Authority Set Active ✓", cx, cy + 8);
+        }
+
+        // Title text at bottom
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = phase === 2 ? "#05c98c" : `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText(phase === 2 ? "Authority Nodes Whitelisted and Active" : "Vetting Node Candidates...", cx, h - 15);
+
+    } else if (step === 1) {
+        // STEP 2 — TRANSACTION SUBMISSION
+        // User wallets (bottom), Central Tx Pool (mempool), 4 Green Authority Nodes (circle)
+
+        // Draw the 4 green Authority Nodes in a circle
+        for (let i = 0; i < authorities; i++) {
+            const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
+            const x = cx + Math.cos(angle) * radius;
+            const y = cy + Math.sin(angle) * radius;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 11, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(5, 201, 140, 0.12)";
+            ctx.strokeStyle = "rgba(5, 201, 140, 0.6)";
+            ctx.lineWidth = 1.5;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "bold 6px Fira Code";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#fff";
+            ctx.fillText(`Node ${String.fromCharCode(65 + i)}`, x, y + 2.5);
+        }
+
+        // Central Tx Pool / Mempool
+        const poolW = 86, poolH = 34;
+        ctx.beginPath();
+        ctx.roundRect(cx - poolW / 2, cy - poolH / 2 - 10, poolW, poolH, 5);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.03)";
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.4)`;
+        ctx.lineWidth = 1.5;
+        ctx.fill();
+        ctx.stroke();
+
+        ctx.font = "bold 7px Fira Code";
+        ctx.fillStyle = color.hex;
+        ctx.textAlign = "center";
+        ctx.fillText("TRANSACTION POOL", cx, cy - 18);
+
+        // Render small boxes representing transactions in the pool
+        const numPoolTxs = Math.min(4, Math.floor(t / 25));
+        for (let i = 0; i < numPoolTxs; i++) {
+            const txX = cx - 32 + (i % 2) * 36;
+            const txY = cy - 12 + Math.floor(i / 2) * 11;
+            ctx.fillStyle = "rgba(255, 255, 255, 0.08)";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+            ctx.beginPath();
+            ctx.roundRect(txX, txY, 28, 8, 2);
+            ctx.fill();
+            ctx.stroke();
+            ctx.font = "5px Fira Code";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.6)";
+            ctx.fillText(`tx_${100 + i}`, txX + 14, txY + 6);
+        }
+
+        // Draw 3 user nodes at the bottom
+        const userCount = 3;
+        const userSpacing = 72;
+        const userBaseY = cy + 56;
+        for (let i = 0; i < userCount; i++) {
+            const ux = cx - ((userCount - 1) * userSpacing) / 2 + i * userSpacing;
+
+            ctx.beginPath();
+            ctx.arc(ux, userBaseY, 9, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(255, 255, 255, 0.05)";
+            ctx.strokeStyle = "rgba(255, 255, 255, 0.3)";
+            ctx.lineWidth = 1;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "8px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("👤", ux, userBaseY + 3);
+
+            ctx.font = "6px Fira Code";
+            ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+            ctx.fillText(`User ${i+1}`, ux, userBaseY + 12);
+
+            // Animate transaction flying from User to Tx Pool
+            const progress = (t * 0.015 + i * 0.33) % 1;
+            if (t < 80) {
+                const startX = ux;
+                const startY = userBaseY - 10;
+                const endX = cx - 20 + i * 20;
+                const endY = cy + 7;
+                const currentX = startX + (endX - startX) * progress;
+                const currentY = startY + (endY - startY) * progress;
+
+                ctx.font = "8px sans-serif";
+                ctx.fillText("📄", currentX, currentY);
+            }
+        }
+
+        // Animate broadcast from Tx Pool to Authority Nodes (t >= 50)
+        if (t >= 50) {
+            for (let i = 0; i < authorities; i++) {
+                const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
+                const targetX = cx + Math.cos(angle) * radius;
+                const targetY = cy + Math.sin(angle) * radius;
+
+                const bProgress = ((t - 50) * 0.03) % 1;
+                const curX = cx + (targetX - cx) * bProgress;
+                const curY = (cy - 10) + (targetY - (cy - 10)) * bProgress;
+
+                ctx.beginPath();
+                ctx.arc(curX, curY, 2.5, 0, Math.PI * 2);
+                ctx.fillStyle = color.hex;
+                ctx.fill();
+            }
+        }
+
+        ctx.font = "bold 12px Outfit";
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.fillText("Transactions Submitted and Distributed to Authority Nodes", cx, h - 15);
+
+    } else if (step === 2) {
+        // STEP 3 — TRANSACTION VALIDATION
+        // Display validation list & checkmarks + Candidate Block
+
+        // Draw 4 green nodes
+        for (let i = 0; i < authorities; i++) {
+            const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
+            const x = cx - 80 + Math.cos(angle) * 30;
+            const y = cy + Math.sin(angle) * 30;
+
+            ctx.beginPath();
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = "rgba(5, 201, 140, 0.15)";
+            ctx.strokeStyle = "rgba(5, 201, 140, 0.7)";
+            ctx.lineWidth = 1.5;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "bold 6px Fira Code";
+            ctx.textAlign = "center";
+            ctx.fillStyle = "#fff";
+            ctx.fillText(String.fromCharCode(65 + i), x, y + 2);
+        }
+
+        // Draw Candidate Block on the right
+        const blockX = cx + 80, blockY = cy + 10;
+        ctx.beginPath();
+        ctx.roundRect(blockX - 25, blockY - 20, 50, 40, 5);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
         ctx.strokeStyle = color.hex;
         ctx.lineWidth = 1.5;
         ctx.fill();
         ctx.stroke();
 
-        // Profile icon
-        ctx.beginPath();
-        ctx.arc(cx - 16, cy - 14, 10, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.2)`;
-        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.5)`;
-        ctx.fill();
-        ctx.stroke();
-        ctx.font = "12px sans-serif";
-        ctx.textAlign = "center";
+        ctx.font = "bold 7px Fira Code";
         ctx.fillStyle = color.hex;
-        ctx.fillText("👤", cx - 16, cy - 10);
-
-        // Data lines
-        ctx.fillStyle = "rgba(255,255,255,0.35)";
-        ctx.fillRect(cx + 2, cy - 22, 22, 3);
-        ctx.fillRect(cx + 2, cy - 14, 18, 3);
-        ctx.fillRect(cx + 2, cy - 6, 22, 3);
-        ctx.fillRect(cx - 28, cy + 4, 56, 3);
-        ctx.fillRect(cx - 28, cy + 11, 40, 3);
-
-        // Scanning line
-        const scanY = cy - 38 + ((t * 0.8) % 56);
-        ctx.beginPath();
-        ctx.moveTo(cx - 35, scanY);
-        ctx.lineTo(cx + 35, scanY);
-        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.6)`;
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-
-        // Animated checkmarks appearing
-        const checks = Math.min(3, Math.floor(t / 40));
-        ctx.font = "bold 8px sans-serif";
-        ctx.fillStyle = "#05c98c";
-        if (checks > 0) ctx.fillText("✓ ID", cx + 42, cy - 18);
-        if (checks > 1) ctx.fillText("✓ Rep", cx + 42, cy - 6);
-        if (checks > 2) ctx.fillText("✓ Gov", cx + 42, cy + 6);
-
-        ctx.font = "bold 12px Outfit";
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
         ctx.textAlign = "center";
-        ctx.fillText("Validator Identity & Reputation Vetting", cx, h - 15);
+        ctx.fillText("CANDIDATE", blockX, blockY - 6);
+        ctx.fillText("BLOCK", blockX, blockY + 4);
 
-    } else if (step === 1) {
-        // Step 2: Authority Whitelisting
-        // Registry container
-        ctx.beginPath();
-        ctx.roundRect(cx - 55, cy - 30, 110, 50, 6);
-        ctx.fillStyle = "rgba(5, 201, 140, 0.08)";
-        ctx.strokeStyle = "#05c98c";
-        ctx.lineWidth = 2;
-        ctx.fill();
-        ctx.stroke();
+        // Verification checks list in the middle
+        const checks = [
+            "Digital Signature",
+            "Tx Format & Nonce",
+            "Account Balance",
+            "Gas / Fees & Rules",
+            "Double-Spend Check"
+        ];
 
-        ctx.font = "bold 9px Fira Code";
-        ctx.fillStyle = "#05c98c";
-        ctx.textAlign = "center";
-        ctx.fillText("ACTIVE VALIDATOR SET", cx, cy - 16);
-
-        // Validator entries appearing
-        const entries = Math.min(3, Math.floor(t / 30));
-        ctx.font = "7px Fira Code";
-        ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-        if (entries > 0) ctx.fillText("0x8a92...3f7e ✓", cx, cy - 2);
-        if (entries > 1) ctx.fillText("0xb4c1...9d2a ✓", cx, cy + 8);
-        if (entries > 2) {
-            ctx.fillStyle = color.hex;
-            ctx.fillText("0xf7e3...6b1c ✓ NEW", cx, cy + 18);
+        const checksToShow = Math.min(checks.length, Math.floor(t / 20));
+        ctx.textAlign = "left";
+        ctx.font = "6px Fira Code";
+        for (let i = 0; i < checks.length; i++) {
+            const checkY = cy - 25 + i * 11;
+            if (i < checksToShow) {
+                ctx.fillStyle = "#05c98c";
+                ctx.fillText(`✓ ${checks[i]}`, cx - 35, checkY);
+            } else {
+                ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+                ctx.fillText(`◦ ${checks[i]}`, cx - 35, checkY);
+            }
         }
 
-        // Animated key flying in
-        const keyProgress = Math.min(1, (t % 80) / 60);
-        const keyX = cx - 80 + keyProgress * 80;
-        const keyY = cy + 18;
-        ctx.font = "11px sans-serif";
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${keyProgress})`;
-        ctx.fillText("🔑", keyX - 55, keyY + 1);
+        // Verified transaction moving to block
+        if (t >= 80) {
+            const progress = Math.min(1, (t - 80) * 0.04);
+            const startX = cx;
+            const startY = cy;
+            const curX = startX + (blockX - startX) * progress;
+            const curY = startY + (blockY - startY) * progress;
+
+            ctx.font = "10px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("📄", curX, curY);
+
+            ctx.font = "bold 6px Fira Code";
+            ctx.fillStyle = "#05c98c";
+            ctx.fillText("Verified", curX, curY - 5);
+        }
+
+        // Invalid transaction (Red) rejected
+        if (t > 30 && t < 70) {
+            const progress = (t - 30) * 0.025;
+            const startX = cx - 80;
+            const startY = cy;
+            const curX = startX + (cx - 50 - startX) * progress;
+            const curY = startY + 30 * Math.sin(progress * Math.PI);
+
+            ctx.font = "10px sans-serif";
+            ctx.textAlign = "center";
+            ctx.fillText("❌", curX, curY);
+            ctx.font = "bold 5px Fira Code";
+            ctx.fillStyle = "#ff6b6b";
+            ctx.fillText("Rejected", curX, curY - 5);
+        }
 
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Validator Public Key Added to Active Set", cx, h - 15);
+        ctx.textAlign = "center";
+        ctx.fillText("Independent Validation: Invalid Rejected, Valid to Candidate Block", cx, h - 15);
 
-    } else if (step === 2) {
-        // Step 3: Block Proposal
-        const activeIdx = Math.floor(t / 50) % authorities;
+    } else if (step === 3) {
+        // STEP 4 — BLOCK PROPOSER SELECTION
+        // Highlight ONLY ONE Authority Node as "Current Block Proposer"
+        // No probability bars, no lottery wheels. Scheduled Rotation or assignment.
 
-        // Draw all authority nodes
+        const proposerIdx = 1; // Node B is deterministically selected as proposer
+
         for (let i = 0; i < authorities; i++) {
             const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
             const x = cx + Math.cos(angle) * radius;
             const y = cy + Math.sin(angle) * radius;
-            const isActive = i === activeIdx;
+            const isProposer = i === proposerIdx;
 
-            // Pulsing glow for active proposer
-            if (isActive) {
-                const pulse = 0.15 + Math.sin(t * 0.1) * 0.1;
+            // Proposer node gets special highlighted styling and glowing ring
+            if (isProposer) {
+                const pulse = 0.2 + Math.sin(t * 0.1) * 0.1;
                 ctx.beginPath();
                 ctx.arc(x, y, 22, 0, Math.PI * 2);
                 ctx.fillStyle = `rgba(${color.rgb.join(",")}, ${pulse})`;
@@ -1927,196 +2364,202 @@ function drawPoAAnimation(ctx, w, h, color, step, t) {
             }
 
             ctx.beginPath();
-            ctx.arc(x, y, isActive ? 15 : 10, 0, Math.PI * 2);
-            ctx.fillStyle = isActive ? `rgba(${color.rgb.join(",")}, 0.35)` : "rgba(255,255,255,0.05)";
-            ctx.strokeStyle = isActive ? color.hex : "rgba(255,255,255,0.15)";
-            ctx.lineWidth = isActive ? 2.5 : 1;
+            ctx.arc(x, y, isProposer ? 15 : 10, 0, Math.PI * 2);
+            ctx.fillStyle = isProposer ? `rgba(${color.rgb.join(",")}, 0.3)` : "rgba(255, 255, 255, 0.05)";
+            ctx.strokeStyle = isProposer ? color.hex : "rgba(255, 255, 255, 0.2)";
+            ctx.lineWidth = isProposer ? 2.5 : 1;
             ctx.fill();
             ctx.stroke();
 
-            ctx.font = isActive ? "bold 9px Fira Code" : "bold 8px Fira Code";
-            ctx.fillStyle = isActive ? color.hex : "rgba(255,255,255,0.4)";
+            // Labels
+            ctx.font = isProposer ? "bold 7px Fira Code" : "6px Fira Code";
+            ctx.fillStyle = isProposer ? "#fff" : "rgba(255, 255, 255, 0.4)";
             ctx.textAlign = "center";
-            ctx.fillText(isActive ? "PROP" : `A${i+1}`, x, y + 3);
+            ctx.fillText(isProposer ? "PROP" : `Node ${String.fromCharCode(65 + i)}`, x, y + 2.5);
+
+            if (isProposer) {
+                // Glowing text above the proposer node
+                ctx.font = "bold 7px Fira Code";
+                ctx.fillStyle = color.hex;
+                ctx.fillText("Current Block Proposer", x, y - 22);
+            } else {
+                ctx.font = "6px Fira Code";
+                ctx.fillStyle = "rgba(255, 255, 255, 0.25)";
+                ctx.fillText("Active", x, y - 16);
+            }
         }
 
-        // Block broadcasting lines from proposer to all others
-        const proposerAngle = (activeIdx / authorities) * Math.PI * 2 - Math.PI / 2;
-        const px = cx + Math.cos(proposerAngle) * radius;
-        const py = cy + Math.sin(proposerAngle) * radius;
-
-        for (let i = 0; i < authorities; i++) {
-            if (i === activeIdx) continue;
-            const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
-            const x = cx + Math.cos(angle) * radius;
-            const y = cy + Math.sin(angle) * radius;
-
-            // Animated broadcast particles
-            const progress = (t * 0.025 + i * 0.25) % 1;
-            const fx = px + (x - px) * progress;
-            const fy = py + (y - py) * progress;
-
-            ctx.beginPath();
-            ctx.moveTo(px, py);
-            ctx.lineTo(x, y);
-            ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.1)`;
-            ctx.lineWidth = 1;
-            ctx.stroke();
-
-            ctx.beginPath();
-            ctx.arc(fx, fy, 3, 0, Math.PI * 2);
-            ctx.fillStyle = color.hex;
-            ctx.fill();
-        }
-
-        // Floating block icon at center
-        const blockY = cy + Math.sin(t * 0.06) * 4;
-        ctx.font = "16px sans-serif";
+        // Draw Candidate Block in center
+        ctx.beginPath();
+        ctx.roundRect(cx - 20, cy - 12, 40, 24, 4);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.04)";
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
+        ctx.lineWidth = 1;
+        ctx.fill();
+        ctx.stroke();
+        ctx.font = "6px Fira Code";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
         ctx.textAlign = "center";
-        ctx.fillText("📦", cx, blockY + 5);
+        ctx.fillText("CANDIDATE", cx, cy + 2);
+
+        // Animated arrow from Current Block Proposer to Candidate Block
+        const pAngle = (proposerIdx / authorities) * Math.PI * 2 - Math.PI / 2;
+        const px = cx + Math.cos(pAngle) * radius;
+        const py = cy + Math.sin(pAngle) * radius;
+
+        // Draw the connecting path line
+        ctx.beginPath();
+        ctx.moveTo(px, py);
+        ctx.lineTo(cx, cy);
+        ctx.strokeStyle = `rgba(${color.rgb.join(",")}, 0.25)`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+
+        // Flying particle indicating proposer assignment / connection
+        const progress = (t * 0.02) % 1;
+        const particleX = px + (cx - px) * progress;
+        const particleY = py + (cy - py) * progress;
+        ctx.beginPath();
+        ctx.arc(particleX, particleY, 3, 0, Math.PI * 2);
+        ctx.fillStyle = color.hex;
+        ctx.fill();
 
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText(`Validator A${activeIdx + 1} Proposing Block`, cx, h - 15);
+        ctx.fillText("Consensus Scheduled Rotation: Node B Selected as Proposer", cx, h - 15);
 
-    } else if (step === 3) {
-        // Step 4: Block Validation & Consensus
-        // Central block being validated
-        const ringPulse = 0.6 + Math.sin(t * 0.08) * 0.2;
+    } else if (step === 4) {
+        // STEP 5 — BLOCK CREATION, VERIFICATION & FINALIZATION
+        // Proposer node signs and broadcasts. Other nodes verify, accept. Chain extends.
+
+        const proposerIdx = 1; // Node B proposer
+        const pxAngle = (proposerIdx / authorities) * Math.PI * 2 - Math.PI / 2;
+        const px = cx + Math.cos(pxAngle) * radius;
+        const py = cy + Math.sin(pxAngle) * radius;
+
+        // Draw Proposer Node (Glowing)
         ctx.beginPath();
-        ctx.arc(cx, cy, 35, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(5, 201, 140, ${0.05 + Math.sin(t * 0.1) * 0.03})`;
-        ctx.strokeStyle = `rgba(5, 201, 140, ${ringPulse})`;
+        ctx.arc(px, py, 14, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.25)`;
+        ctx.strokeStyle = color.hex;
         ctx.lineWidth = 2;
         ctx.fill();
         ctx.stroke();
+        ctx.font = "bold 6px Fira Code";
+        ctx.fillStyle = "#fff";
+        ctx.textAlign = "center";
+        ctx.fillText("PROP", px, py + 2.5);
 
-        // Inner block representation
-        ctx.beginPath();
-        ctx.roundRect(cx - 14, cy - 16, 28, 22, 4);
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.2)`;
-        ctx.strokeStyle = color.hex;
-        ctx.lineWidth = 1.5;
-        ctx.fill();
-        ctx.stroke();
-
-        // Block content lines
-        ctx.fillStyle = "rgba(255,255,255,0.3)";
-        ctx.fillRect(cx - 9, cy - 11, 18, 2);
-        ctx.fillRect(cx - 9, cy - 6, 14, 2);
-        ctx.fillRect(cx - 9, cy - 1, 18, 2);
-
-        // Validators around verifying with animated checkmarks
+        // Draw other nodes
         for (let i = 0; i < authorities; i++) {
+            if (i === proposerIdx) continue;
             const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
             const x = cx + Math.cos(angle) * radius;
             const y = cy + Math.sin(angle) * radius;
 
-            const verified = t > (i * 20 + 20);
+            const isAccepted = t >= 45;
 
             ctx.beginPath();
-            ctx.arc(x, y, 12, 0, Math.PI * 2);
-            ctx.fillStyle = verified ? "rgba(5, 201, 140, 0.2)" : "rgba(255,255,255,0.05)";
-            ctx.strokeStyle = verified ? "#05c98c" : "rgba(255,255,255,0.2)";
-            ctx.lineWidth = verified ? 2 : 1;
+            ctx.arc(x, y, 10, 0, Math.PI * 2);
+            ctx.fillStyle = isAccepted ? "rgba(5, 201, 140, 0.12)" : "rgba(255, 255, 255, 0.05)";
+            ctx.strokeStyle = isAccepted ? "#05c98c" : "rgba(255, 255, 255, 0.2)";
+            ctx.lineWidth = 1;
             ctx.fill();
             ctx.stroke();
 
-            ctx.font = "bold 8px Fira Code";
-            ctx.textAlign = "center";
-            ctx.fillStyle = verified ? "#05c98c" : "rgba(255,255,255,0.4)";
-            ctx.fillText(verified ? "✓" : `A${i+1}`, x, y + 3);
+            ctx.font = "6px Fira Code";
+            ctx.fillStyle = isAccepted ? "#05c98c" : "rgba(255, 255, 255, 0.4)";
+            ctx.fillText(isAccepted ? "✓ ACC" : `Node ${String.fromCharCode(65 + i)}`, x, y + 2);
+        }
 
-            // Verification beam from block to validator
-            if (verified) {
+        // Animate block broadcasting from proposer to others (t < 45)
+        if (t < 45) {
+            const p = t / 45;
+            for (let i = 0; i < authorities; i++) {
+                if (i === proposerIdx) continue;
+                const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
+                const tx = cx + Math.cos(angle) * radius;
+                const ty = cy + Math.sin(angle) * radius;
+
+                const curX = px + (tx - px) * p;
+                const curY = py + (ty - py) * p;
+
+                ctx.font = "8px sans-serif";
+                ctx.fillText("📦", curX, curY);
+            }
+        }
+
+        // Extend the chain at the bottom of the canvas
+        const blockW = 34, blockH = 18, blockGap = 8;
+        const chainY = cy + 50;
+        const numBlocks = 4;
+        const chainStartX = cx - ((numBlocks * (blockW + blockGap)) - blockGap) / 2;
+
+        for (let i = 0; i < numBlocks; i++) {
+            const bx = chainStartX + i * (blockW + blockGap);
+            const isNew = i === numBlocks - 1;
+            const scale = isNew ? Math.min(1, (t - 45) / 25) : 1;
+
+            if (isNew && t < 45) continue; // Not added yet
+
+            ctx.save();
+            if (isNew) {
+                ctx.globalAlpha = scale;
+                ctx.translate(bx + blockW / 2, chainY + blockH / 2);
+                ctx.scale(scale, scale);
+                ctx.translate(-(bx + blockW / 2), -(chainY + blockH / 2));
+            }
+
+            ctx.beginPath();
+            ctx.roundRect(bx, chainY, blockW, blockH, 3);
+            ctx.fillStyle = isNew ? "rgba(5, 201, 140, 0.22)" : "rgba(255, 255, 255, 0.05)";
+            ctx.strokeStyle = isNew ? "#05c98c" : "rgba(255, 255, 255, 0.2)";
+            ctx.lineWidth = isNew ? 1.5 : 1;
+            ctx.fill();
+            ctx.stroke();
+
+            ctx.font = "bold 5px Fira Code";
+            ctx.fillStyle = isNew ? "#05c98c" : "rgba(255, 255, 255, 0.4)";
+            ctx.textAlign = "center";
+            ctx.fillText(isNew ? "FINALIZED" : `Block #${1000 + i}`, bx + blockW / 2, chainY + blockH / 2 + 2);
+
+            ctx.restore();
+
+            // Connector lines
+            if (i > 0 && (!isNew || t >= 45)) {
                 ctx.beginPath();
-                ctx.moveTo(cx, cy);
-                ctx.lineTo(x, y);
-                ctx.strokeStyle = `rgba(5, 201, 140, ${0.1 + Math.sin(t * 0.12 + i) * 0.08})`;
+                ctx.moveTo(bx, chainY + blockH / 2);
+                ctx.lineTo(bx - blockGap, chainY + blockH / 2);
+                ctx.strokeStyle = "rgba(255, 255, 255, 0.2)";
                 ctx.lineWidth = 1;
                 ctx.stroke();
             }
         }
 
-        // Consensus progress ring
-        const consensusProgress = Math.min(1, t / 100);
-        ctx.beginPath();
-        ctx.arc(cx, cy, 42, -Math.PI / 2, -Math.PI / 2 + consensusProgress * Math.PI * 2);
-        ctx.strokeStyle = `rgba(5, 201, 140, 0.4)`;
-        ctx.lineWidth = 2;
-        ctx.stroke();
-
-        ctx.font = "bold 12px Outfit";
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Block Validation & Consensus", cx, h - 15);
-
-    } else if (step === 4) {
-        // Step 5: Validator Revocation
-        for (let i = 0; i < authorities; i++) {
-            const angle = (i / authorities) * Math.PI * 2 - Math.PI / 2;
-            const x = cx + Math.cos(angle) * radius;
-            const y = cy + Math.sin(angle) * radius;
-            const isRevoked = i === 2;
-
-            // Red pulse for revoked node
-            if (isRevoked) {
-                const pulse = 0.15 + Math.sin(t * 0.15) * 0.1;
-                ctx.beginPath();
-                ctx.arc(x, y, 18, 0, Math.PI * 2);
-                ctx.fillStyle = `rgba(255, 107, 107, ${pulse})`;
-                ctx.fill();
-            }
-
-            ctx.beginPath();
-            ctx.arc(x, y, 12, 0, Math.PI * 2);
-            ctx.fillStyle = isRevoked ? "rgba(255, 107, 107, 0.25)" : "rgba(255,255,255,0.05)";
-            ctx.strokeStyle = isRevoked ? "#ff6b6b" : "rgba(255,255,255,0.2)";
-            ctx.lineWidth = isRevoked ? 2.5 : 1;
-            ctx.fill();
-            ctx.stroke();
-
-            if (isRevoked) {
-                // X mark
-                ctx.font = "bold 10px sans-serif";
-                ctx.fillStyle = "#ff6b6b";
-                ctx.textAlign = "center";
-                ctx.fillText("✕", x, y + 4);
-
-                ctx.font = "bold 8px Fira Code";
-                ctx.fillText("REVOKED", x, y + 24);
-
-                // Strike-through lines
-                ctx.beginPath();
-                ctx.moveTo(x - 14, y - 14);
-                ctx.lineTo(x + 14, y + 14);
-                ctx.strokeStyle = "rgba(255, 107, 107, 0.4)";
-                ctx.lineWidth = 1.5;
-                ctx.stroke();
-            } else {
-                ctx.font = "bold 8px Fira Code";
-                ctx.fillStyle = "rgba(255,255,255,0.5)";
-                ctx.textAlign = "center";
-                ctx.fillText(`A${i+1}`, x, y + 3);
-
-                // Active indicator
-                ctx.beginPath();
-                ctx.arc(x + 10, y - 10, 3, 0, Math.PI * 2);
-                ctx.fillStyle = "#05c98c";
-                ctx.fill();
-            }
+        // Draw digital signature signing details from Proposer (t < 40)
+        if (t < 40) {
+            ctx.font = "6px Fira Code";
+            ctx.fillStyle = color.hex;
+            ctx.textAlign = "left";
+            ctx.fillText("📝 Signing block with Authority key...", cx - 45, cy - 25);
+            ctx.fillText("🔑 ECDSA Signature generated", cx - 45, cy - 15);
+        } else if (t >= 40 && t < 65) {
+            ctx.font = "6px Fira Code";
+            ctx.fillStyle = "#05c98c";
+            ctx.textAlign = "left";
+            ctx.fillText("✓ Block signature verified by peers", cx - 45, cy - 25);
+            ctx.fillText("✓ Headers, rules, double-spend verified", cx - 45, cy - 15);
+        } else {
+            ctx.font = "bold 7px Fira Code";
+            ctx.fillStyle = "#05c98c";
+            ctx.textAlign = "center";
+            ctx.fillText("BLOCK ACCEPTED & INDEXED", cx, cy - 15);
         }
 
-        // Governance action indicator
-        ctx.font = "9px sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillStyle = "rgba(255, 107, 107, 0.7)";
-        ctx.fillText("⚠ Governance Action", cx, cy - 5);
-        ctx.font = "7px Fira Code";
-        ctx.fillText("Malicious behavior detected", cx, cy + 8);
-
         ctx.font = "bold 12px Outfit";
-        ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Malicious Validator Revoked from Active Set", cx, h - 15);
+        ctx.fillStyle = t >= 55 ? "#05c98c" : `rgba(${color.rgb.join(",")}, 0.95)`;
+        ctx.textAlign = "center";
+        ctx.fillText(t >= 55 ? "Proposed Block Verified, Accepted & Finalized" : "Broadcasting & Verifying Proposed Block...", cx, h - 15);
     }
 }
 
@@ -2153,7 +2596,7 @@ function drawPBFTAnimation(ctx, w, h, color, step, t) {
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
         ctx.textAlign = "center";
-        ctx.fillText("Nodes Configured with Local Quorum Slices", cx, h - 15);
+        ctx.fillText("Trust Configuration — Quorum Slices Defined", cx, h - 15);
 
     } else if (step === 1) {
         // Step 2: Nomination Phase
@@ -2182,7 +2625,7 @@ function drawPBFTAnimation(ctx, w, h, color, step, t) {
         }
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Nodes Nominating Transaction Candidates", cx, h - 15);
+        ctx.fillText("SCP Nominate — Proposing Candidate Values", cx, h - 15);
 
     } else if (step === 2) {
         // Step 3: Ballot Selection
@@ -2217,7 +2660,7 @@ function drawPBFTAnimation(ctx, w, h, color, step, t) {
 
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Ballot Prepared in Overlapping Quorums", cx, h - 15);
+        ctx.fillText("SCP Prepare — Ballot Prepared in Overlapping Quorums", cx, h - 15);
 
     } else if (step === 3) {
         // Step 4: Commit Phase
@@ -2248,7 +2691,7 @@ function drawPBFTAnimation(ctx, w, h, color, step, t) {
         }
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Commit Stage: Nodes Broadcasting Lock Signatures", cx, h - 15);
+        ctx.fillText("SCP Commit — Nodes Lock Agreed Value", cx, h - 15);
 
     } else if (step === 4) {
         // Step 5: Final Externalization
@@ -2272,7 +2715,7 @@ function drawPBFTAnimation(ctx, w, h, color, step, t) {
 
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Ledger Updated Simultaneously (Instant Finality)", cx, h - 15);
+        ctx.fillText("SCP Externalize — Ledger Closed (Instant Finality)", cx, h - 15);
     }
 }
 
@@ -2343,7 +2786,7 @@ function drawPoBAnimation(ctx, w, h, color, step, t) {
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
         ctx.textAlign = "center";
-        ctx.fillText("Acquiring Coins — Wallet Balance Growing", cx, h - 15);
+        ctx.fillText("Participant Acquires Native Coins — Ready for Burning", cx, h - 15);
 
     } else if (step === 1) {
         // Step 2: Burn Transaction — coins travel from wallet to burn address and permanently disappear
@@ -2410,7 +2853,7 @@ function drawPoBAnimation(ctx, w, h, color, step, t) {
             }
         }
 
-        // Blockchain ledger recording — "Burn Recorded"
+        // Blockchain ledger recording — "Burn Confirmed"
         const ledgerY = cy + 45;
         ctx.beginPath();
         ctx.roundRect(cx - 60, ledgerY, 120, 20, 4);
@@ -2422,11 +2865,11 @@ function drawPoBAnimation(ctx, w, h, color, step, t) {
         ctx.font = "bold 7px Fira Code";
         ctx.fillStyle = "#05c98c";
         ctx.textAlign = "center";
-        ctx.fillText("LEDGER: Burn Recorded ✓", cx, ledgerY + 13);
+        ctx.fillText("LEDGER: Burn Confirmed ✓", cx, ledgerY + 13);
 
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Coins Permanently Sent to Burn Address", cx, h - 15);
+        ctx.fillText("Coins Sent to Burn Address; Burn Confirmed", cx, h - 15);
 
     } else if (step === 2) {
         // Step 3: Burn Weight Assignment — burn weight meter fills, Virtual Mining Power indicator glows
@@ -2486,7 +2929,7 @@ function drawPoBAnimation(ctx, w, h, color, step, t) {
 
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Burn Score Converted to Block Selection Weight", cx, h - 15);
+        ctx.fillText("Burn Weight Assigned; Virtual Mining Power Increased", cx, h - 15);
 
     } else if (step === 3) {
         // Step 4: Block Producer Selection — weighted probability bars, probabilistic lottery spinner
@@ -2567,10 +3010,10 @@ function drawPoBAnimation(ctx, w, h, color, step, t) {
             ctx.stroke();
             ctx.setLineDash([]);
 
-            ctx.font = "bold 7px Fira Code";
+            ctx.font = "bold 6px Fira Code";
             ctx.fillStyle = "#05c98c";
             ctx.textAlign = "center";
-            ctx.fillText("SELECTED", winX, barBaseY - winBarH - 32);
+            ctx.fillText("Selected Block Producer", winX, barBaseY - winBarH - 32);
         }
 
         // "Weighted Probability" label
@@ -2582,7 +3025,7 @@ function drawPoBAnimation(ctx, w, h, color, step, t) {
         ctx.font = "bold 12px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
         ctx.textAlign = "center";
-        ctx.fillText(isSelected ? `Participant ${selectedIdx + 1} Selected (Probabilistic)` : "Weighted Burn Lottery in Progress...", cx, h - 15);
+        ctx.fillText(isSelected ? `Participant ${selectedIdx + 1} Selected as Block Producer` : "Selecting Block Producer based on Burn Weight...", cx, h - 15);
 
     } else if (step === 4) {
         // Step 5: Block Creation & Reward — block built, chain extends, reward, burn weight decays
@@ -2601,7 +3044,7 @@ function drawPoBAnimation(ctx, w, h, color, step, t) {
         ctx.font = "bold 7px Fira Code";
         ctx.fillStyle = "#fff";
         ctx.textAlign = "center";
-        ctx.fillText("PROD", proposerX, proposerY + 3);
+        ctx.fillText("PRODUCER", proposerX, proposerY + 3);
 
         // Arrow down to new block
         ctx.beginPath();
@@ -2677,9 +3120,9 @@ function drawPoBAnimation(ctx, w, h, color, step, t) {
         ctx.textAlign = "center";
         ctx.fillText("↓ Burn Influence Decayed Slightly (Slimcoin)", cx, decayY + decayH + 10);
 
-        ctx.font = "bold 12px Outfit";
+        ctx.font = "bold 11px Outfit";
         ctx.fillStyle = `rgba(${color.rgb.join(",")}, 0.95)`;
-        ctx.fillText("Block Created, Reward Earned, Burn Weight Decays", cx, h - 15);
+        ctx.fillText("Block Created and Propagated; Reward Received. Note: Burn decay shown in this animation represents Slimcoin's implementation and is not universal across all Proof of Burn systems.", cx, h - 15);
     }
 }
 
@@ -2856,6 +3299,15 @@ function updateDashboard(algoId) {
     specStakeEl.textContent = algo.specs.stake;
 
     // Mapping
+    const mappingSubtitleEl = document.querySelector("#section-mapping .section-subtitle");
+    if (mappingSubtitleEl) {
+        if (algoId === 'pob') {
+            mappingSubtitleEl.textContent = "Blockchain projects associated with Proof of Burn, either as a consensus mechanism or as a token distribution mechanism.";
+        } else {
+            mappingSubtitleEl.textContent = "Blockchains powered by the selected consensus algorithm";
+        }
+    }
+
     mappingContainerEl.innerHTML = "";
     algo.blockchains.forEach(chain => {
         const card = document.createElement("div");
@@ -2878,6 +3330,21 @@ function updateDashboard(algoId) {
     });
 
     // Matrix highlight
+    const matrixTitleEl = document.querySelector("#section-matrix h2");
+    const matrixSubtitleEl = document.querySelector("#section-matrix .section-subtitle");
+    if (matrixTitleEl && matrixSubtitleEl) {
+        if (algoId === 'pob') {
+            matrixTitleEl.textContent = "Proof of Burn Relationship Matrix";
+            matrixSubtitleEl.textContent = "Relationship of blockchain projects to the Proof of Burn ecosystem.";
+        } else if (algoId === 'pbft') {
+            matrixTitleEl.textContent = "Federated Byzantine Agreement Relationship Matrix";
+            matrixSubtitleEl.textContent = "Relationship of blockchain projects to the Federated Byzantine Agreement ecosystem.";
+        } else {
+            matrixTitleEl.textContent = "Protocol Compatibility Heatmap";
+            matrixSubtitleEl.textContent = "Cross-chain interoperability driven by consensus architecture alignment";
+        }
+    }
+    renderCompatibilityMatrix();
     highlightMatrixForAlgo(algo);
 
     // Extended feature panels (from features.js)
@@ -2934,19 +3401,24 @@ function updateScoreBars(scores) {
 // 12. COMPATIBILITY MATRIX
 // ==========================================================================
 function renderCompatibilityMatrix() {
+    const isPoB = (activeAlgoId === "pob");
+    const isFBA = (activeAlgoId === "pbft");
+    const activeList = isPoB ? pobBlockchainsList : (isFBA ? fbaBlockchainsList : blockchainsList);
+    const activeMap = isPoB ? pobCompatibilityMap : (isFBA ? fbaCompatibilityMap : compatibilityMap);
+
     let headHtml = `<tr><th class="corner-cell" aria-label="Compatibility grid corner"></th>`;
-    blockchainsList.forEach(chain => {
+    activeList.forEach(chain => {
         headHtml += `<th scope="col" id="col-header-${chain.replace(/\s+/g, '')}">${chain}</th>`;
     });
     headHtml += `</tr>`;
     matrixHeaderEl.innerHTML = headHtml;
 
     let bodyHtml = "";
-    blockchainsList.forEach(rowChain => {
+    activeList.forEach(rowChain => {
         bodyHtml += `<tr id="row-line-${rowChain.replace(/\s+/g, '')}">`;
         bodyHtml += `<th scope="row" class="matrix-header-y" id="row-header-${rowChain.replace(/\s+/g, '')}">${rowChain}</th>`;
-        blockchainsList.forEach(colChain => {
-            const match = compatibilityMap[rowChain][colChain];
+        activeList.forEach(colChain => {
+            const match = activeMap[rowChain][colChain];
             const isCompat = match.status === "Compatible";
             const isPartial = match.status === "Partial";
             const cellClass = isCompat ? "cell-compat" : (isPartial ? "cell-partial" : "cell-incompat");
@@ -2970,8 +3442,39 @@ function renderCompatibilityMatrix() {
         const showDetails = () => {
             const row = cell.getAttribute("data-row");
             const col = cell.getAttribute("data-col");
-            const data = compatibilityMap[row][col];
-            const statusText = data.status === "Compatible" ? "🟢 Compatible" : (data.status === "Partial" ? "🟡 Partial" : "🔴 Incompatible");
+            const data = activeMap[row][col];
+            let statusText = "";
+            if (isPoB) {
+                let relationship = data.status;
+                if (row === "Bitcoin" && col === "Bitcoin") relationship = "Host Blockchain";
+                else if (row === "Bitcoin" && col === "Slimcoin") relationship = "Bitcoin-derived Codebase";
+                else if (row === "Slimcoin" && col === "Bitcoin") relationship = "Bitcoin-derived Codebase";
+                else if (row === "Bitcoin" && col === "Counterparty") relationship = "Host Blockchain";
+                else if (row === "Counterparty" && col === "Bitcoin") relationship = "Runs on Bitcoin";
+                else if (row === "Slimcoin" && col === "Slimcoin") relationship = "Native Proof of Burn Consensus";
+                else if (row === "Slimcoin" && col === "Counterparty") relationship = "Independent Project";
+                else if (row === "Counterparty" && col === "Slimcoin") relationship = "Independent Project";
+                else if (row === "Counterparty" && col === "Counterparty") relationship = "Genesis Proof-of-Burn Distribution";
+                else relationship = "No Proof of Burn relationship";
+
+                let emoji = "🔴";
+                if (data.status === "Compatible") emoji = "🟢";
+                else if (data.status === "Partial") emoji = "🟡";
+                statusText = `${emoji} ${relationship}`;
+            } else if (isFBA) {
+                let relationship = data.status;
+                if (row === "Stellar" && col === "Stellar") relationship = "Native SCP (Federated Byzantine Agreement)";
+                else if ((row === "Stellar" && col === "Ripple") || (row === "Ripple" && col === "Stellar")) relationship = "Related Trust-Based Consensus";
+                else if (row === "Ripple" && col === "Ripple") relationship = "RPCA (Unique Node List)";
+                else relationship = "No FBA relationship";
+
+                let emoji = "🔴";
+                if (data.status === "Compatible") emoji = "🟢";
+                else if (data.status === "Partial") emoji = "🟡";
+                statusText = `${emoji} ${relationship}`;
+            } else {
+                statusText = data.status === "Compatible" ? "🟢 Compatible" : (data.status === "Partial" ? "🟡 Partial" : "🔴 Incompatible");
+            }
             matrixInfoEl.innerHTML = `<span class="title">${row} & ${col} — ${statusText}</span>${data.detail}`;
         };
         cell.addEventListener("mouseenter", showDetails);
@@ -2983,6 +3486,42 @@ function renderCompatibilityMatrix() {
 
 function restoreDefaultMatrixInfo() {
     const algo = algorithmsData[activeAlgoId];
+    if (activeAlgoId === 'pob') {
+        matrixInfoEl.innerHTML = `
+            <span class="title">Proof of Burn Ecosystem</span>
+            <div style="margin-top: 0.5rem; line-height: 1.6;">
+                <ul style="margin: 0; padding-left: 1.2rem; list-style-type: disc;">
+                    <li><strong>Slimcoin</strong> is the primary blockchain implementing native Proof of Burn consensus.</li>
+                    <li><strong>Counterparty</strong> used Proof of Burn only during its genesis token distribution.</li>
+                    <li><strong>Bitcoin</strong> serves as Counterparty's host blockchain through Proof of Work.</li>
+                </ul>
+                <div style="margin-top: 0.75rem; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.5rem;">
+                    <span style="color: #05c98c; font-weight: bold; margin-right: 1rem;">🟢 Green:</span> Native implementation of Proof of Burn.<br>
+                    <span style="color: #ff9f43; font-weight: bold; margin-right: 1.2rem;">🟡 Amber:</span> Indirect association with Proof of Burn through genesis burn, host blockchain, or shared codebase.<br>
+                    <span style="color: #a0aec0; font-weight: bold; margin-right: 1.7rem;">⚪ Gray:</span> No relationship to Proof of Burn.
+                </div>
+            </div>
+        `;
+        return;
+    }
+    if (activeAlgoId === 'pbft') {
+        matrixInfoEl.innerHTML = `
+            <span class="title">Federated Byzantine Agreement Ecosystem</span>
+            <div style="margin-top: 0.5rem; line-height: 1.6;">
+                <ul style="margin: 0; padding-left: 1.2rem; list-style-type: disc;">
+                    <li><strong>Stellar</strong> implements the Stellar Consensus Protocol (SCP) — the canonical Federated Byzantine Agreement.</li>
+                    <li><strong>Ripple</strong> uses RPCA (Unique Node List) — related to but architecturally distinct from SCP.</li>
+                    <li>Other blockchains use different consensus mechanisms with no direct FBA relationship.</li>
+                </ul>
+                <div style="margin-top: 0.75rem; font-size: 0.85rem; border-top: 1px solid rgba(255,255,255,0.06); padding-top: 0.5rem;">
+                    <span style="color: #05c98c; font-weight: bold; margin-right: 1rem;">🟢 Green:</span> Native implementation of Federated Byzantine Agreement (SCP).<br>
+                    <span style="color: #ff9f43; font-weight: bold; margin-right: 1.2rem;">🟡 Amber:</span> Related trust-based consensus (RPCA) — architecturally distinct from SCP.<br>
+                    <span style="color: #a0aec0; font-weight: bold; margin-right: 1.7rem;">⚪ Gray:</span> No relationship to Federated Byzantine Agreement.
+                </div>
+            </div>
+        `;
+        return;
+    }
     const blockchains = algo.blockchains.map(b => b.name).join(", ");
     let activeDesc = `Highlighting ${algo.acronym} blockchains (${blockchains}). Hover cells to inspect bridging details.`;
     if (activeAlgoId === 'poa') {
@@ -2995,6 +3534,9 @@ function restoreDefaultMatrixInfo() {
 }
 
 function highlightMatrixForAlgo(algo) {
+    const isPoB = (activeAlgoId === "pob");
+    const isFBA = (activeAlgoId === "pbft");
+    const activeList = isPoB ? pobBlockchainsList : (isFBA ? fbaBlockchainsList : blockchainsList);
     const activeChainNames = algo.blockchains.map(b => b.name);
     const rows = matrixBodyEl.querySelectorAll("tr");
     const headersY = matrixBodyEl.querySelectorAll(".matrix-header-y");
@@ -3009,7 +3551,7 @@ function highlightMatrixForAlgo(algo) {
         c.style.opacity = "0.5";
     });
 
-    blockchainsList.forEach(chain => {
+    activeList.forEach(chain => {
         if (activeChainNames.includes(chain)) {
             const xHead = document.getElementById(`col-header-${chain.replace(/\s+/g, '')}`);
             if (xHead) xHead.style.color = "var(--accent-theme)";

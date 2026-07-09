@@ -103,14 +103,16 @@ const blockStructureData = {
         blockSize: "Similar to Bitcoin (implementation dependent)",
         headerFields: [
             { name: "Block Hash", desc: "Unique cryptographic hash identifying the block." },
-            { name: "Previous Block Hash", desc: "Hash linking to the parent block in the chain" },
-            { name: "Merkle Root", desc: "Root hash of all transactions in the block" },
-            { name: "Timestamp", desc: "Unix time of block creation" },
-            { name: "Burn Score", desc: "Effective burn weight used by the consensus algorithm (implementation-specific)." },
-            { name: "Burn Reference", desc: "Reference to the participant's historical burn record used by the consensus algorithm." }
+            { name: "Previous Block Hash", desc: "Hash linking to the parent block in the chain." },
+            { name: "Merkle Root", desc: "Root hash of all transactions in the block." },
+            { name: "Timestamp", desc: "Unix time of block creation." },
+            { name: "Burn Weight", desc: "Generic PoB: The effective burn weight (virtual mining power) of the block producer." },
+            { name: "Burn Reference", desc: "Generic PoB: Reference to the participant's historical burn record." },
+            { name: "Burn History", desc: "Generic PoB: Ledger record of all past burns determining eligibility." },
+            { name: "Nonce (Hybrid PoW Component)", desc: "Slimcoin-specific: Used in Slimcoin's hybrid Proof of Work block generation component." }
         ],
         merkleType: "Binary Merkle Tree (SHA-256d)",
-        forkRule: "Longest Chain Rule weighted by cumulative burn score — more burns = higher chain weight",
+        forkRule: "Longest Chain weighted by Burn Weight",
         specialNote: "Burn transactions permanently destroy coins by sending them to verifiably unspendable addresses. Different Proof of Burn implementations define how burn history influences future block production."
     }
 };
@@ -165,22 +167,22 @@ const consensusPatternsData = {
         energyModel: "Negligible — no competition or stake required"
     },
     pbft: {
-        selectionType: "Trust-Based (self-selected quorum slice membership)",
-        communicationType: "Quorum Slice Overlap — nodes communicate within trust circles",
-        forkResolution: "SCP Ballot Protocol — nomination → prepare → commit → externalize",
-        finalityType: "Deterministic — finalized upon quorum slice agreement (~2–5 sec)",
-        byzantineTolerance: "Quorum-dependent — tolerates failures within non-overlapping slices",
+        selectionType: "Trust-Based (self-selected quorum slices, no global validator list)",
+        communicationType: "Quorum Slice Overlap — nodes communicate within overlapping trust circles",
+        forkResolution: "SCP Ballot Protocol — nominate → prepare → commit → externalize (no forks)",
+        finalityType: "Deterministic — finalized upon quorum agreement (~3–5 sec)",
+        byzantineTolerance: "Quorum intersection dependent — tolerates Byzantine failures as long as quorum slices overlap correctly",
         patternCategory: "Federated Byzantine Agreement — decentralized trust without global validator list",
         energyModel: "Negligible — voting-based with minimal computation"
     },
     pob: {
-        selectionType: "Weighted Random Lottery (burn-weight proportional)",
+        selectionType: "Weighted selection according to effective Burn Weight.",
         communicationType: "Gossip Protocol — flood broadcast inherited from Bitcoin codebase",
-        forkResolution: "Longest Chain Rule weighted by cumulative burn score",
+        forkResolution: "Longest Chain weighted by Burn Weight.",
         finalityType: "Probabilistic — increases with successive blocks (~6 confirmations)",
         byzantineTolerance: "Secure while honest participants collectively control the majority of effective burn weight.",
         patternCategory: "Burn-Based Nakamoto Consensus — irreversible capital commitment replaces hash computation",
-        energyModel: "Low — no ongoing hash competition; cost is front-loaded into token burn transactions"
+        energyModel: "Low ongoing energy consumption because irreversible economic commitment replaces computational competition."
     }
 };
 
@@ -416,6 +418,7 @@ const currencyDetailsData = {
         maxSupply: "250,000,000 SLM (soft cap via burn decay)",
         circulatingModel: "Hybrid PoW/PoS/PoB emissions — participants earn virtual mining power by burning coins; burn weight decays over time (Slimcoin-specific)",
         currentPhase: "Active niche network — first blockchain to implement native Proof of Burn consensus in a hybrid PoW/PoS/PoB model",
+        description: "Slimcoin pioneered native Proof of Burn consensus through a hybrid PoW/PoS/PoB architecture where burned coins create virtual mining power that gradually decays over time.",
         keyMilestones: [
             { year: 2014, event: "Launched as first cryptocurrency with native Proof of Burn consensus" },
             { year: 2014, event: "Hybrid PoW/PoS/PoB model introduced — all three mechanisms operate simultaneously" },
@@ -431,6 +434,7 @@ const currencyDetailsData = {
         maxSupply: "2,648,755 XCP (fixed — created entirely via genesis burn)",
         circulatingModel: "No inflation — all XCP minted in genesis by burning 2,130 BTC to unspendable address",
         currentPhase: "Bitcoin metaprotocol for token issuance, NFTs, and decentralized exchange using OP_RETURN",
+        description: "Counterparty introduced a Proof-of-Burn token distribution model during genesis by permanently destroying Bitcoin to issue XCP tokens fairly. Consensus remains secured by Bitcoin.",
         keyMilestones: [
             { year: 2014, event: "Genesis burn — 2,130 BTC permanently destroyed to create XCP supply fairly" },
             { year: 2014, event: "Counterparty DEX launched — first decentralized exchange on Bitcoin" },
@@ -502,14 +506,14 @@ const workflowAnimationData = {
         ]
     },
     pbft: {
-        title: "Federated Byzantine Agreement",
+        title: "SCP Consensus Lifecycle",
         frames: [
-            { icon: "🤝", label: "Trust Config", desc: "Each node defines its own 'quorum slice' — a subset of trusted peers.", duration: 2000 },
-            { icon: "📋", label: "Nomination", desc: "Nodes propose candidate transactions for the current ledger slot to their quorum peers.", duration: 2500 },
-            { icon: "🗳️", label: "Ballot Voting", desc: "Peers exchange votes. A ballot is prepared when a node's quorum agrees on candidates.", duration: 2500 },
-            { icon: "🔒", label: "Commit Phase", desc: "Nodes commit to the ballot and verify that trusted peers commit to the same state.", duration: 2000 },
-            { icon: "📤", label: "Externalization", desc: "Transaction set finalized. All quorum slices that overlap reach agreement.", duration: 2000 },
-            { icon: "📒", label: "Ledger Close", desc: "Ledger updated atomically. Instant finality — no possibility of rollback.", duration: 2000 }
+            { icon: "🤝", label: "Trust Config", desc: "Each node defines its own 'quorum slice' — a subset of trusted peers. Overlapping slices form network-wide quorums.", duration: 2000 },
+            { icon: "📝", label: "Nominate", desc: "Nodes propose candidate transaction sets for the current ledger slot and broadcast nominations to quorum slice peers.", duration: 2500 },
+            { icon: "🗳️", label: "Prepare", desc: "SCP ballot protocol begins. Nodes vote to prepare a ballot. A ballot is prepared when a quorum of peers agrees.", duration: 2500 },
+            { icon: "🔒", label: "Commit", desc: "Nodes vote to commit the prepared ballot. Once a quorum confirms, the value is locked and cannot be rolled back.", duration: 2000 },
+            { icon: "📤", label: "Externalize", desc: "The committed value is externalized — the transaction set is applied. All agreeing nodes close the ledger simultaneously.", duration: 2000 },
+            { icon: "📒", label: "Ledger Close", desc: "Ledger updated atomically with deterministic finality. No possibility of rollback or fork.", duration: 2000 }
         ]
     },
     pob: {
