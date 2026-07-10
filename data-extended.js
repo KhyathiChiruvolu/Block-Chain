@@ -122,13 +122,13 @@ const blockStructureData = {
 // ============================================================
 const consensusPatternsData = {
     pow: {
-        selectionType: "Lottery (Cryptographic Hash Puzzle)",
-        communicationType: "Gossip Protocol — flood broadcast to all peers",
-        forkResolution: "Longest Chain Rule (most cumulative work)",
-        finalityType: "Probabilistic — ~6 confirmations (~60 min for Bitcoin)",
-        byzantineTolerance: "50% of total network hash power",
-        patternCategory: "Nakamoto Consensus — open competition, permissionless entry",
-        energyModel: "High — proportional to hash rate difficulty"
+        selectionType: "Open Lottery — Miners compete by solving a math puzzle. The first one to find the answer wins the right to add the next block. Anyone with the right hardware can enter — no permission needed.",
+        communicationType: "Gossip Network — When a miner finds a new block, it tells a few neighbors, who tell their neighbors, and so on — like a rumor spreading through a crowd until everyone knows.",
+        forkResolution: "Longest Chain Wins — If two miners solve a block at the same time, the network temporarily has two versions. Everyone follows whichever chain gets the next block added first (the longest one with the most work).",
+        finalityType: "Probabilistic — A transaction isn't 100% final instantly. With each new block added on top, it becomes exponentially harder to reverse. After ~6 blocks (~60 minutes on Bitcoin), reversal is practically impossible.",
+        byzantineTolerance: "Safe as long as honest miners control more than 50% of the total computing power. An attacker would need to outpace the entire honest network to cheat.",
+        patternCategory: "Nakamoto Consensus — A fully open, permissionless competition where anyone in the world can participate as a miner without needing approval.",
+        energyModel: "High energy usage — The harder the puzzle gets, the more electricity miners consume. This is the trade-off for Bitcoin's extreme security."
     },
     pos: {
         selectionType: "Weighted Random Lottery (stake-proportional)",
@@ -140,13 +140,13 @@ const consensusPatternsData = {
         energyModel: "Very Low — no hash computation required"
     },
     poh: {
-        selectionType: "Leader Schedule (deterministic VDF-based rotation)",
-        communicationType: "Pipeline Streaming — fragments broadcast before block completion",
-        forkResolution: "Tower BFT — exponential lockout voting weighted by PoH clock",
-        finalityType: "Optimistic Deterministic — ~400ms slot time, multi-slot confirmation",
-        byzantineTolerance: "33% of total staked value",
-        patternCategory: "Leader-Based with Cryptographic Clock — single-threaded VDF ordering",
-        energyModel: "Moderate — continuous SHA-256 VDF computation by leader"
+        selectionType: "Pre-Set Leader Schedule — Instead of a competition, Solana picks leaders in advance using a rotating schedule. Each leader knows exactly when it's their turn, so there's zero wasted effort.",
+        communicationType: "Pipeline Streaming — The leader starts sending transaction data to other validators before the block is even finished — like streaming a movie while it's still being filmed, instead of waiting for the whole thing to be done.",
+        forkResolution: "Tower BFT Voting — Validators vote on which version of history is correct. Once they vote, they're locked in for increasing amounts of time (exponential lockout), which prevents flip-flopping and forces quick agreement.",
+        finalityType: "Near-Instant — Each time slot is only ~400 milliseconds. Transactions confirm within seconds, though full finality requires a few more slots of validator votes to pile up.",
+        byzantineTolerance: "Safe as long as honest validators control more than 67% of the total staked value. An attacker would need to control over 1/3 of all staked SOL to disrupt the network.",
+        patternCategory: "Leader-Based with a Built-In Clock — A single leader processes transactions in order using a cryptographic clock (PoH), removing the need for validators to constantly synchronize with each other.",
+        energyModel: "Moderate — The leader node runs continuous hash computations to maintain the PoH clock, but this is far less energy than PoW mining since it's done by one node, not thousands competing."
     },
     dpos: {
         selectionType: "Democratic Election (token-weighted voting for delegates)",
