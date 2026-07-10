@@ -9,19 +9,19 @@
 // ============================================================
 const blockStructureData = {
     pow: {
-        model: "UTXO (Unspent Transaction Output)",
-        blockSize: "1 – 4 MB (SegWit)",
+        model: "UTXO — Tracks Unspent Coins (like keeping track of which bills in your wallet haven't been spent yet)",
+        blockSize: "1 – 4 MB per block (enough for ~2,000–4,000 transactions)",
         headerFields: [
-            { name: "Version", desc: "Protocol version rules governing block validity" },
-            { name: "Previous Block Hash", desc: "SHA-256d hash linking to the parent block" },
-            { name: "Merkle Root", desc: "Root hash of all transactions in a binary Merkle tree" },
-            { name: "Timestamp", desc: "Unix epoch time when the miner started hashing" },
-            { name: "Difficulty Target", desc: "Compact representation of the target hash threshold" },
-            { name: "Nonce", desc: "32-bit value miners iterate to find a valid hash" }
+            { name: "Version", desc: "A version number that tells the network which set of rules this block follows — like a software version label." },
+            { name: "Previous Block Hash", desc: "A unique fingerprint of the block that came right before this one. This is how blocks are chained together — if someone tampers with an older block, all the fingerprints after it break." },
+            { name: "Merkle Root", desc: "A single summary fingerprint that represents every transaction inside this block. If even one transaction is changed, this fingerprint completely changes — making fraud instantly detectable." },
+            { name: "Timestamp", desc: "The date and time when the miner started working on this block. Helps the network track when blocks were created." },
+            { name: "Difficulty Target", desc: "A number that defines how hard the mining puzzle is. The network automatically adjusts this every ~2 weeks so that blocks are found roughly every 10 minutes, no matter how many miners are competing." },
+            { name: "Nonce", desc: "A random 'guess number' that miners keep changing billions of times per second, trying to find one that produces a block fingerprint below the difficulty target — this is the core of the mining race." }
         ],
-        merkleType: "Binary Merkle Tree (SHA-256d)",
-        forkRule: "Longest chain rule — the chain with the most cumulative proof-of-work wins",
-        specialNote: "Each transaction references unspent outputs (UTXOs) from prior transactions. Miners pack transactions by fee priority."
+        merkleType: "Merkle Tree — A tree-shaped structure that organizes all transactions so any single transaction can be quickly verified without downloading the entire block.",
+        forkRule: "Longest chain wins — if two miners solve a block at the same time, the network follows whichever chain grows longer first (has the most total work done).",
+        specialNote: "Bitcoin tracks money like physical cash — each transaction spends specific 'unspent coins' from previous transactions and creates new ones. Miners prioritize transactions that pay higher fees."
     },
     pos: {
         model: "Account-Based (Global State Trie)",
@@ -39,19 +39,19 @@ const blockStructureData = {
         specialNote: "Blocks include attestations (validator committee votes) that contribute to finality. Finalized blocks can never be reverted."
     },
     poh: {
-        model: "Account-Based (Parallel Execution)",
-        blockSize: "Entries streamed in real-time (~1232 bytes per entry batch)",
+        model: "Account-Based — Works like a bank ledger where each account has a balance that gets updated directly (instead of tracking individual coins)",
+        blockSize: "Data is streamed continuously in real-time rather than bundled into fixed-size blocks — entries arrive in small batches (~1,232 bytes each)",
         headerFields: [
-            { name: "Previous Blockhash", desc: "Hash of the prior slot's block" },
-            { name: "Slot Number", desc: "Position in the leader schedule rotation" },
-            { name: "Leader Identity", desc: "Public key of the scheduled leader validator" },
-            { name: "PoH Hash Sequence", desc: "Continuous SHA-256 VDF chain proving passage of time" },
-            { name: "Transaction Entries", desc: "Batched transactions embedded within the PoH hash chain" },
-            { name: "Tick Count", desc: "Number of SHA-256 iterations between transaction timestamps" }
+            { name: "Previous Blockhash", desc: "A fingerprint of the block that came right before this one — links blocks together in an unbreakable chain, just like in Bitcoin." },
+            { name: "Slot Number", desc: "A time slot position in the schedule. Solana divides time into tiny slots (~400ms each) and assigns each slot to a specific leader. Think of it like a numbered ticket in a queue." },
+            { name: "Leader Identity", desc: "The public address of the validator who is assigned to process transactions during this slot. Leaders are chosen on a rotating schedule so no single validator controls the chain." },
+            { name: "PoH Hash Sequence", desc: "The core innovation — a running chain of hashes where each hash is computed from the previous one. This creates a built-in clock that proves time has passed, so validators don't need to wait and ask each other 'what time is it?'" },
+            { name: "Transaction Entries", desc: "The actual transactions (payments, smart contract calls, etc.) are embedded directly into the PoH hash chain. Each transaction gets a precise timestamp showing exactly when it arrived — no disputes about ordering." },
+            { name: "Tick Count", desc: "The number of hash computations between transactions. This measures how much time elapsed between events — like counting the ticks of a clock between two moments." }
         ],
-        merkleType: "SHA-256 Sequential Hash Chain (Verifiable Delay Function)",
-        forkRule: "Tower BFT — PoH-weighted voting with exponential lockout penalties",
-        specialNote: "No traditional blocks — transactions are timestamped within a continuous hash chain, eliminating the need for network-wide time synchronization."
+        merkleType: "Sequential Hash Chain — Instead of a tree, transactions are organized in a straight-line chain of hashes that acts as a built-in, tamper-proof clock.",
+        forkRule: "Tower BFT — Validators vote on which chain is correct, and once they vote, they are locked in for increasing amounts of time. This prevents flip-flopping and makes the network settle on one truth quickly.",
+        specialNote: "Solana doesn't create traditional blocks the way Bitcoin does. Instead, transactions are continuously timestamped into a running hash chain — like stamping each letter with the exact moment it arrives at the post office. This removes the need for the network to agree on a shared clock."
     },
     dpos: {
         model: "Account-Based",
