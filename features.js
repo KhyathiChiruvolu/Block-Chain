@@ -288,6 +288,10 @@ function renderLayerStack(algoId) {
                             <span class="layer-example-role">Merged-mining sidechain with EVM on Bitcoin</span>
                         </div>
                         <div class="layer-example">
+                            <span class="layer-example-name">Counterparty</span>
+                            <span class="layer-example-role">Bitcoin metaprotocol — PoB genesis token distribution on Bitcoin</span>
+                        </div>
+                        <div class="layer-example">
                             <span class="layer-example-name">zkSync Era</span>
                             <span class="layer-example-role">ZK rollup — validity proofs for instant L1 finality</span>
                         </div>
@@ -323,16 +327,28 @@ function renderLayerStack(algoId) {
                             <span class="layer-example-role">PoW — original decentralized settlement layer</span>
                         </div>
                         <div class="layer-example">
+                            <span class="layer-example-name">Litecoin</span>
+                            <span class="layer-example-role">PoW (Scrypt) — fast-confirming 'silver to Bitcoin's gold'</span>
+                        </div>
+                        <div class="layer-example">
                             <span class="layer-example-name">Ethereum</span>
                             <span class="layer-example-role">PoS — programmable settlement with smart contracts</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Cardano</span>
+                            <span class="layer-example-role">PoS (Ouroboros) — peer-reviewed formal verification</span>
                         </div>
                         <div class="layer-example">
                             <span class="layer-example-name">Solana</span>
                             <span class="layer-example-role">PoH+PoS — high-throughput single-layer execution</span>
                         </div>
                         <div class="layer-example">
-                            <span class="layer-example-name">Cardano</span>
-                            <span class="layer-example-role">PoS (Ouroboros) — peer-reviewed formal verification</span>
+                            <span class="layer-example-name">Tron</span>
+                            <span class="layer-example-role">DPoS — 27 Super Representatives for high-volume stablecoin transfers</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">EOS</span>
+                            <span class="layer-example-role">DPoS — 21 Block Producers for fee-less enterprise dApps</span>
                         </div>
                         <div class="layer-example">
                             <span class="layer-example-name">BNB Chain</span>
@@ -341,6 +357,10 @@ function renderLayerStack(algoId) {
                         <div class="layer-example">
                             <span class="layer-example-name">VeChain</span>
                             <span class="layer-example-role">PoA 2.0 — enterprise supply chain and sustainability</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Slimcoin</span>
+                            <span class="layer-example-role">PoB/PoW/PoS hybrid — first native Proof of Burn blockchain</span>
                         </div>
                     </div>
                 </div>
@@ -475,16 +495,28 @@ function renderLayerStack(algoId) {
                             <span class="layer-example-role">Proof of Work blockchain serving as the underlying host chain for Counterparty.</span>
                         </div>
                         <div class="layer-example">
+                            <span class="layer-example-name">Litecoin</span>
+                            <span class="layer-example-role">PoW (Scrypt) — fast-confirming 'silver to Bitcoin's gold'</span>
+                        </div>
+                        <div class="layer-example">
                             <span class="layer-example-name">Ethereum</span>
                             <span class="layer-example-role">PoS — programmable settlement with smart contracts</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Cardano</span>
+                            <span class="layer-example-role">PoS (Ouroboros) — peer-reviewed formal verification</span>
                         </div>
                         <div class="layer-example">
                             <span class="layer-example-name">Solana</span>
                             <span class="layer-example-role">PoH+PoS — high-throughput single-layer execution</span>
                         </div>
                         <div class="layer-example">
-                            <span class="layer-example-name">Cardano</span>
-                            <span class="layer-example-role">PoS (Ouroboros) — peer-reviewed formal verification</span>
+                            <span class="layer-example-name">Tron</span>
+                            <span class="layer-example-role">DPoS — 27 Super Representatives for high-volume stablecoin transfers</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">EOS</span>
+                            <span class="layer-example-role">DPoS — 21 Block Producers for fee-less enterprise dApps</span>
                         </div>
                         <div class="layer-example">
                             <span class="layer-example-name">BNB Chain</span>
@@ -493,6 +525,14 @@ function renderLayerStack(algoId) {
                         <div class="layer-example">
                             <span class="layer-example-name">VeChain</span>
                             <span class="layer-example-role">PoA 2.0 — enterprise supply chain and sustainability</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Stellar</span>
+                            <span class="layer-example-role">FBA (SCP) — cross-border payments with deterministic finality</span>
+                        </div>
+                        <div class="layer-example">
+                            <span class="layer-example-name">Ripple</span>
+                            <span class="layer-example-role">RPCA (UNL) — enterprise banking settlement network</span>
                         </div>
                     </div>
                 </div>

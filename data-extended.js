@@ -554,11 +554,17 @@ const layerDefinitions = [
         description: "The primary blockchain that achieves consensus independently, processes transactions, settles state, and provides the ultimate source of truth and security for the ecosystem.",
         examples: [
             { name: "Bitcoin", role: "PoW — original decentralized settlement layer" },
+            { name: "Litecoin", role: "PoW (Scrypt) — fast-confirming 'silver to Bitcoin's gold'" },
             { name: "Ethereum", role: "PoS — programmable settlement with smart contracts" },
-            { name: "Solana", role: "PoH+PoS — high-throughput single-layer execution" },
             { name: "Cardano", role: "PoS (Ouroboros) — peer-reviewed formal verification" },
+            { name: "Solana", role: "PoH+PoS — high-throughput single-layer execution" },
+            { name: "Tron", role: "DPoS — 27 Super Representatives for high-volume stablecoin transfers" },
+            { name: "EOS", role: "DPoS — 21 Block Producers for fee-less enterprise dApps" },
             { name: "BNB Chain", role: "PoSA — fast EVM-compatible execution" },
-            { name: "VeChain", role: "PoA 2.0 — enterprise supply chain and sustainability" }
+            { name: "VeChain", role: "PoA 2.0 — enterprise supply chain and sustainability" },
+            { name: "Stellar", role: "FBA (SCP) — cross-border payments with deterministic finality" },
+            { name: "Ripple", role: "RPCA (UNL) — enterprise banking settlement network" },
+            { name: "Slimcoin", role: "PoB/PoW/PoS hybrid — first native Proof of Burn blockchain" }
         ]
     },
     {
@@ -572,6 +578,7 @@ const layerDefinitions = [
             { name: "Base", role: "OP Stack rollup — Coinbase-operated sequencer on Ethereum" },
             { name: "Lightning Network", role: "Payment channels for instant Bitcoin micropayments" },
             { name: "Rootstock (RSK)", role: "Merged-mining sidechain with EVM on Bitcoin" },
+            { name: "Counterparty", role: "Bitcoin metaprotocol — PoB genesis token distribution on Bitcoin" },
             { name: "zkSync Era", role: "ZK rollup — validity proofs for instant L1 finality" }
         ]
     },
